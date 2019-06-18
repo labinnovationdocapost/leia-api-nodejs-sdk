@@ -233,7 +233,7 @@ module.exports.adminDeleteApplication = (token, id) => {
 * @param token - a LeIA API token
 * @param tags (optional) - an email address to filter applications
 * @param sort (optional) - a list of parameters 
-* Can be 'applicationName', 'applicationType', 'creationTime', 'firstname', 'lastname', 'email'. In ascending order by default.
+* Can be 'applicationId', 'creationTime', 'name', 'description', 'modelType'. In ascending order by default.
 * If a parameter is preceded by '-' it means descending order.
 * @param offset (optional) - list offset number for pagination
 * @param limit (optional) - max per page
@@ -297,7 +297,7 @@ module.exports.adminGetModels = (token, tags = null, sort = null, offset = null,
 * @param token - a LeIA API token
 * @param tags (optional) - an email address to filter applications
 * @param sort (optional) - a list of parameters 
-* Can be 'applicationName', 'applicationType', 'creationTime', 'firstname', 'lastname', 'email'. In ascending order by default.
+* Can be 'applicationId', 'creationTime', 'name', 'description', 'modelType'. In ascending order by default.
 * If a parameter is preceded by '-' it means descending order.
 * @param offset (optional) - list offset number for pagination
 * @param limit (optional) - max per page
@@ -672,24 +672,6 @@ module.exports.adminRemoveTagFromModel = (token, modelId, tag) => {
 }
 
 /**
- * (promise) Remove a tag from a Model (admin)
- * @param token - a LeIA API token
- * @param modelId - a Model id
- * @param tag - the tag to add
- * @return a Model object
- */
-
-module.exports.adminRemoveTagFromModel = (token, modelId, tag) => {
-    return new Promise(function (resolve, reject) {
-        LeiaIORequest.del(token, process.env.LEIAWS_URL + '/admin/model/' + modelId + '/tag/' + tag, true).then((body) => {
-            resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
-        }).catch((error) => {
-            reject(error)
-        })
-    })
-}
-
-/**
  * (promise) Remove a tag from a Model
  * @param token - a LeIA API token
  * @param modelId - a Model id
@@ -697,7 +679,7 @@ module.exports.adminRemoveTagFromModel = (token, modelId, tag) => {
  * @return a Model object
  */
 
-module.exports.adminRemoveTagFromModel = (token, modelId, tag) => {
+module.exports.removeTagFromModel = (token, modelId, tag) => {
     return new Promise(function (resolve, reject) {
         LeiaIORequest.del(token, process.env.LEIAWS_URL + '/model/' + modelId + '/tag/' + tag, true).then((body) => {
             resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
