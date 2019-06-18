@@ -438,7 +438,7 @@ module.exports.adminAddDocument = (token, file, applicationId, tags = null) => {
 * @return a Model object
 */
 
-module.exports.adminAddDocument = (token, file, tags = null) => {
+module.exports.addDocument = (token, file, tags = null) => {
     var tagsStr = ""
     var firstChar = "&"
 
