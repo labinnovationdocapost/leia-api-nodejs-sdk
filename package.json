@@ -1,5 +1,5 @@
 {
-  "name": "leiaws-sdk",
+  "name": "leia-api-sdk",
   "version": "1.0.0",
   "description": "Use LeIA API",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "leiaws", "leiaapi", "leia"
+    "leiaws", "leiaapi", "leia", "leia-api", "leia-sdk", "leia-api-sdk"
   ],
   "dependencies": {
     "request": "2.88.0",
