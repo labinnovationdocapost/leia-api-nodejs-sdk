@@ -391,7 +391,7 @@ module.exports.getModel = (token, id) => {
 * @return an Application object
 */
 
-module.exports.getApplication = (token, id) => {
+module.exports.adminGetApplication = (token, id) => {
     return new Promise(function (resolve, reject) {
         LeiaIORequest.get(token, process.env.LEIAWS_URL + '/admin/application/' + id, true).then((body) => {
             resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.api_key))
