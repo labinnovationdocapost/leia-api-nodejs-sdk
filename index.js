@@ -474,12 +474,12 @@ module.exports.adminTransformPDF = (token, documentIds, outputType, inputTag, ou
     var firstChar = "?"
 
     if (inputTag) {
-        inputTagStr = firstChar + '?input_tag=' + inputTag
+        inputTagStr = firstChar + 'input_tag=' + inputTag
         firstChar = "&"
     }
 
     if (outputTag) {
-        outputTagStr = firstChar + '?output_tag=' + outputTag
+        outputTagStr = firstChar + 'output_tag=' + outputTag
         firstChar = "&"
     }
 
@@ -515,12 +515,12 @@ module.exports.transformPDF = (token, documentIds, outputType, inputTag, outputT
     var firstChar = "?"
 
     if (inputTag) {
-        inputTagStr = firstChar + '?input_tag=' + inputTag
+        inputTagStr = firstChar + 'input_tag=' + inputTag
         firstChar = "&"
     }
 
     if (outputTag) {
-        outputTagStr = firstChar + '?output_tag=' + outputTag
+        outputTagStr = firstChar + 'output_tag=' + outputTag
         firstChar = "&"
     }
 
