@@ -1,0 +1,18 @@
+{
+  "name": "leiaws-nodejs",
+  "version": "1.0.0",
+  "description": "Node methods to use LeiaWS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "leiaws"
+  ],
+  "dependencies": {
+    "request": "2.88.0",
+    "streamifier": "0.1.1"
+  },
+  "author": "Docaposte",
+  "license": "ISC"
+}
