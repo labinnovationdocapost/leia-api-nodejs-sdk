@@ -487,7 +487,7 @@ module.exports.adminTransformPDF = (token, documentIds, outputType, inputTag, ou
         LeiaIORequest.post(token, process.env.LEIAWS_URL + '/admin/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr, {}, true).then((body) => {
             var documents = []
             for (var i = 0; i < body.length; i++) {
-                documents.push(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
+                documents.push(new Document(body[i].id, body[i].creation_time, body[i].application_id, body[i].filename, body[i].extension, body[i].mime_type, body[i].correct_angle, body[i].tags))
             }
             resolve(documents)
         }).catch((error) => {
@@ -528,7 +528,7 @@ module.exports.transformPDF = (token, documentIds, outputType, inputTag, outputT
         LeiaIORequest.post(token, process.env.LEIAWS_URL + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr, {}, true).then((body) => {
             var documents = []
             for (var i = 0; i < body.length; i++) {
-                documents.push(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
+                documents.push(new Document(body[i].id, body[i].creation_time, body[i].application_id, body[i].filename, body[i].extension, body[i].mime_type, body[i].correct_angle, body[i].tags))
             }
             resolve(documents)
         }).catch((error) => {
