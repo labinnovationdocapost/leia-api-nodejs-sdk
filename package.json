@@ -1,13 +1,13 @@
 {
-  "name": "leiaws-nodejs",
+  "name": "leiaws-sdk",
   "version": "1.0.0",
-  "description": "Node methods to use LeiaWS",
+  "description": "Use LeIA API",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "leiaws"
+    "leiaws", "leiaapi", "leia"
   ],
   "dependencies": {
     "request": "2.88.0",
