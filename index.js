@@ -944,7 +944,7 @@ module.exports.adminGetDocumentsTags = (token, applicationId = null) => {
 
 module.exports.getDocumentsTags = (token) => {
     return new Promise(function (resolve, reject) {
-        LeiaIORequest.get(token, process.env.LEIAWS_URL + '/admin/document/tag', true).then((body) => {
+        LeiaIORequest.get(token, process.env.LEIAWS_URL + '/document/tag', true).then((body) => {
             resolve(body)
         }).catch((error) => {
             if (error.status == 404) {
