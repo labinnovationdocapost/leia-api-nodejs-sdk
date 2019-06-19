@@ -1,17 +1,31 @@
 {
   "name": "leia-api-sdk",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Use LeIA API",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --timeout 10000"
   },
   "keywords": [
-    "leiaws", "leiaapi", "leia", "leia-api", "leia-sdk", "leia-api-sdk"
+    "leiaws",
+    "leiaapi",
+    "leia",
+    "leia-api",
+    "leia-sdk",
+    "leia-api-sdk"
   ],
   "dependencies": {
     "request": "2.88.0",
     "streamifier": "0.1.1"
+  },
+  "devDependencies": {
+    "chai": "4.2.0",
+    "chai-as-promised": "7.1.1",
+    "chai-http": "4.2.1",
+    "mocha": "5.2.0",
+    "mocha-prepare": "0.1.0",
+    "mongo-unit": "1.3.4",
+    "nock": "10.0.6"
   },
   "author": "Docaposte",
   "license": "ISC"
