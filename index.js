@@ -1,8 +1,7 @@
-var request = require('request');
-var streamifier = require('streamifier')
 var Model = require('./models/model')
 var Application = require('./models/application')
 var Document = require('./models/document')
+var Annotation = require('./models/annotation')
 var LeiaAPIRequest = require('./leia-api-request')
 var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils')
 
@@ -55,7 +54,7 @@ module.exports = class LeiaAPI {
     * If a parameter is preceded by '-' it means descending order.
     * @param offset (optional) - list offset number for pagination
     * @param limit (optional) - max per page
-    * @return a list of objects with the following format: [{contentRange: '0-1/50', applications: [Application]}]
+    * @return a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, applications: [Application]}]
      */
 
     adminGetApplications(email = null, applicationName = null, sort = null, offset = null, limit = null) {
@@ -249,7 +248,7 @@ module.exports = class LeiaAPI {
     * @param offset (optional) - list offset number for pagination
     * @param limit (optional) - max per page
     * @param applicationId (optional) - an Application id to filter models
-    * @return a list of objects with the following format: [{contentRange: '0-1/50', models: [Model]}]
+    * @return a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, models: [Model]}]
     */
 
     adminGetModels(tags = null, sort = null, offset = null, limit = null, applicationId = null) {
@@ -312,7 +311,7 @@ module.exports = class LeiaAPI {
     * If a parameter is preceded by '-' it means descending order.
     * @param offset (optional) - list offset number for pagination
     * @param limit (optional) - max per page
-    * @return a list of objects with the following format: [{contentRange: '0-1/50', models: [Model]}]
+    * @return a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, models: [Model]}]
     */
 
     getModels(tags = null, sort = null, offset = null, limit = null) {
@@ -480,7 +479,7 @@ module.exports = class LeiaAPI {
      * @return a list of Documents
      */
 
-    adminTransformPDF(documentIds, outputType, inputTag=null, outputTag=null) {
+    adminTransformPDF(documentIds, outputType, inputTag = null, outputTag = null) {
         var documentIdsString = documentIds.join(',')
         var inputTagStr = ""
         var outputTagStr = ""
@@ -521,7 +520,7 @@ module.exports = class LeiaAPI {
      * @return a list of new Documents
      */
 
-    transformPDF(documentIds, outputType, inputTag=null, outputTag=null) {
+    transformPDF(documentIds, outputType, inputTag = null, outputTag = null) {
         var documentIdsString = documentIds.join(',')
         var inputTagStr = ""
         var outputTagStr = ""
@@ -711,7 +710,7 @@ module.exports = class LeiaAPI {
     * @param offset (optional) - list offset number for pagination
     * @param limit (optional) - max per page
     * @param applicationId (optional) - an Application id to filter documents
-    * @return a list of objects with the following format: [{contentRange: '0-1/50', documents: [Document]}]
+    * @return a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
     */
 
     adminGetDocuments(tags = null, sort = null, offset = null, limit = null, applicationId = null) {
@@ -777,7 +776,7 @@ module.exports = class LeiaAPI {
     * @param offset (optional) - list offset number for pagination
     * @param limit (optional) - max per page
     * @param applicationId (optional) - an Application id to filter documents
-    * @return a list of objects with the following format: [{contentRange: '0-1/50', documents: [Document]}]
+    * @return a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
     */
 
     getDocuments(tags = null, sort = null, offset = null, limit = null) {
@@ -968,17 +967,17 @@ module.exports = class LeiaAPI {
         })
     }
 
-     /**
-     * (promise) Remove a tag from a Document (admin)
-     * @param documentId - a Document id
-     * @param tag - a tag
-     * @return a Document object
-     */
-    
-    adminRemoveTagFromDocument (documentId, tag) {
+    /**
+    * (promise) Remove a tag from a Document (admin)
+    * @param documentId - a Document id
+    * @param tag - a tag
+    * @return a Document object
+    */
+
+    adminRemoveTagFromDocument(documentId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedDelete(that.serverURL  + '/admin/document/' + documentId + '/tag/' + tag, true).then((body) => {
+            that.leiaAPIRequest.loggedDelete(that.serverURL + '/admin/document/' + documentId + '/tag/' + tag, true).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -1005,17 +1004,17 @@ module.exports = class LeiaAPI {
         })
     }
 
-     /**
-     * (promise) Remove a tag from a Document
-     * @param documentId - a Document id
-     * @param tag - a tag
-     * @return a Document object
-     */
-    
-    removeTagFromDocument (documentId, tag) {
+    /**
+    * (promise) Remove a tag from a Document
+    * @param documentId - a Document id
+    * @param tag - a tag
+    * @return a Document object
+    */
+
+    removeTagFromDocument(documentId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedDelete(that.serverURL  + '/document/' + documentId + '/tag/' + tag, true).then((body) => {
+            that.leiaAPIRequest.loggedDelete(that.serverURL + '/document/' + documentId + '/tag/' + tag, true).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -1031,7 +1030,7 @@ module.exports = class LeiaAPI {
      * @return a Document object
      */
 
-    adminUpdateDocument (id, fileName = null, rotationAngle = null) {
+    adminUpdateDocument(id, fileName = null, rotationAngle = null) {
         var filenameStr = ""
         var rotationAngleStr = ""
         var firstChar = "?"
@@ -1045,7 +1044,7 @@ module.exports = class LeiaAPI {
             rotationAngleStr = firstChar + "rotation_angle=" + rotationAngle
             firstChar = "&"
         }
-        
+
         var that = this
         return new Promise(function (resolve, reject) {
             that.leiaAPIRequest.loggedPatch(that.serverURL + '/admin/document/' + id + filenameStr + rotationAngleStr, {}, true).then((body) => {
@@ -1056,15 +1055,15 @@ module.exports = class LeiaAPI {
         })
     }
 
-     /**
-     * (promise) Update a Document
-     * @param id - a Document id
-     * @param fileName (optional) - a new file name
-     * @param rotationAngle (optional) - a new rotation angle
-     * @return a Document object
-     */
+    /**
+    * (promise) Update a Document
+    * @param id - a Document id
+    * @param fileName (optional) - a new file name
+    * @param rotationAngle (optional) - a new rotation angle
+    * @return a Document object
+    */
 
-    updateDocument (id, fileName = null, rotationAngle = null) {
+    updateDocument(id, fileName = null, rotationAngle = null) {
         var filenameStr = ""
         var rotationAngleStr = ""
         var firstChar = "?"
@@ -1078,12 +1077,212 @@ module.exports = class LeiaAPI {
             rotationAngleStr = firstChar + "rotation_angle=" + rotationAngle
             firstChar = "&"
         }
-        
+
         var that = this
         return new Promise(function (resolve, reject) {
             that.leiaAPIRequest.loggedPatch(that.serverURL + '/document/' + id + filenameStr + rotationAngleStr, {}, true).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
                 resolve(document)
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+
+    /**
+    * (promise) Return a list of paginated Annotations
+    * @param tags (optional) - an email address to filter documents
+    * @param annotationType (optional) - a type of annotation (can be BOX, TYPING or TEXT so far)
+    * @param name (optional) - an Annotation name
+    * @param documentId (optional) - a Document id to filter annotations
+    * @param offset (optional) - list offset number for pagination
+    * @param limit (optional) - max per page
+    * @return a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, annotations: [Annotation]}]
+    */
+
+    getAnnotations(tags = null, annotationType = null, name = null, documentId = null, offset = null, limit = null) {
+        var offsetStr = ""
+        var limitStr = ""
+        var tagsStr = ""
+        var documentIdStr = ""
+        var annotationTypeStr = ""
+        var nameStr = ""
+        var firstChar = "?"
+
+        if (offset !== null) {
+            offsetStr += firstChar + 'offset=' + offset
+            firstChar = "&"
+        }
+
+        if (limit !== null) {
+            limitStr += firstChar + 'limit=' + limit
+            firstChar = "&"
+        }
+
+        for (var i = 0; tags && i < tags.length; i++) {
+            tagsStr += firstChar + 'tags=' + tags[i]
+            firstChar = "&"
+        }
+
+        if (documentId) {
+            documentIdStr = firstChar + "document_id=" + documentId
+            firstChar = "&"
+        }
+
+        if (annotationType) {
+            annotationTypeStr = firstChar + "annotation_type=" + annotationType
+            firstChar = "&"
+        }
+
+        if (name) {
+            nameStr = firstChar + "name=" + name
+            firstChar = "&"
+        }
+
+        var that = this
+        return new Promise(function (resolve, reject) {
+            that.leiaAPIRequest.loggedGet(that.serverURL + '/annotation' + offsetStr + limitStr + tagsStr + documentIdStr + annotationTypeStr + nameStr, true, true).then((result) => {
+                var body = result.body
+                var contentRange = extractContentRangeInfo(result.contentRange)
+                var annotations = []
+                for (var i = 0; i < body.length; i++) {
+                    annotations.push(new Annotation(body[i].id, body[i].creation_time, body[i].annotation_type, body[i].application_id, body[i].document_id, body[i].name, body[i].prediction,
+                        body[i].tags))
+                }
+                resolve({ contentRange, annotations })
+            }).catch((error) => {
+                if (error.status == 404) {
+                    return resolve({ contentRange: null, annotations: [] })
+                }
+                reject(error)
+            })
+
+        })
+    }
+
+    /**
+    * (promise) Return an Annotation (admin)
+    * @param id - an Annotation id
+    * @return an Annotation object
+    */
+
+    getAnnotation(id) {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            that.leiaAPIRequest.loggedGet(that.serverURL + '/annotation/' + id, true).then((body) => {
+                resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
+                    body.tags))
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+    /**
+    * (promise) Delete an Annotation (admin)
+    * @param id - an Annotation id
+    */
+
+    deleteAnnotation(id) {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            that.leiaAPIRequest.loggedGet(that.serverURL + '/annotation/' + id, true).then(() => {
+                resolve()
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+    /**
+     * (promise) Add a tag to a Document (admin)
+     * @param id - an Annotation id
+     * @param tag - a tag
+     * @return an Annotation object
+     */
+
+    addTagToAnnotation(id, tag) {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            that.leiaAPIRequest.loggedPost(that.serverURL + '/annotation/' + id + '/tag/' + tag, {}, true).then((body) => {
+                resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
+                    body.tags))
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+    /**
+    * (promise) Remove a tag from an Annotation
+    * @param id - an Annotation id
+    * @param tag - a tag
+    * @return an Annotation object
+    */
+
+    removeTagFromAnnotation(id, tag) {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            that.leiaAPIRequest.loggedDelete(that.serverURL + '/annotation/' + id + '/tag/' + tag, true).then((body) => {
+                resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
+                    body.tags))
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+    /**
+     * (promise) Update an Annotation (admin)
+     * @param documentId - a Document id
+     * @param annotationType - an Annotation type (can be BOX, TYPING or TEXT so far)
+     * @param prediction - a prediction object
+     * @param name (optional) - an Annotation name
+     * @param tags (optional) - a list of tags
+     * @return an Annotation object
+     */
+
+    addAnnotation(documentId, annotationType, prediction, name = null, tags = null) {
+        var tagsStr = ""
+
+        for (var i = 0; tags && i < tags.length; i++) {
+            tagsStr += '&tags=' + tags[i]
+        }
+
+        var that = this
+        return new Promise(function (resolve, reject) {
+            that.leiaAPIRequest.loggedPost(that.serverURL + '/annotation?document_id=' + documentId + '&annotation_type=' + annotationType + (name ? ('&name=' + name) : '') + tagsStr, prediction, true).then((body) => {
+                resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
+                    body.tags))
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+    /**
+     * (promise) Update an Annotation
+     * @param id - an Annotation id
+     * @param name (optional) - an Annotation name
+     * @param prediction (optional - a predictionn object
+     * @return an Annotation object
+     */
+
+    updateAnnotation(id, name = null, prediction = null) {
+        var nameStr = ""
+        var firstChar = "?"
+
+        if (name) {
+            nameStr += firstChar + 'name=' + name
+            firstChar = "&"
+        }
+
+        var that = this
+        return new Promise(function (resolve, reject) {
+            that.leiaAPIRequest.loggedPatch(that.serverURL + '/annotation/' + id + nameStr, prediction, true).then((body) => {
+                resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
+                    body.tags))
             }).catch((error) => {
                 reject(error)
             })
