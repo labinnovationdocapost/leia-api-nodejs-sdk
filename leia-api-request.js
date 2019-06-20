@@ -190,6 +190,7 @@ module.exports = class LeiaAPIRequest {
         var that = this
         return new Promise(function (resolve, reject) {
             if (err) {
+                console.log(err)
                 var error = new Error('Unknown error')
                 error.status = 500
                 reject(error)

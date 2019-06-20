@@ -102,14 +102,14 @@ module.exports = class LeiaAPI {
     * (promise) Add a Model (admin)
     * @param name - a Model name
     * @param applicationId - an Application id
-    * @param file - a model file with a valid name in a zip file
+    * @param fileBuffer - a model file zip buffer. The model inside the zip should have a valid name.
     * @param description (optional) - a Model description
     * @param ttl (optional) - a ttl value in seconds
     * @param tags (optional) - a list of tags
     * @return a Model object
     */
 
-    adminAddModel(name, applicationId, file, description = null, ttl = null, tags = null) {
+    adminAddModel(name, applicationId, fileBuffer, description = null, ttl = null, tags = null) {
         var that = this
         var tagsStr = ""
         var firstChar = "&"
@@ -119,7 +119,7 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedStreamPost(that.serverURL + '/admin/model?name=' + name + '&application_id=' + applicationId + (description ? '&description=' + description : '') + (ttl ? '&ttl=' + ttl : '') + tagsStr, file.buffer, true).then((body) => {
+            that.leiaAPIRequest.loggedStreamPost(that.serverURL + '/admin/model?name=' + name + '&application_id=' + applicationId + (description ? '&description=' + description : '') + (ttl ? '&ttl=' + ttl : '') + tagsStr, fileBuffer, true).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -289,7 +289,7 @@ module.exports = class LeiaAPI {
         return new Promise(function (resolve, reject) {
             that.leiaAPIRequest.loggedGet(that.serverURL + '/admin/model' + offsetStr + limitStr + tagsStr + applicationIdStr + sortStr, true, true).then((result) => {
                 var body = result.body
-                var contentRange = result.contentRange
+                var contentRange = extractContentRangeInfo(result.contentRange)
                 var models = []
                 for (var i = 0; i < body.length; i++) {
                     models.push(new Model(body[i].id, body[i].creation_time, body[i].description, body[i].ttl, body[i].input_types, body[i].name, body[i].tags, body[i].model_type, body[i].application_id))
@@ -346,7 +346,7 @@ module.exports = class LeiaAPI {
         return new Promise(function (resolve, reject) {
             that.leiaAPIRequest.loggedGet(that.serverURL + '/model' + offsetStr + limitStr + tagsStr + sortStr, true, true).then((result) => {
                 var body = result.body
-                var contentRange = result.contentRange
+                var contentRange = extractContentRangeInfo(result.contentRange)
                 var models = []
                 for (var i = 0; i < body.length; i++) {
                     models.push(new Model(body[i].id, body[i].creation_time, body[i].description, body[i].ttl, body[i].input_types, body[i].name, body[i].tags, body[i].model_type, body[i].application_id))
@@ -415,13 +415,14 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Add a Document (admin)
-    * @param file - a document file
+    * @param fileName - a document file name
+    * @param fileBuffer - a document file buffer
     * @param applicationId - an Application id
     * @param tags (optional) - a list of tags
     * @return a Model object
     */
 
-    adminAddDocument(file, applicationId, tags = null) {
+    adminAddDocument(fileName, fileBuffer, applicationId, tags = null) {
         var tagsStr = ""
         var applicationIdStr = ""
         var firstChar = "&"
@@ -434,7 +435,7 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedStreamPost(that.serverURL + '/admin/document?filename=' + file.originalname + tagsStr + applicationIdStr, file.buffer, true).then((body) => {
+            that.leiaAPIRequest.loggedStreamPost(that.serverURL + '/admin/document?filename=' + fileName + tagsStr + applicationIdStr, fileBuffer, true).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -444,12 +445,13 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Add a Document
-    * @param file - a document file
+    * @param fileName - a document file name
+    * @param fileBuffer - a document file buffer
     * @param tags (optional) - a list of tags
     * @return a Model object
     */
 
-    addDocument(file, tags = null) {
+    addDocument(fileName, fileBuffer, tags = null) {
         var tagsStr = ""
         var firstChar = "&"
 
@@ -459,7 +461,7 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedStreamPost(that.serverURL + '/document?filename=' + file.originalname + tagsStr, file.buffer, true).then((body) => {
+            that.leiaAPIRequest.loggedStreamPost(that.serverURL + '/document?filename=' + fileName + tagsStr, fileBuffer, true).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -478,7 +480,7 @@ module.exports = class LeiaAPI {
      * @return a list of Documents
      */
 
-    adminTransformPDF(documentIds, outputType, inputTag, outputTag) {
+    adminTransformPDF(documentIds, outputType, inputTag=null, outputTag=null) {
         var documentIdsString = documentIds.join(',')
         var inputTagStr = ""
         var outputTagStr = ""
@@ -519,7 +521,7 @@ module.exports = class LeiaAPI {
      * @return a list of new Documents
      */
 
-    transformPDF(documentIds, outputType, inputTag, outputTag) {
+    transformPDF(documentIds, outputType, inputTag=null, outputTag=null) {
         var documentIdsString = documentIds.join(',')
         var inputTagStr = ""
         var outputTagStr = ""
@@ -749,7 +751,7 @@ module.exports = class LeiaAPI {
         return new Promise(function (resolve, reject) {
             that.leiaAPIRequest.loggedGet(that.serverURL + '/admin/document' + offsetStr + limitStr + tagsStr + applicationIdStr + sortStr, true, true).then((result) => {
                 var body = result.body
-                var contentRange = result.contentRange
+                var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
                 for (var i = 0; i < body.length; i++) {
                     documents.push(new Document(body[i].id, body[i].creation_time, body[i].application_id, body[i].filename, body[i].extension, body[i].mime_type, body[i].correct_angle,
@@ -809,7 +811,7 @@ module.exports = class LeiaAPI {
         return new Promise(function (resolve, reject) {
             that.leiaAPIRequest.loggedGet(that.serverURL + '/document' + offsetStr + limitStr + tagsStr + sortStr, true, true).then((result) => {
                 var body = result.body
-                var contentRange = result.contentRange
+                var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
                 for (var i = 0; i < body.length; i++) {
                     documents.push(new Document(body[i].id, body[i].creation_time, body[i].application_id, body[i].filename, body[i].extension, body[i].mime_type, body[i].correct_angle,
