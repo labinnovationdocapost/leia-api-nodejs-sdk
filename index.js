@@ -865,10 +865,10 @@ module.exports = class LeiaAPI {
     /**
      * (promise) Get the content of a Document (admin)
      * @param documentId - a Document id
-     * @param maxSize - a max size if the Document is an image
+     * @param maxSize (optional) - a max size if the Document is an image
      */
 
-    adminGetDocumentContent(documentId, maxSize) {
+    adminGetDocumentContent(documentId, maxSize = null) {
         var maxSizeStr = ""
         if (maxSize) {
             maxSizeStr = "&max_size=" + maxSize
@@ -886,10 +886,10 @@ module.exports = class LeiaAPI {
     /**
      * (promise) Get the content of a Document
      * @param documentId - a Document id
-     * @param maxSize - a max size if the Document is an image
+     * @param maxSize (optional) - a max size if the Document is an image
      */
 
-    getDocumentContent(documentId, maxSize) {
+    getDocumentContent(documentId, maxSize = null) {
         var maxSizeStr = ""
         if (maxSize) {
             maxSizeStr = "&max_size=" + maxSize
@@ -1017,6 +1017,73 @@ module.exports = class LeiaAPI {
         return new Promise(function (resolve, reject) {
             that.leiaAPIRequest.loggedDelete(that.serverURL  + '/document/' + documentId + '/tag/' + tag, true).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+    /**
+     * (promise) Update a Document (admin)
+     * @param id - a Document id
+     * @param fileName (optional) - a new file name
+     * @param rotationAngle (optional) - a new rotation angle
+     * @return a Document object
+     */
+
+    adminUpdateDocument (id, fileName = null, rotationAngle = null) {
+        var filenameStr = ""
+        var rotationAngleStr = ""
+        var firstChar = "?"
+
+        if (fileName) {
+            filenameStr = firstChar + "filename=" + fileName
+            firstChar = "&"
+        }
+
+        if (rotationAngle) {
+            rotationAngleStr = firstChar + "rotation_angle=" + rotationAngle
+            firstChar = "&"
+        }
+        
+        var that = this
+        return new Promise(function (resolve, reject) {
+            that.leiaAPIRequest.loggedPatch(that.serverURL + '/admin/document/' + id + filenameStr + rotationAngleStr, {}, true).then((body) => {
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+     /**
+     * (promise) Update a Document
+     * @param id - a Document id
+     * @param fileName (optional) - a new file name
+     * @param rotationAngle (optional) - a new rotation angle
+     * @return a Document object
+     */
+
+    updateDocument (id, fileName = null, rotationAngle = null) {
+        var filenameStr = ""
+        var rotationAngleStr = ""
+        var firstChar = "?"
+
+        if (fileName) {
+            filenameStr = firstChar + "filename=" + fileName
+            firstChar = "&"
+        }
+
+        if (rotationAngle) {
+            rotationAngleStr = firstChar + "rotation_angle=" + rotationAngle
+            firstChar = "&"
+        }
+        
+        var that = this
+        return new Promise(function (resolve, reject) {
+            that.leiaAPIRequest.loggedPatch(that.serverURL + '/document/' + id + filenameStr + rotationAngleStr, {}, true).then((body) => {
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
+                resolve(document)
             }).catch((error) => {
                 reject(error)
             })

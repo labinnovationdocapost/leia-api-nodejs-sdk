@@ -790,6 +790,54 @@ function mockDocumentAPI() {
     nock(serverURL)
         .delete('/document/documentId1/tag/tag4')
         .reply(404, null);
+
+    nock(serverURL)
+        .patch('/admin/document/documentId1?filename=test.jpg')
+        .reply(200, document);
+
+    nock(serverURL)
+        .patch('/admin/document/documentId1?rotation_angle=90')
+        .reply(200, document);
+
+    nock(serverURL)
+        .patch('/admin/document/documentId1?filename=test.jpg&rotation_angle=90')
+        .reply(200, document);
+
+    nock(serverURL)
+        .patch('/admin/document/documentId1?filename=test2.jpg')
+        .reply(400, null);
+
+    nock(serverURL)
+        .patch('/admin/document/documentId1?filename=test3.jpg')
+        .reply(401, null);
+
+    nock(serverURL)
+        .patch('/admin/document/documentId1?filename=test4.jpg')
+        .reply(404, null);
+
+    nock(serverURL)
+        .patch('/document/documentId1?filename=test.jpg')
+        .reply(200, document);
+
+    nock(serverURL)
+        .patch('/document/documentId1?rotation_angle=90')
+        .reply(200, document);
+
+    nock(serverURL)
+        .patch('/document/documentId1?filename=test.jpg&rotation_angle=90')
+        .reply(200, document);
+
+    nock(serverURL)
+        .patch('/document/documentId1?filename=test2.jpg')
+        .reply(400, null);
+
+    nock(serverURL)
+        .patch('/document/documentId1?filename=test3.jpg')
+        .reply(401, null);
+
+    nock(serverURL)
+        .patch('/document/documentId1?filename=test4.jpg')
+        .reply(404, null);
 }
 
 describe('LeIA Application API', () => {
@@ -2891,4 +2939,82 @@ describe('LeIA Document API', () => {
             })
         });
     })
+
+    describe('adminUpdateDocument()', () => {
+        it('should return a Document when providing fileName', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.adminUpdateDocument('documentId1', 'test.jpg').then((result) => {
+                result.should.be.a('object');
+                result.id.should.be.eql(document.id)
+                result.creationTime.should.be.eql(document.creation_time)
+                result.filename.should.be.eql(document.filename)
+                result.extension.should.be.eql(document.extension)
+                result.correctAngle.should.be.eql(document.correct_angle)
+                result.applicationId.should.be.eql(document.application_id)
+                result.mimeType.should.be.eql(document.mime_type)
+                result.tags.should.be.eql(document.tags)
+                done()
+            })
+        });
+
+        it('should return a Document when providing rotationAngle', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.adminUpdateDocument('documentId1', null, 90).then((result) => {
+                result.should.be.a('object');
+                result.id.should.be.eql(document.id)
+                result.creationTime.should.be.eql(document.creation_time)
+                result.filename.should.be.eql(document.filename)
+                result.extension.should.be.eql(document.extension)
+                result.correctAngle.should.be.eql(document.correct_angle)
+                result.applicationId.should.be.eql(document.application_id)
+                result.mimeType.should.be.eql(document.mime_type)
+                result.tags.should.be.eql(document.tags)
+                done()
+            })
+        });
+
+        it('should return a Document when providing all parameters', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.adminUpdateDocument('documentId1', 'test.jpg', 90).then((result) => {
+                result.should.be.a('object');
+                result.id.should.be.eql(document.id)
+                result.creationTime.should.be.eql(document.creation_time)
+                result.filename.should.be.eql(document.filename)
+                result.extension.should.be.eql(document.extension)
+                result.correctAngle.should.be.eql(document.correct_angle)
+                result.applicationId.should.be.eql(document.application_id)
+                result.mimeType.should.be.eql(document.mime_type)
+                result.tags.should.be.eql(document.tags)
+                done()
+            })
+        });
+
+        it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.adminUpdateDocument('documentId1', 'test2.jpg').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(400)
+                done()
+            })
+        })
+
+        it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.adminUpdateDocument('documentId1', 'test3.jpg').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(401)
+                done()
+            })
+        })
+
+        it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.adminUpdateDocument('documentId1', 'test4.jpg').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(404)
+                done()
+            })
+        })
+    })
+
 })
