@@ -950,6 +950,79 @@ module.exports = class LeiaAPI {
         })
     }
 
+    /**
+     * (promise) Add a tag to a Document (admin)
+     * @param documentId - a Document id
+     * @param tag - a tag
+     * @return a Document object
+     */
+
+    adminAddTagToDocument(documentId, tag) {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            that.leiaAPIRequest.loggedPost(that.serverURL + '/admin/document/' + documentId + '/tag/' + tag, {}, true).then((body) => {
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+     /**
+     * (promise) Remove a tag from a Document (admin)
+     * @param documentId - a Document id
+     * @param tag - a tag
+     * @return a Document object
+     */
+    
+    adminRemoveTagFromDocument (documentId, tag) {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            that.leiaAPIRequest.loggedDelete(that.serverURL  + '/admin/document/' + documentId + '/tag/' + tag, true).then((body) => {
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+    /**
+     * (promise) Add a tag to a Document (admin)
+     * @param documentId - a Document id
+     * @param tag - a tag
+     * @return a Document object
+     */
+
+    addTagToDocument(documentId, tag) {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            that.leiaAPIRequest.loggedPost(that.serverURL + '/document/' + documentId + '/tag/' + tag, {}, true).then((body) => {
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
+            }).catch((error) => {
+                reject(error)
+
+            })
+        })
+    }
+
+     /**
+     * (promise) Remove a tag from a Document
+     * @param documentId - a Document id
+     * @param tag - a tag
+     * @return a Document object
+     */
+    
+    removeTagFromDocument (documentId, tag) {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            that.leiaAPIRequest.loggedDelete(that.serverURL  + '/document/' + documentId + '/tag/' + tag, true).then((body) => {
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
 }
 
 

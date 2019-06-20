@@ -484,244 +484,312 @@ function mockModelAPI() {
 }
 
 function mockDocumentAPI() {
-        nock(serverURL)
-            .get('/login/mockApiKey')
-            .reply(200, { token: 'faketoken', application: { id: 'id1', application_type: 'admin' } });
-    
-        nock(serverURL)
-            .get('/login/mockApiKeyDev')
-            .reply(200, { token: 'faketoken', application: { id: 'id1', application_type: 'developer' } });
-    
-        nock(serverURL)
-            .get('/admin/document')
-            .reply(200, [document], { 'content-range': '0-1/1' });
-    
-        nock(serverURL)
-            .get('/admin/document?offset=20')
-            .reply(200, [document], { 'content-range': '0-1/1' });
-    
-        nock(serverURL)
-            .get('/admin/document?limit=20')
-            .reply(200, [document], { 'content-range': '0-1/1' });
-    
-        nock(serverURL)
-            .get('/admin/document?tags=tag1&tags=tag2')
-            .reply(200, [document], { 'content-range': '0-1/1' });
-    
-        nock(serverURL)
-            .get('/admin/document?application_id=appId1')
-            .reply(200, [document], { 'content-range': '0-1/1' });
-    
-        nock(serverURL)
-            .get('/admin/document?sort=filename,-extension')
-            .reply(200, [document], { 'content-range': '0-1/1' });
-    
-        nock(serverURL)
-            .get('/admin/document?offset=20&limit=20&tags=tag1&tags=tag2&application_id=appId1&sort=filename,-extension')
-            .reply(200, [document], { 'content-range': '0-1/1' });
-    
-        nock(serverURL)
-            .get('/admin/document?limit=3')
-            .reply(401, null);
-    
-        nock(serverURL)
-            .get('/admin/document?limit=4')
-            .reply(403, null);
-    
-        nock(serverURL)
-            .get('/admin/document?limit=5')
-            .reply(404, [], { 'content-range': '0-0/0' });
-    
-        nock(serverURL)
-            .get('/admin/document?limit=6')
-            .reply(400, null);
-    
-        nock(serverURL)
-            .get('/admin/document/id1')
-            .reply(200, document);
-    
-        nock(serverURL)
-            .get('/admin/document/id2')
-            .reply(401, null);
-    
-        nock(serverURL)
-            .get('/admin/document/id3')
-            .reply(403, null);
-    
-        nock(serverURL)
-            .get('/admin/document/id4')
-            .reply(404, null);
+    nock(serverURL)
+        .get('/login/mockApiKey')
+        .reply(200, { token: 'faketoken', application: { id: 'id1', application_type: 'admin' } });
 
-        nock(serverURL)
-            .post('/admin/document/id1/transform/image')
-            .reply(200, [document]);
+    nock(serverURL)
+        .get('/login/mockApiKeyDev')
+        .reply(200, { token: 'faketoken', application: { id: 'id1', application_type: 'developer' } });
 
-        nock(serverURL)
-            .post('/admin/document/id1/transform/image?input_tag=tag1')
-            .reply(200, [document]);
+    nock(serverURL)
+        .get('/admin/document')
+        .reply(200, [document], { 'content-range': '0-1/1' });
 
-        nock(serverURL)
-            .post('/admin/document/id1/transform/image?input_tag=tag1&output_tag=tag1')
-            .reply(200, [document]);
-    
-        nock(serverURL)
-            .post('/admin/document/id1/transform/image?output_tag=tag1')
-            .reply(200, [document]);
-    
-        nock(serverURL)
-            .post('/admin/document/id2/transform/image?output_tag=tag2')
-            .reply(401, null);
-    
-        nock(serverURL)
-            .post('/admin/document/id3/transform/image?output_tag=tag3')
-            .reply(403, null);
-    
-        nock(serverURL)
-            .post('/admin/document/id4/transform/image?output_tag=tag4')
-            .reply(404, null);
-    
-        nock(serverURL)
-            .get('/document')
-            .reply(200, [document], { 'content-range': '0-1/1' });
-    
-        nock(serverURL)
-            .get('/document?offset=20')
-            .reply(200, [document], { 'content-range': '0-1/1' });
-    
-        nock(serverURL)
-            .get('/document?limit=20')
-            .reply(200, [document], { 'content-range': '0-1/1' });
-    
-        nock(serverURL)
-            .get('/document?tags=tag1&tags=tag2')
-            .reply(200, [document], { 'content-range': '0-1/1' });
-    
-        nock(serverURL)
-            .get('/document?sort=filename,-extension')
-            .reply(200, [document], { 'content-range': '0-1/1' });
-    
-        nock(serverURL)
-            .get('/document?offset=20&limit=20&tags=tag1&tags=tag2&sort=filename,-extension')
-            .reply(200, [document], { 'content-range': '0-1/1' });
-    
-        nock(serverURL)
-            .get('/document?limit=3')
-            .reply(401, null);
-    
-        nock(serverURL)
-            .get('/document?limit=4')
-            .reply(403, null);
-    
-        nock(serverURL)
-            .get('/document?limit=5')
-            .reply(404, [], { 'content-range': '0-0/0' });
-    
-        nock(serverURL)
-            .get('/document?limit=6')
-            .reply(400, null);
-    
-        nock(serverURL)
-            .get('/document/id1')
-            .reply(200, document);
-    
-        nock(serverURL)
-            .get('/document/id2')
-            .reply(401, null);
-    
-        nock(serverURL)
-            .get('/document/id3')
-            .reply(403, null);
-    
-        nock(serverURL)
-            .get('/document/id4')
-            .reply(404, null);
+    nock(serverURL)
+        .get('/admin/document?offset=20')
+        .reply(200, [document], { 'content-range': '0-1/1' });
 
-        nock(serverURL)
-            .post('/document/id1/transform/image')
-            .reply(200, [document]);
+    nock(serverURL)
+        .get('/admin/document?limit=20')
+        .reply(200, [document], { 'content-range': '0-1/1' });
 
-        nock(serverURL)
-            .post('/document/id1/transform/image?input_tag=tag1')
-            .reply(200, [document]);
-    
-        nock(serverURL)
-            .post('/document/id1/transform/image?output_tag=tag1')
-            .reply(200, [document]);
-    
-        nock(serverURL)
-            .post('/document/id2/transform/image?output_tag=tag2')
-            .reply(401, null);
-    
-        nock(serverURL)
-            .post('/document/id3/transform/image?output_tag=tag3')
-            .reply(403, null);
-    
-        nock(serverURL)
-            .post('/document/id4/transform/image?output_tag=tag4')
-            .reply(404, null);
-    
-        nock(serverURL)
-            .delete('/admin/document/id1')
-            .reply(204, null);
-    
-        nock(serverURL)
-            .delete('/admin/document/id2')
-            .reply(401, null);
-    
-        nock(serverURL)
-            .delete('/admin/document/id3')
-            .reply(403, null);
-    
-        nock(serverURL)
-            .delete('/admin/document/id4')
-            .reply(404, null);
-    
-        nock(serverURL)
-            .delete('/document/id1')
-            .reply(204, null);
-    
-        nock(serverURL)
-            .delete('/document/id2')
-            .reply(401, null);
-    
-        nock(serverURL)
-            .delete('/document/id3')
-            .reply(403, null);
-    
-        nock(serverURL)
-            .delete('/document/id4')
-            .reply(404, null);
-    
-        nock(serverURL)
-            .post('/admin/document?filename=test.jpg&tags=tag1&application_id=appId1')
-            .reply(200, document);
-        nock(serverURL)
-            .post('/document?filename=test.jpg&tags=tag1')
-            .reply(200, document);
-    
-        nock(serverURL)
-            .post('/admin/document?filename=test.jpg&tags=tag0&application_id=appId0')
-            .reply(400, null);
-    
-        nock(serverURL)
-            .post('/document?filename=test.jpg&tags=tag0')
-            .reply(400, null);
-    
-        nock(serverURL)
-            .post('/admin/document?filename=test.jpg&tags=tag2&application_id=appId2')
-            .reply(401, null);
-    
-        nock(serverURL)
-            .post('/document?filename=test.jpg&tags=tag2')
-            .reply(401, null);
-    
-        nock(serverURL)
-            .post('/admin/document?filename=test.jpg&tags=tag3&application_id=appId3')
-            .reply(403, null);
-    
-        nock(serverURL)
-            .post('/document?filename=test.jpg&tags=tag3')
-            .reply(403, null);
+    nock(serverURL)
+        .get('/admin/document?tags=tag1&tags=tag2')
+        .reply(200, [document], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/admin/document?application_id=appId1')
+        .reply(200, [document], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/admin/document?sort=filename,-extension')
+        .reply(200, [document], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/admin/document?offset=20&limit=20&tags=tag1&tags=tag2&application_id=appId1&sort=filename,-extension')
+        .reply(200, [document], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/admin/document?limit=3')
+        .reply(401, null);
+
+    nock(serverURL)
+        .get('/admin/document?limit=4')
+        .reply(403, null);
+
+    nock(serverURL)
+        .get('/admin/document?limit=5')
+        .reply(404, [], { 'content-range': '0-0/0' });
+
+    nock(serverURL)
+        .get('/admin/document?limit=6')
+        .reply(400, null);
+
+    nock(serverURL)
+        .get('/admin/document/id1')
+        .reply(200, document);
+
+    nock(serverURL)
+        .get('/admin/document/id2')
+        .reply(401, null);
+
+    nock(serverURL)
+        .get('/admin/document/id3')
+        .reply(403, null);
+
+    nock(serverURL)
+        .get('/admin/document/id4')
+        .reply(404, null);
+
+    nock(serverURL)
+        .post('/admin/document/id1/transform/image')
+        .reply(200, [document]);
+
+    nock(serverURL)
+        .post('/admin/document/id1/transform/image?input_tag=tag1')
+        .reply(200, [document]);
+
+    nock(serverURL)
+        .post('/admin/document/id1/transform/image?input_tag=tag1&output_tag=tag1')
+        .reply(200, [document]);
+
+    nock(serverURL)
+        .post('/admin/document/id1/transform/image?output_tag=tag1')
+        .reply(200, [document]);
+
+    nock(serverURL)
+        .post('/admin/document/id2/transform/image?output_tag=tag2')
+        .reply(401, null);
+
+    nock(serverURL)
+        .post('/admin/document/id3/transform/image?output_tag=tag3')
+        .reply(403, null);
+
+    nock(serverURL)
+        .post('/admin/document/id4/transform/image?output_tag=tag4')
+        .reply(404, null);
+
+    nock(serverURL)
+        .get('/document')
+        .reply(200, [document], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/document?offset=20')
+        .reply(200, [document], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/document?limit=20')
+        .reply(200, [document], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/document?tags=tag1&tags=tag2')
+        .reply(200, [document], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/document?sort=filename,-extension')
+        .reply(200, [document], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/document?offset=20&limit=20&tags=tag1&tags=tag2&sort=filename,-extension')
+        .reply(200, [document], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/document?limit=3')
+        .reply(401, null);
+
+    nock(serverURL)
+        .get('/document?limit=4')
+        .reply(403, null);
+
+    nock(serverURL)
+        .get('/document?limit=5')
+        .reply(404, [], { 'content-range': '0-0/0' });
+
+    nock(serverURL)
+        .get('/document?limit=6')
+        .reply(400, null);
+
+    nock(serverURL)
+        .get('/document/id1')
+        .reply(200, document);
+
+    nock(serverURL)
+        .get('/document/id2')
+        .reply(401, null);
+
+    nock(serverURL)
+        .get('/document/id3')
+        .reply(403, null);
+
+    nock(serverURL)
+        .get('/document/id4')
+        .reply(404, null);
+
+    nock(serverURL)
+        .post('/document/id1/transform/image')
+        .reply(200, [document]);
+
+    nock(serverURL)
+        .post('/document/id1/transform/image?input_tag=tag1')
+        .reply(200, [document]);
+
+    nock(serverURL)
+        .post('/document/id1/transform/image?output_tag=tag1')
+        .reply(200, [document]);
+
+    nock(serverURL)
+        .post('/document/id2/transform/image?output_tag=tag2')
+        .reply(401, null);
+
+    nock(serverURL)
+        .post('/document/id3/transform/image?output_tag=tag3')
+        .reply(403, null);
+
+    nock(serverURL)
+        .post('/document/id4/transform/image?output_tag=tag4')
+        .reply(404, null);
+
+    nock(serverURL)
+        .delete('/admin/document/id1')
+        .reply(204, null);
+
+    nock(serverURL)
+        .delete('/admin/document/id2')
+        .reply(401, null);
+
+    nock(serverURL)
+        .delete('/admin/document/id3')
+        .reply(403, null);
+
+    nock(serverURL)
+        .delete('/admin/document/id4')
+        .reply(404, null);
+
+    nock(serverURL)
+        .delete('/document/id1')
+        .reply(204, null);
+
+    nock(serverURL)
+        .delete('/document/id2')
+        .reply(401, null);
+
+    nock(serverURL)
+        .delete('/document/id3')
+        .reply(403, null);
+
+    nock(serverURL)
+        .delete('/document/id4')
+        .reply(404, null);
+
+    nock(serverURL)
+        .post('/admin/document?filename=test.jpg&tags=tag1&application_id=appId1')
+        .reply(200, document);
+    nock(serverURL)
+        .post('/document?filename=test.jpg&tags=tag1')
+        .reply(200, document);
+
+    nock(serverURL)
+        .post('/admin/document?filename=test.jpg&tags=tag0&application_id=appId0')
+        .reply(400, null);
+
+    nock(serverURL)
+        .post('/document?filename=test.jpg&tags=tag0')
+        .reply(400, null);
+
+    nock(serverURL)
+        .post('/admin/document?filename=test.jpg&tags=tag2&application_id=appId2')
+        .reply(401, null);
+
+    nock(serverURL)
+        .post('/document?filename=test.jpg&tags=tag2')
+        .reply(401, null);
+
+    nock(serverURL)
+        .post('/admin/document?filename=test.jpg&tags=tag3&application_id=appId3')
+        .reply(403, null);
+
+    nock(serverURL)
+        .post('/document?filename=test.jpg&tags=tag3')
+        .reply(403, null);
+
+    nock(serverURL)
+        .post('/admin/document/documentId1/tag/tag1')
+        .reply(200, document);
+
+    nock(serverURL)
+        .post('/document/documentId1/tag/tag1')
+        .reply(200, document);
+
+    nock(serverURL)
+        .post('/admin/document/documentId1/tag/tag2')
+        .reply(401, null);
+
+    nock(serverURL)
+        .post('/document/documentId1/tag/tag2')
+        .reply(401, null);
+
+    nock(serverURL)
+        .post('/admin/document/documentId1/tag/tag3')
+        .reply(403, null);
+
+    nock(serverURL)
+        .post('/document/documentId1/tag/tag3')
+        .reply(403, null);
+
+    nock(serverURL)
+        .post('/admin/document/documentId1/tag/tag4')
+        .reply(404, null);
+
+    nock(serverURL)
+        .post('/document/documentId1/tag/tag4')
+        .reply(404, null);
+
+    nock(serverURL)
+        .post('/model/documentId1/tag/tag4')
+        .reply(404, null);
+
+    nock(serverURL)
+        .delete('/admin/document/documentId1/tag/tag1')
+        .reply(200, document);
+
+    nock(serverURL)
+        .delete('/document/documentId1/tag/tag1')
+        .reply(200, document);
+
+    nock(serverURL)
+        .delete('/admin/document/documentId1/tag/tag2')
+        .reply(401, null);
+
+    nock(serverURL)
+        .delete('/document/documentId1/tag/tag2')
+        .reply(401, null);
+
+    nock(serverURL)
+        .delete('/admin/document/documentId1/tag/tag3')
+        .reply(403, null);
+
+    nock(serverURL)
+        .delete('/document/documentId1/tag/tag3')
+        .reply(403, null);
+
+    nock(serverURL)
+        .delete('/admin/document/documentId1/tag/tag4')
+        .reply(404, null);
+
+    nock(serverURL)
+        .delete('/document/documentId1/tag/tag4')
+        .reply(404, null);
 }
 
 describe('LeIA Application API', () => {
@@ -2570,7 +2638,7 @@ describe('LeIA Document API', () => {
         })
 
     })
-    
+
 
     describe('adminDeleteDocument()', () => {
         it('should call the right url', (done) => {
@@ -2637,6 +2705,186 @@ describe('LeIA Document API', () => {
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
             var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
             leiaAPI.deleteDocument('id4').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(404)
+                done()
+            })
+        });
+    })
+
+    describe('adminAddTagToDocument()', () => {
+        it('should return a Document', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.adminAddTagToDocument('documentId1', 'tag1').then((result) => {
+                result.should.be.a('object');
+                result.id.should.be.eql(document.id)
+                result.creationTime.should.be.eql(document.creation_time)
+                result.filename.should.be.eql(document.filename)
+                result.extension.should.be.eql(document.extension)
+                result.correctAngle.should.be.eql(document.correct_angle)
+                result.applicationId.should.be.eql(document.application_id)
+                result.mimeType.should.be.eql(document.mime_type)
+                result.tags.should.be.eql(document.tags)
+                done()
+            })
+        });
+
+        it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.adminAddTagToDocument('documentId1', 'tag2').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(401)
+                done()
+            })
+        })
+
+        it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.adminAddTagToDocument('documentId1', 'tag3').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(403)
+                done()
+            })
+        });
+
+        it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.adminAddTagToDocument('documentId1', 'tag4').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(404)
+                done()
+            })
+        });
+    })
+
+    describe('addTagToDocument()', () => {
+        it('should return a Document', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            leiaAPI.addTagToDocument('documentId1', 'tag1').then((result) => {
+                result.should.be.a('object');
+                result.id.should.be.eql(document.id)
+                result.creationTime.should.be.eql(document.creation_time)
+                result.filename.should.be.eql(document.filename)
+                result.extension.should.be.eql(document.extension)
+                result.correctAngle.should.be.eql(document.correct_angle)
+                result.applicationId.should.be.eql(document.application_id)
+                result.mimeType.should.be.eql(document.mime_type)
+                result.tags.should.be.eql(document.tags)
+                done()
+            })
+        });
+
+        it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            leiaAPI.addTagToDocument('documentId1', 'tag2').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(401)
+                done()
+            })
+        })
+
+        it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            leiaAPI.addTagToDocument('documentId1', 'tag3').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(403)
+                done()
+            })
+        });
+
+        it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            leiaAPI.addTagToDocument('documentId1', 'tag4').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(404)
+                done()
+            })
+        });
+    })
+
+    describe('adminRemoveTagFromDocument()', () => {
+        it('should return a Document', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.adminRemoveTagFromDocument('documentId1', 'tag1').then((result) => {
+                result.should.be.a('object');
+                result.id.should.be.eql(document.id)
+                result.creationTime.should.be.eql(document.creation_time)
+                result.filename.should.be.eql(document.filename)
+                result.extension.should.be.eql(document.extension)
+                result.correctAngle.should.be.eql(document.correct_angle)
+                result.applicationId.should.be.eql(document.application_id)
+                result.mimeType.should.be.eql(document.mime_type)
+                result.tags.should.be.eql(document.tags)
+                done()
+            })
+        });
+
+        it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.adminRemoveTagFromDocument('documentId1', 'tag2').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(401)
+                done()
+            })
+        })
+
+        it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.adminRemoveTagFromDocument('documentId1', 'tag3').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(403)
+                done()
+            })
+        });
+
+        it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.adminRemoveTagFromDocument('documentId1', 'tag4').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(404)
+                done()
+            })
+        });
+    })
+
+    describe('removeTagFromDocument()', () => {
+        it('should return a Document', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            leiaAPI.removeTagFromDocument('documentId1', 'tag1').then((result) => {
+                result.should.be.a('object');
+                result.id.should.be.eql(document.id)
+                result.creationTime.should.be.eql(document.creation_time)
+                result.filename.should.be.eql(document.filename)
+                result.extension.should.be.eql(document.extension)
+                result.correctAngle.should.be.eql(document.correct_angle)
+                result.applicationId.should.be.eql(document.application_id)
+                result.mimeType.should.be.eql(document.mime_type)
+                result.tags.should.be.eql(document.tags)
+                done()
+            })
+        });
+
+        it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            leiaAPI.removeTagFromDocument('documentId1', 'tag2').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(401)
+                done()
+            })
+        })
+
+        it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            leiaAPI.removeTagFromDocument('documentId1', 'tag3').then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(403)
+                done()
+            })
+        });
+
+        it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            leiaAPI.removeTagFromDocument('documentId1', 'tag4').then((_) => {
             }).catch((error) => {
                 error.status.should.be.eql(404)
                 done()
