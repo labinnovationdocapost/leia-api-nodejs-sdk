@@ -61,11 +61,19 @@ const predictionResult = {
 function mockApplicationAPI() {
     nock(serverURL)
         .get('/login/mockApiKey')
-        .reply(200, { token: 'faketoken', application: { id: 'id1', application_type: 'admin' } });
+        .reply(200, { token: 'faketoken', application });
 
     nock(serverURL)
         .get('/login/mockApiKeyDev')
         .reply(200, { token: 'faketoken', application: { id: 'id1', application_type: 'developer' } });
+
+    nock(serverURL)
+        .get('/login/badApiKey')
+        .reply(403, null);
+
+    nock(serverURL)
+        .get('/logout')
+        .reply(200, null);
 
     nock(serverURL)
         .get('/admin/application')
@@ -1029,6 +1037,43 @@ describe('LeIA Application API', () => {
         mockApplicationAPI()
         done()
     });
+
+    describe('login()', () => {
+        it('should return a token and an Application', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+
+            leiaAPI.login().then((result) => {
+                result.should.be.a('object');
+                result.token.should.be.eql('faketoken')
+                result.application.id.should.be.eql(application.id)
+                result.application.creationTime.should.be.eql(application.creation_time)
+                result.application.applicationName.should.be.eql(application.application_name)
+                result.application.applicationType.should.be.eql(application.application_type)
+                result.application.email.should.be.eql(application.email)
+                result.application.firstname.should.be.eql(application.first_name)
+                result.application.lastname.should.be.eql(application.last_name)
+                done()
+            })
+        });
+
+        it('should return a 403 status', (done) => {
+            var leiaAPI = new LeiaAPI('badApiKey', serverURL)
+            leiaAPI.login().then((_) => {
+            }).catch((error) => {
+                error.status.should.be.eql(403)
+                done()
+            })
+        });
+    })
+
+    describe('logout()', () => {
+        it('should call the right url', (done) => {
+            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            leiaAPI.logout().then((_) => {
+                done()
+            })
+        });
+    })
 
     describe('adminGetApplication()', () => {
         it('should return a list of applications', (done) => {
@@ -3714,7 +3759,7 @@ describe('LeIA Annotation API', () => {
                 done()
             })
         });
-        
+
         it('should return an Annotation when providing all parameters', (done) => {
             var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
             leiaAPI.updateAnnotation('annotationId1', 'test', { category: 'TEXT' }).then((result) => {

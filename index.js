@@ -7,25 +7,26 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
 
 module.exports = class LeiaAPI {
 
-    constructor(apiKey, serverURL) {
+    constructor(apiKey, serverURL, refreshToken = false) {
         this.apiKey = apiKey
         this.serverURL = serverURL
         if (!this.serverURL) {
             this.serverURL = "https://api.leia.io/leia/1.0.0"
         }
-        this.leiaAPIRequest = new LeiaAPIRequest(apiKey, this.serverURL)
+        this.leiaAPIRequest = new LeiaAPIRequest(apiKey, this.serverURL, refreshToken)
     }
 
     /**
-     * (promise) Log out
-     * @param token - a LeIA token
+     * Log in
+     * @return an object with the following format: {token: 'token', application: an Application object}
      */
 
-    logout() {
+    login() {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/logout', true).then(() => {
-                resolve()
+            that.leiaAPIRequest.get(that.serverURL + '/login/' + that.apiKey, true, false, false).then((body) => {
+                body.application = new Application(body.application.id, body.application.creation_time, body.application.application_type, body.application.email, body.application.application_name, body.application.first_name, body.application.last_name, body.application.api_key)
+                resolve(body)
             }).catch((error) => {
                 reject(error)
             })
@@ -33,16 +34,18 @@ module.exports = class LeiaAPI {
     }
 
     /**
-     * Return the current logged in application
-     * @return an Application object
+     * (promise) Log out
      */
 
-    getCurrentApplication() {
-        var application = that.leiaAPIRequest.application
-        if (application) {
-            return new Application(application.id, application.creation_time,
-                application.application_type, application.email, application_name, application.first_name, application.last_name, application.api_key)
-        }
+    logout() {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            that.leiaAPIRequest.loggedGet(that.serverURL + '/logout', false).then(() => {
+                resolve()
+            }).catch((error) => {
+                reject(error)
+            })
+        })
     }
 
     /**
@@ -54,7 +57,7 @@ module.exports = class LeiaAPI {
     * If a parameter is preceded by '-' it means descending order.
     * @param offset (optional) - list offset number for pagination
     * @param limit (optional) - max per page
-    * @return a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, applications: [Application]}]
+    * @returns {Application} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, applications: [Application]}]
      */
 
     adminGetApplications(email = null, applicationName = null, sort = null, offset = null, limit = null) {
@@ -80,7 +83,7 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.get(that.serverURL + '/admin/application' + offsetStr + limitStr + (email ? firstChar + 'email=' + email : '') + (applicationName ? firstChar + 'application_name=' + applicationName : '') + sortStr, true, true).then((result) => {
+            that.leiaAPIRequest.loggedGet(that.serverURL + '/admin/application' + offsetStr + limitStr + (email ? firstChar + 'email=' + email : '') + (applicationName ? firstChar + 'application_name=' + applicationName : '') + sortStr, true, true).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var applications = []
@@ -105,7 +108,7 @@ module.exports = class LeiaAPI {
     * @param description (optional) - a Model description
     * @param ttl (optional) - a ttl value in seconds
     * @param tags (optional) - a list of tags
-    * @return a Model object
+    * @returns a Model object
     */
 
     adminAddModel(name, applicationId, fileBuffer, description = null, ttl = null, tags = null) {
@@ -133,7 +136,7 @@ module.exports = class LeiaAPI {
     * @param applicationType - an Application type. Can be 'admin' or 'developer'
     * @param firstname - an Application owner's firstname
     * @param lastname - an Application owner's lastname
-    * @return an Application object
+    * @returns an Application object
     */
 
     adminAddApplication(email, applicationName, applicationType, firstname, lastname) {
@@ -158,7 +161,7 @@ module.exports = class LeiaAPI {
     /**
     * (promise) Reset an Application API Key and get a new one (admin)
     * @param id - an Application id
-    * @return an Application object with the new API Key
+    * @returns an Application object with the new API Key
     */
 
     adminResetApplicationApiKey(id) {
@@ -194,7 +197,7 @@ module.exports = class LeiaAPI {
      * @param name - a Model name
      * @param description - a Model description
      * @param ttl - a TTL value
-     * @return a Model object
+     * @returns a Model object
      */
 
     adminUpdateModel(id, name = null, description = null, ttl = null) {
@@ -248,7 +251,7 @@ module.exports = class LeiaAPI {
     * @param offset (optional) - list offset number for pagination
     * @param limit (optional) - max per page
     * @param applicationId (optional) - an Application id to filter models
-    * @return a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, models: [Model]}]
+    * @returns {Model} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, models: [Model]}]
     */
 
     adminGetModels(tags = null, sort = null, offset = null, limit = null, applicationId = null) {
@@ -311,7 +314,7 @@ module.exports = class LeiaAPI {
     * If a parameter is preceded by '-' it means descending order.
     * @param offset (optional) - list offset number for pagination
     * @param limit (optional) - max per page
-    * @return a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, models: [Model]}]
+    * @returns {Model} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, models: [Model]}]
     */
 
     getModels(tags = null, sort = null, offset = null, limit = null) {
@@ -363,7 +366,7 @@ module.exports = class LeiaAPI {
     /**
     * (promise) Return a Model (admin)
     * @param id - a Model id
-    * @return a Model object
+    * @returns a Model object
     */
 
     adminGetModel(id) {
@@ -380,7 +383,7 @@ module.exports = class LeiaAPI {
     /**
     * (promise) Return a Model
     * @param id - a Model id
-    * @return a Model object
+    * @returns a Model object
     */
 
     getModel(id) {
@@ -398,7 +401,7 @@ module.exports = class LeiaAPI {
     /**
     * (promise) Return an Application (admin)
     * @param id - a Model id
-    * @return an Application object
+    * @returns an Application object
     */
 
     adminGetApplication(id) {
@@ -418,7 +421,7 @@ module.exports = class LeiaAPI {
     * @param fileBuffer - a document file buffer
     * @param applicationId - an Application id
     * @param tags (optional) - a list of tags
-    * @return a Model object
+    * @returns a Model object
     */
 
     adminAddDocument(fileName, fileBuffer, applicationId, tags = null) {
@@ -447,7 +450,7 @@ module.exports = class LeiaAPI {
     * @param fileName - a document file name
     * @param fileBuffer - a document file buffer
     * @param tags (optional) - a list of tags
-    * @return a Model object
+    * @returns a Model object
     */
 
     addDocument(fileName, fileBuffer, tags = null) {
@@ -476,7 +479,7 @@ module.exports = class LeiaAPI {
      * If inputTag is present, document_ids should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
      * @param outputTag (optional) - an output tag for the new documents
-     * @return a list of Documents
+     * @returns a list of Documents
      */
 
     adminTransformPDF(documentIds, outputType, inputTag = null, outputTag = null) {
@@ -517,7 +520,7 @@ module.exports = class LeiaAPI {
      * If inputTag is present, document_ids should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
      * @param outputTag (optional) - an output tag for the new documents
-     * @return a list of new Documents
+     * @returns a list of new Documents
      */
 
     transformPDF(documentIds, outputType, inputTag = null, outputTag = null) {
@@ -558,7 +561,7 @@ module.exports = class LeiaAPI {
      * @param tag (optional) - The tag of the documents to process.
      * If tag is present, documentIds should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
-     * @return a result object
+     * @returns a result object
      */
 
     adminApplyModelToDocument(modelId, documentIds, tag = null) {
@@ -580,7 +583,7 @@ module.exports = class LeiaAPI {
      * @param tag (optional) - The tag of the documents to process.
      * If tag is present, documentIds should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
-     * @return a result object
+     * @returns a result object
      */
 
     applyModelToDocument(modelId, documentIds, tag = null) {
@@ -633,7 +636,7 @@ module.exports = class LeiaAPI {
      * (promise) Add a tag to a Model (admin
      * @param modelId - a Model id
      * @param tag - the tag to add
-     * @return a Model object
+     * @returns a Model object
      */
 
     adminAddTagToModel(modelId, tag) {
@@ -651,7 +654,7 @@ module.exports = class LeiaAPI {
      * (promise) Add a tag to a Model (admin)
      * @param modelId - a Model id
      * @param tag - the tag to add
-     * @return a Model object
+     * @returns a Model object
      */
 
     addTagToModel(modelId, tag) {
@@ -669,7 +672,7 @@ module.exports = class LeiaAPI {
      * (promise) Remove a tag from a Model (admin)
      * @param modelId - a Model id
      * @param tag - the tag to add
-     * @return a Model object
+     * @returns a Model object
      */
 
     adminRemoveTagFromModel(modelId, tag) {
@@ -687,7 +690,7 @@ module.exports = class LeiaAPI {
      * (promise) Remove a tag from a Model
      * @param modelId - a Model id
      * @param tag - the tag to add
-     * @return a Model object
+     * @returns a Model object
      */
 
     removeTagFromModel(modelId, tag) {
@@ -710,7 +713,7 @@ module.exports = class LeiaAPI {
     * @param offset (optional) - list offset number for pagination
     * @param limit (optional) - max per page
     * @param applicationId (optional) - an Application id to filter documents
-    * @return a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
+    * @returns {Document} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
     */
 
     adminGetDocuments(tags = null, sort = null, offset = null, limit = null, applicationId = null) {
@@ -776,7 +779,7 @@ module.exports = class LeiaAPI {
     * @param offset (optional) - list offset number for pagination
     * @param limit (optional) - max per page
     * @param applicationId (optional) - an Application id to filter documents
-    * @return a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
+    * @returns {Document} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
     */
 
     getDocuments(tags = null, sort = null, offset = null, limit = null) {
@@ -830,7 +833,7 @@ module.exports = class LeiaAPI {
     /**
      * (promise) Get a Document (admin)
      * @param documentId - a Document id
-     * @return a Document object
+     * @returns a Document object
      */
 
     adminGetDocument(documentId) {
@@ -847,7 +850,7 @@ module.exports = class LeiaAPI {
     /**
      * (promise) Get a Document
      * @param documentId - a Document id
-     * @return a Document object
+     * @returns a Document object
      */
 
     getDocument(documentId) {
@@ -906,7 +909,7 @@ module.exports = class LeiaAPI {
     /**
      * (promise) Return a list of Document tags (admin)
      * @param applicationId - an Application id to filter Document tags
-     * @return a list of tags
+     * @returns a list of tags
      */
 
     adminGetDocumentsTags(applicationId = null) {
@@ -932,7 +935,7 @@ module.exports = class LeiaAPI {
     /**
      * (promise) Return a list of Document tags
      * @param applicationId - an Application id to filter Document tags
-     * @return a list of tags
+     * @returns a list of tags
      */
 
     getDocumentsTags() {
@@ -953,7 +956,7 @@ module.exports = class LeiaAPI {
      * (promise) Add a tag to a Document (admin)
      * @param documentId - a Document id
      * @param tag - a tag
-     * @return a Document object
+     * @returns a Document object
      */
 
     adminAddTagToDocument(documentId, tag) {
@@ -971,7 +974,7 @@ module.exports = class LeiaAPI {
     * (promise) Remove a tag from a Document (admin)
     * @param documentId - a Document id
     * @param tag - a tag
-    * @return a Document object
+    * @returns a Document object
     */
 
     adminRemoveTagFromDocument(documentId, tag) {
@@ -989,7 +992,7 @@ module.exports = class LeiaAPI {
      * (promise) Add a tag to a Document (admin)
      * @param documentId - a Document id
      * @param tag - a tag
-     * @return a Document object
+     * @returns a Document object
      */
 
     addTagToDocument(documentId, tag) {
@@ -1008,7 +1011,7 @@ module.exports = class LeiaAPI {
     * (promise) Remove a tag from a Document
     * @param documentId - a Document id
     * @param tag - a tag
-    * @return a Document object
+    * @returns a Document object
     */
 
     removeTagFromDocument(documentId, tag) {
@@ -1027,7 +1030,7 @@ module.exports = class LeiaAPI {
      * @param id - a Document id
      * @param fileName (optional) - a new file name
      * @param rotationAngle (optional) - a new rotation angle
-     * @return a Document object
+     * @returns a Document object
      */
 
     adminUpdateDocument(id, fileName = null, rotationAngle = null) {
@@ -1060,7 +1063,7 @@ module.exports = class LeiaAPI {
     * @param id - a Document id
     * @param fileName (optional) - a new file name
     * @param rotationAngle (optional) - a new rotation angle
-    * @return a Document object
+    * @returns a Document object
     */
 
     updateDocument(id, fileName = null, rotationAngle = null) {
@@ -1098,7 +1101,7 @@ module.exports = class LeiaAPI {
     * @param documentId (optional) - a Document id to filter annotations
     * @param offset (optional) - list offset number for pagination
     * @param limit (optional) - max per page
-    * @return a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, annotations: [Annotation]}]
+    * @returns {Annotation} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, annotations: [Annotation]}]
     */
 
     getAnnotations(tags = null, annotationType = null, name = null, documentId = null, offset = null, limit = null) {
@@ -1164,7 +1167,7 @@ module.exports = class LeiaAPI {
     /**
     * (promise) Return an Annotation (admin)
     * @param id - an Annotation id
-    * @return an Annotation object
+    * @returns an Annotation object
     */
 
     getAnnotation(id) {
@@ -1199,7 +1202,7 @@ module.exports = class LeiaAPI {
      * (promise) Add a tag to a Document (admin)
      * @param id - an Annotation id
      * @param tag - a tag
-     * @return an Annotation object
+     * @returns an Annotation object
      */
 
     addTagToAnnotation(id, tag) {
@@ -1218,7 +1221,7 @@ module.exports = class LeiaAPI {
     * (promise) Remove a tag from an Annotation
     * @param id - an Annotation id
     * @param tag - a tag
-    * @return an Annotation object
+    * @returns an Annotation object
     */
 
     removeTagFromAnnotation(id, tag) {
@@ -1240,7 +1243,7 @@ module.exports = class LeiaAPI {
      * @param prediction - a prediction object
      * @param name (optional) - an Annotation name
      * @param tags (optional) - a list of tags
-     * @return an Annotation object
+     * @returns an Annotation object
      */
 
     addAnnotation(documentId, annotationType, prediction, name = null, tags = null) {
@@ -1266,7 +1269,7 @@ module.exports = class LeiaAPI {
      * @param id - an Annotation id
      * @param name (optional) - an Annotation name
      * @param prediction (optional - a predictionn object
-     * @return an Annotation object
+     * @returns an Annotation object
      */
 
     updateAnnotation(id, name = null, prediction = null) {
