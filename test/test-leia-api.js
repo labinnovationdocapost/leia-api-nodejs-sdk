@@ -1044,14 +1044,13 @@ describe('LeIA Application API', () => {
 
             leiaAPI.login().then((result) => {
                 result.should.be.a('object');
-                result.token.should.be.eql('faketoken')
-                result.application.id.should.be.eql(application.id)
-                result.application.creationTime.should.be.eql(application.creation_time)
-                result.application.applicationName.should.be.eql(application.application_name)
-                result.application.applicationType.should.be.eql(application.application_type)
-                result.application.email.should.be.eql(application.email)
-                result.application.firstname.should.be.eql(application.first_name)
-                result.application.lastname.should.be.eql(application.last_name)
+                result.id.should.be.eql(application.id)
+                result.creationTime.should.be.eql(application.creation_time)
+                result.applicationName.should.be.eql(application.application_name)
+                result.applicationType.should.be.eql(application.application_type)
+                result.email.should.be.eql(application.email)
+                result.firstname.should.be.eql(application.first_name)
+                result.lastname.should.be.eql(application.last_name)
                 done()
             })
         });

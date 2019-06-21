@@ -10,9 +10,24 @@ LeIA API allows you to use a wide range of Deep Learning tools to inject intelli
 
 ```npm install leia-api-sdk```
 
-Read the [LeIA API documentation](https://api.leia.io).
+- Get an API key
 
-Get an API key.
+- Read the [documentation](./documentation/index.html)
+
+- Create a LeiaAPI object and authenticate to use the API
+
+```javascript
+const leiaAPI = new LeiaAPI('apiKey')
+leiaAPI.login().then((application) => {
+    console.log("it's me", application)
+})
+...
+leiaAPI.getDocuments().then((results) => {
+   ...
+})
+```
+
+You can also read the [LeIA API documentation](https://api.leia.io)
 
 
 
