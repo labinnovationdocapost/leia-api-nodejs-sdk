@@ -1,5 +1,5 @@
 
-LEIA API SDK for NodeJS [![npm version](https://img.shields.io/npm/v/leia-api-sdk.svg?style=flat)](https://www.npmjs.com/package/leia-api-sdk)
+LEIA API SDK for Node.js [![npm version](https://img.shields.io/npm/v/leia-api-sdk.svg?style=flat)](https://www.npmjs.com/package/leia-api-sdk)
 ---
 
 LEIA API allows you to use a wide range of Deep Learning tools to inject intelligence into your projects.
