@@ -10,7 +10,7 @@ LEIA API allows you to use a wide range of Deep Learning tools to inject intelli
 
 - Get an API key
 
-- Read the [documentation](./documentation/index.html)
+- Read the [documentation](https://htmlpreview.github.io/?https://github.com/labinnovationdocapost/leia-api-nodejs-sdk/blob/master/documentation/LeiaAPI.html)
 
 - Create a LeiaAPI object and authenticate to use the API
 
