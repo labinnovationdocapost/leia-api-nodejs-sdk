@@ -1,10 +1,8 @@
 
-LeIA API SDK [![npm version](https://img.shields.io/npm/v/leia-api-sdk.svg?style=flat)](https://www.npmjs.com/package/react-native-maps)
+LEIA API SDK for NodeJS [![npm version](https://img.shields.io/npm/v/leia-api-sdk.svg?style=flat)](https://www.npmjs.com/package/leia-api-sdk)
 ---
 
-LeIA API allows you to use a wide range of Deep Learning tools to inject intelligence into your projects.
-
-[LeIA API](https://api.leia.io)
+LEIA API allows you to use a wide range of Deep Learning tools to inject intelligence into your projects.
 
 ### Getting started
 
@@ -19,7 +17,7 @@ LeIA API allows you to use a wide range of Deep Learning tools to inject intelli
 ```javascript
 const leiaAPI = new LeiaAPI('apiKey')
 leiaAPI.login().then((application) => {
-    console.log("it's me", application)
+    console.log("you", application)
 })
 ...
 leiaAPI.getDocuments().then((results) => {
