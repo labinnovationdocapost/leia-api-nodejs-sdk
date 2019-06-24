@@ -15,8 +15,8 @@ LEIA API allows you to use a wide range of Deep Learning tools to inject intelli
 - Create a LeiaAPI object and authenticate to use the API
 
 ```javascript
-const leiaAPI = new LeiaAPI('apiKey')
-leiaAPI.login().then((application) => {
+const leiaAPI = new LeiaAPI()
+leiaAPI.login('apiKey').then((application) => {
     console.log("you", application)
 })
 ...
