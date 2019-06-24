@@ -13,30 +13,30 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
 module.exports = class LeiaAPI {
 
     /**
-     * 
-     * @param {string} apiKey - a LeIA API key
      * @param {string} serverURL  - a LeIA API server URL
-     * @param {boolean} refreshToken - if true, expired tokens are refreshed automatically
+     * @param {boolean} autoRefreshToken - if true, expired tokens are refreshed automatically
      */
 
-    constructor(apiKey, serverURL, refreshToken = false) {
-        this.apiKey = apiKey
+    constructor(serverURL, autoRefreshToken = false) {
         this.serverURL = serverURL
         if (!this.serverURL) {
             this.serverURL = "https://api.leia.io/leia/1.0.0"
         }
-        this.leiaAPIRequest = new LeiaAPIRequest(apiKey, this.serverURL, refreshToken)
+        this.autoRefreshToken = autoRefreshToken
     }
 
     /**
      * Log in
+     * @param {string} apiKey - a LeIA API key
      * @returns {Application}
      */
 
-    login() {
+    login(apiKey) {
+        const leiaAPIRequest = new LeiaAPIRequest(apiKey, this.serverURL)
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.get(that.serverURL + '/login/' + that.apiKey, true, false, false).then((body) => {
+            leiaAPIRequest.get(that.serverURL + '/login/' + apiKey, true, false, false).then((body) => {
+                that.leiaAPIRequest = leiaAPIRequest
                 resolve(new Application(body.application.id, body.application.creation_time, body.application.application_type, body.application.email, body.application.application_name, body.application.first_name, body.application.last_name, body.application.api_key))
             }).catch((error) => {
                 reject(error)
@@ -51,7 +51,12 @@ module.exports = class LeiaAPI {
     logout() {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/logout', false).then(() => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/logout', false).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -94,7 +99,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/admin/application' + offsetStr + limitStr + (email ? firstChar + 'email=' + email : '') + (applicationName ? firstChar + 'application_name=' + applicationName : '') + sortStr, true, true).then((result) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/admin/application' + offsetStr + limitStr + (email ? firstChar + 'email=' + email : '') + (applicationName ? firstChar + 'application_name=' + applicationName : '') + sortStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var applications = []
@@ -132,7 +142,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedStreamPost(that.serverURL + '/admin/model?name=' + name + '&application_id=' + applicationId + (description ? '&description=' + description : '') + (ttl ? '&ttl=' + ttl : '') + tagsStr, fileBuffer, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/model?name=' + name + '&application_id=' + applicationId + (description ? '&description=' + description : '') + (ttl ? '&ttl=' + ttl : '') + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -153,6 +168,11 @@ module.exports = class LeiaAPI {
     adminAddApplication(email, applicationName, applicationType, firstname, lastname) {
         var that = this
         return new Promise(function (resolve, reject) {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
             var application = {
                 email: email,
                 application_name: applicationName,
@@ -161,7 +181,7 @@ module.exports = class LeiaAPI {
                 last_name: lastname
             }
 
-            that.leiaAPIRequest.loggedPost(that.serverURL + '/admin/application', application, true).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/application', application, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.api_key))
             }).catch((error) => {
                 reject(error)
@@ -178,7 +198,12 @@ module.exports = class LeiaAPI {
     adminResetApplicationApiKey(id) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedPost(that.serverURL + '/admin/application/' + id + '/reset_api_key', {}, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.post(that.serverURL + '/admin/application/' + id + '/reset_api_key', {}, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.api_key))
             }).catch((error) => {
                 reject(error)
@@ -194,7 +219,12 @@ module.exports = class LeiaAPI {
     adminDeleteModel(id) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedDelete(that.serverURL + '/admin/model/' + id, true).then(() => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.del(that.serverURL + '/admin/model/' + id, true, false, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -229,7 +259,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedPatch(that.serverURL + '/admin/model/' + id + query, {}, true).then((model) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.patch(that.serverURL + '/admin/model/' + id + query, {}, true, false, that.autoRefreshToken).then((model) => {
                 resolve(model)
             }).catch((error) => {
                 reject(error)
@@ -245,7 +280,12 @@ module.exports = class LeiaAPI {
     adminDeleteApplication(id) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedDelete(that.serverURL + '/admin/application/' + id, true).then(() => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.del(that.serverURL + '/admin/application/' + id, true, false, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -300,7 +340,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/admin/model' + offsetStr + limitStr + tagsStr + applicationIdStr + sortStr, true, true).then((result) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/admin/model' + offsetStr + limitStr + tagsStr + applicationIdStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var models = []
@@ -358,7 +403,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/model' + offsetStr + limitStr + tagsStr + sortStr, true, true).then((result) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/model' + offsetStr + limitStr + tagsStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var models = []
@@ -384,7 +434,12 @@ module.exports = class LeiaAPI {
     adminGetModel(id) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/admin/model/' + id, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/admin/model/' + id, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -401,7 +456,12 @@ module.exports = class LeiaAPI {
     getModel(id) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/model/' + id, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/model/' + id, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -419,7 +479,12 @@ module.exports = class LeiaAPI {
     adminGetApplication(id) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/admin/application/' + id, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/admin/application/' + id, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.api_key))
             }).catch((error) => {
                 reject(error)
@@ -449,7 +514,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedStreamPost(that.serverURL + '/admin/document?filename=' + fileName + tagsStr + applicationIdStr, fileBuffer, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/document?filename=' + fileName + tagsStr + applicationIdStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -475,7 +545,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedStreamPost(that.serverURL + '/document?filename=' + fileName + tagsStr, fileBuffer, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.streamPost(that.serverURL + '/document?filename=' + fileName + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -512,7 +587,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedPost(that.serverURL + '/admin/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr, {}, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.post(that.serverURL + '/admin/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr, {}, true, false, that.autoRefreshToken).then((body) => {
                 var documents = []
                 for (var i = 0; i < body.length; i++) {
                     documents.push(new Document(body[i].id, body[i].creation_time, body[i].application_id, body[i].filename, body[i].extension, body[i].mime_type, body[i].correct_angle, body[i].tags))
@@ -554,7 +634,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedPost(that.serverURL + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr, {}, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr, {}, true, false, that.autoRefreshToken).then((body) => {
                 var documents = []
                 for (var i = 0; i < body.length; i++) {
                     documents.push(new Document(body[i].id, body[i].creation_time, body[i].application_id, body[i].filename, body[i].extension, body[i].mime_type, body[i].correct_angle, body[i].tags))
@@ -580,7 +665,12 @@ module.exports = class LeiaAPI {
         var documentIdsString = documentIds.join(',')
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/admin/model/' + modelId + '/apply/' + documentIdsString + (tag ? '?tag=' + tag : ''), true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/admin/model/' + modelId + '/apply/' + documentIdsString + (tag ? '?tag=' + tag : ''), true, false, that.autoRefreshToken).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 reject(error)
@@ -602,7 +692,12 @@ module.exports = class LeiaAPI {
         var documentIdsString = documentIds.join(',')
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + (tag ? '?tag=' + tag : ''), true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + (tag ? '?tag=' + tag : ''), true, false, that.autoRefreshToken).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 reject(error)
@@ -619,7 +714,12 @@ module.exports = class LeiaAPI {
     adminDeleteDocument(documentId) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedDelete(that.serverURL + '/admin/document/' + documentId).then(() => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.del(that.serverURL + '/admin/document/' + documentId, false, false, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -636,7 +736,12 @@ module.exports = class LeiaAPI {
     deleteDocument(documentId) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedDelete(that.serverURL + '/document/' + documentId).then(() => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.del(that.serverURL + '/document/' + documentId, false, false, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -654,7 +759,12 @@ module.exports = class LeiaAPI {
     adminAddTagToModel(modelId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedPost(that.serverURL + '/admin/model/' + modelId + '/tag/' + tag, {}, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.post(that.serverURL + '/admin/model/' + modelId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -672,7 +782,12 @@ module.exports = class LeiaAPI {
     addTagToModel(modelId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedPost(that.serverURL + '/model/' + modelId + '/tag/' + tag, {}, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.post(that.serverURL + '/model/' + modelId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -690,7 +805,12 @@ module.exports = class LeiaAPI {
     adminRemoveTagFromModel(modelId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedDelete(that.serverURL + '/admin/model/' + modelId + '/tag/' + tag, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.del(that.serverURL + '/admin/model/' + modelId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -708,7 +828,12 @@ module.exports = class LeiaAPI {
     removeTagFromModel(modelId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedDelete(that.serverURL + '/model/' + modelId + '/tag/' + tag, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.del(that.serverURL + '/model/' + modelId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -763,7 +888,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/admin/document' + offsetStr + limitStr + tagsStr + applicationIdStr + sortStr, true, true).then((result) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/admin/document' + offsetStr + limitStr + tagsStr + applicationIdStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
@@ -822,7 +952,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/document' + offsetStr + limitStr + tagsStr + sortStr, true, true).then((result) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/document' + offsetStr + limitStr + tagsStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
@@ -850,7 +985,12 @@ module.exports = class LeiaAPI {
     adminGetDocument(documentId) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/admin/document/' + documentId, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/admin/document/' + documentId, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -867,7 +1007,12 @@ module.exports = class LeiaAPI {
     getDocument(documentId) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/document/' + documentId, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/document/' + documentId, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -889,7 +1034,12 @@ module.exports = class LeiaAPI {
         }
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGetFile(that.serverURL + '/admin/document/' + documentId + '?file_contents=true' + maxSizeStr).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.getFile(that.serverURL + '/admin/document/' + documentId + '?file_contents=true' + maxSizeStr, false, that.autoRefreshToken).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 reject(error)
@@ -911,7 +1061,12 @@ module.exports = class LeiaAPI {
         }
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGetFile(that.serverURL + '/document/' + documentId + '?file_contents=true' + maxSizeStr).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.getFile(that.serverURL + '/document/' + documentId + '?file_contents=true' + maxSizeStr, false, that.autoRefreshToken).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 reject(error)
@@ -934,7 +1089,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/admin/document/tag' + applicationIdStr, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/admin/document/tag' + applicationIdStr, true, false, that.autoRefreshToken).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 if (error.status == 404) {
@@ -953,7 +1113,12 @@ module.exports = class LeiaAPI {
     getDocumentsTags() {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/document/tag', true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/document/tag', true, false, that.autoRefreshToken).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 if (error.status == 404) {
@@ -974,7 +1139,12 @@ module.exports = class LeiaAPI {
     adminAddTagToDocument(documentId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedPost(that.serverURL + '/admin/document/' + documentId + '/tag/' + tag, {}, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.post(that.serverURL + '/admin/document/' + documentId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -992,7 +1162,12 @@ module.exports = class LeiaAPI {
     adminRemoveTagFromDocument(documentId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedDelete(that.serverURL + '/admin/document/' + documentId + '/tag/' + tag, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.del(that.serverURL + '/admin/document/' + documentId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -1010,7 +1185,12 @@ module.exports = class LeiaAPI {
     addTagToDocument(documentId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedPost(that.serverURL + '/document/' + documentId + '/tag/' + tag, {}, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -1029,7 +1209,12 @@ module.exports = class LeiaAPI {
     removeTagFromDocument(documentId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedDelete(that.serverURL + '/document/' + documentId + '/tag/' + tag, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.del(that.serverURL + '/document/' + documentId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -1062,7 +1247,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedPatch(that.serverURL + '/admin/document/' + id + filenameStr + rotationAngleStr, {}, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.patch(that.serverURL + '/admin/document/' + id + filenameStr + rotationAngleStr, {}, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -1095,7 +1285,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedPatch(that.serverURL + '/document/' + id + filenameStr + rotationAngleStr, {}, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.patch(that.serverURL + '/document/' + id + filenameStr + rotationAngleStr, {}, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
                 resolve(document)
             }).catch((error) => {
@@ -1157,7 +1352,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/annotation' + offsetStr + limitStr + tagsStr + documentIdStr + annotationTypeStr + nameStr, true, true).then((result) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/annotation' + offsetStr + limitStr + tagsStr + documentIdStr + annotationTypeStr + nameStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var annotations = []
@@ -1185,7 +1385,12 @@ module.exports = class LeiaAPI {
     getAnnotation(id) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/annotation/' + id, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/annotation/' + id, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -1202,7 +1407,12 @@ module.exports = class LeiaAPI {
     deleteAnnotation(id) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedGet(that.serverURL + '/annotation/' + id, true).then(() => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/annotation/' + id, true, false, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -1220,7 +1430,12 @@ module.exports = class LeiaAPI {
     addTagToAnnotation(id, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedPost(that.serverURL + '/annotation/' + id + '/tag/' + tag, {}, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.post(that.serverURL + '/annotation/' + id + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -1239,7 +1454,12 @@ module.exports = class LeiaAPI {
     removeTagFromAnnotation(id, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedDelete(that.serverURL + '/annotation/' + id + '/tag/' + tag, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.del(that.serverURL + '/annotation/' + id + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -1267,7 +1487,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedPost(that.serverURL + '/annotation?document_id=' + documentId + '&annotation_type=' + annotationType + (name ? ('&name=' + name) : '') + tagsStr, prediction, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.post(that.serverURL + '/annotation?document_id=' + documentId + '&annotation_type=' + annotationType + (name ? ('&name=' + name) : '') + tagsStr, prediction, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -1295,7 +1520,12 @@ module.exports = class LeiaAPI {
 
         var that = this
         return new Promise(function (resolve, reject) {
-            that.leiaAPIRequest.loggedPatch(that.serverURL + '/annotation/' + id + nameStr, prediction, true).then((body) => {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.patch(that.serverURL + '/annotation/' + id + nameStr, prediction, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {

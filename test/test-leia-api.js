@@ -1040,9 +1040,8 @@ describe('LeIA Application API', () => {
 
     describe('login()', () => {
         it('should return a token and an Application', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-
-            leiaAPI.login().then((result) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((result) => {
                 result.should.be.a('object');
                 result.id.should.be.eql(application.id)
                 result.creationTime.should.be.eql(application.creation_time)
@@ -1056,8 +1055,8 @@ describe('LeIA Application API', () => {
         });
 
         it('should return a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('badApiKey', serverURL)
-            leiaAPI.login().then((_) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('badApiKey').then((_) => {
             }).catch((error) => {
                 error.status.should.be.eql(403)
                 done()
@@ -1067,321 +1066,365 @@ describe('LeIA Application API', () => {
 
     describe('logout()', () => {
         it('should call the right url', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.logout().then((_) => {
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.logout().then((_) => {
+                    done()
+                })
             })
         });
     })
 
     describe('adminGetApplication()', () => {
         it('should return a list of applications', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-
-            leiaAPI.adminGetApplications().then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.applications.should.be.a('array');
-                result.applications.length.should.be.eql(1)
-                result.applications[0].id.should.be.eql(application.id)
-                result.applications[0].creationTime.should.be.eql(application.creation_time)
-                result.applications[0].applicationName.should.be.eql(application.application_name)
-                result.applications[0].applicationType.should.be.eql(application.application_type)
-                result.applications[0].email.should.be.eql(application.email)
-                result.applications[0].firstname.should.be.eql(application.first_name)
-                result.applications[0].lastname.should.be.eql(application.last_name)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetApplications().then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.applications.should.be.a('array');
+                    result.applications.length.should.be.eql(1)
+                    result.applications[0].id.should.be.eql(application.id)
+                    result.applications[0].creationTime.should.be.eql(application.creation_time)
+                    result.applications[0].applicationName.should.be.eql(application.application_name)
+                    result.applications[0].applicationType.should.be.eql(application.application_type)
+                    result.applications[0].email.should.be.eql(application.email)
+                    result.applications[0].firstname.should.be.eql(application.first_name)
+                    result.applications[0].lastname.should.be.eql(application.last_name)
+                    done()
+                })
             })
         });
 
 
         it('should return a list of applications when offset is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-
-            leiaAPI.adminGetApplications(null, null, null, 20, null).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.applications.should.be.a('array');
-                result.applications.length.should.be.eql(1)
-                result.applications[0].id.should.be.eql(application.id)
-                result.applications[0].creationTime.should.be.eql(application.creation_time)
-                result.applications[0].applicationName.should.be.eql(application.application_name)
-                result.applications[0].applicationType.should.be.eql(application.application_type)
-                result.applications[0].email.should.be.eql(application.email)
-                result.applications[0].firstname.should.be.eql(application.first_name)
-                result.applications[0].lastname.should.be.eql(application.last_name)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetApplications(null, null, null, 20, null).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.applications.should.be.a('array');
+                    result.applications.length.should.be.eql(1)
+                    result.applications[0].id.should.be.eql(application.id)
+                    result.applications[0].creationTime.should.be.eql(application.creation_time)
+                    result.applications[0].applicationName.should.be.eql(application.application_name)
+                    result.applications[0].applicationType.should.be.eql(application.application_type)
+                    result.applications[0].email.should.be.eql(application.email)
+                    result.applications[0].firstname.should.be.eql(application.first_name)
+                    result.applications[0].lastname.should.be.eql(application.last_name)
+                    done()
+                })
             })
         });
 
         it('should return a list of applications when limit is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-
-            leiaAPI.adminGetApplications(null, null, null, null, 20).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.applications.should.be.a('array');
-                result.applications.length.should.be.eql(1)
-                result.applications[0].id.should.be.eql(application.id)
-                result.applications[0].creationTime.should.be.eql(application.creation_time)
-                result.applications[0].applicationName.should.be.eql(application.application_name)
-                result.applications[0].applicationType.should.be.eql(application.application_type)
-                result.applications[0].email.should.be.eql(application.email)
-                result.applications[0].firstname.should.be.eql(application.first_name)
-                result.applications[0].lastname.should.be.eql(application.last_name)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetApplications(null, null, null, null, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.applications.should.be.a('array');
+                    result.applications.length.should.be.eql(1)
+                    result.applications[0].id.should.be.eql(application.id)
+                    result.applications[0].creationTime.should.be.eql(application.creation_time)
+                    result.applications[0].applicationName.should.be.eql(application.application_name)
+                    result.applications[0].applicationType.should.be.eql(application.application_type)
+                    result.applications[0].email.should.be.eql(application.email)
+                    result.applications[0].firstname.should.be.eql(application.first_name)
+                    result.applications[0].lastname.should.be.eql(application.last_name)
+                    done()
+                })
             })
         });
 
         it('should return a list of applications when sort is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-
-            leiaAPI.adminGetApplications(null, null, ['applicationName', '-email'], null, null).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.applications.should.be.a('array');
-                result.applications.length.should.be.eql(1)
-                result.applications[0].id.should.be.eql(application.id)
-                result.applications[0].creationTime.should.be.eql(application.creation_time)
-                result.applications[0].applicationName.should.be.eql(application.application_name)
-                result.applications[0].applicationType.should.be.eql(application.application_type)
-                result.applications[0].email.should.be.eql(application.email)
-                result.applications[0].firstname.should.be.eql(application.first_name)
-                result.applications[0].lastname.should.be.eql(application.last_name)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetApplications(null, null, ['applicationName', '-email'], null, null).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.applications.should.be.a('array');
+                    result.applications.length.should.be.eql(1)
+                    result.applications[0].id.should.be.eql(application.id)
+                    result.applications[0].creationTime.should.be.eql(application.creation_time)
+                    result.applications[0].applicationName.should.be.eql(application.application_name)
+                    result.applications[0].applicationType.should.be.eql(application.application_type)
+                    result.applications[0].email.should.be.eql(application.email)
+                    result.applications[0].firstname.should.be.eql(application.first_name)
+                    result.applications[0].lastname.should.be.eql(application.last_name)
+                    done()
+                })
             })
         });
 
         it('should return a list of applications when email is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetApplications('test@test.com', null, null, null, null).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.applications.should.be.a('array');
-                result.applications.length.should.be.eql(1)
-                result.applications[0].id.should.be.eql(application.id)
-                result.applications[0].creationTime.should.be.eql(application.creation_time)
-                result.applications[0].applicationName.should.be.eql(application.application_name)
-                result.applications[0].applicationType.should.be.eql(application.application_type)
-                result.applications[0].email.should.be.eql(application.email)
-                result.applications[0].firstname.should.be.eql(application.first_name)
-                result.applications[0].lastname.should.be.eql(application.last_name)
-                done()
+                leiaAPI.adminGetApplications('test@test.com', null, null, null, null).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.applications.should.be.a('array');
+                    result.applications.length.should.be.eql(1)
+                    result.applications[0].id.should.be.eql(application.id)
+                    result.applications[0].creationTime.should.be.eql(application.creation_time)
+                    result.applications[0].applicationName.should.be.eql(application.application_name)
+                    result.applications[0].applicationType.should.be.eql(application.application_type)
+                    result.applications[0].email.should.be.eql(application.email)
+                    result.applications[0].firstname.should.be.eql(application.first_name)
+                    result.applications[0].lastname.should.be.eql(application.last_name)
+                    done()
+                })
             })
         });
 
         it('should return a list of applications when application_name is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetApplications(null, 'appName', null, null, null).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.applications.should.be.a('array');
-                result.applications.length.should.be.eql(1)
-                result.applications[0].id.should.be.eql(application.id)
-                result.applications[0].creationTime.should.be.eql(application.creation_time)
-                result.applications[0].applicationName.should.be.eql(application.application_name)
-                result.applications[0].applicationType.should.be.eql(application.application_type)
-                result.applications[0].email.should.be.eql(application.email)
-                result.applications[0].firstname.should.be.eql(application.first_name)
-                result.applications[0].lastname.should.be.eql(application.last_name)
-                done()
+                leiaAPI.adminGetApplications(null, 'appName', null, null, null).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.applications.should.be.a('array');
+                    result.applications.length.should.be.eql(1)
+                    result.applications[0].id.should.be.eql(application.id)
+                    result.applications[0].creationTime.should.be.eql(application.creation_time)
+                    result.applications[0].applicationName.should.be.eql(application.application_name)
+                    result.applications[0].applicationType.should.be.eql(application.application_type)
+                    result.applications[0].email.should.be.eql(application.email)
+                    result.applications[0].firstname.should.be.eql(application.first_name)
+                    result.applications[0].lastname.should.be.eql(application.last_name)
+                    done()
+                })
             })
         });
 
 
         it('should return a list of applications when application_name is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetApplications('test@test.com', 'appName', ['applicationName', '-email'], 20, 20).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.applications.should.be.a('array');
-                result.applications.length.should.be.eql(1)
-                result.applications[0].id.should.be.eql(application.id)
-                result.applications[0].creationTime.should.be.eql(application.creation_time)
-                result.applications[0].applicationName.should.be.eql(application.application_name)
-                result.applications[0].applicationType.should.be.eql(application.application_type)
-                result.applications[0].email.should.be.eql(application.email)
-                result.applications[0].firstname.should.be.eql(application.first_name)
-                result.applications[0].lastname.should.be.eql(application.last_name)
-                done()
+                leiaAPI.adminGetApplications('test@test.com', 'appName', ['applicationName', '-email'], 20, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.applications.should.be.a('array');
+                    result.applications.length.should.be.eql(1)
+                    result.applications[0].id.should.be.eql(application.id)
+                    result.applications[0].creationTime.should.be.eql(application.creation_time)
+                    result.applications[0].applicationName.should.be.eql(application.application_name)
+                    result.applications[0].applicationType.should.be.eql(application.application_type)
+                    result.applications[0].email.should.be.eql(application.email)
+                    result.applications[0].firstname.should.be.eql(application.first_name)
+                    result.applications[0].lastname.should.be.eql(application.last_name)
+                    done()
+                })
             })
         });
 
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetApplications(null, null, null, null, 6).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(400)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetApplications(null, null, null, null, 6).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(400)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetApplications(null, null, null, null, 3).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetApplications(null, null, null, null, 3).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         });
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetApplications(null, null, null, null, 4).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetApplications(null, null, null, null, 4).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return an empty list when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetApplications(null, null, null, null, 5).then((result) => {
-                (result.contentRange == null).should.be.true
-                result.applications.length.should.be.eql(0)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetApplications(null, null, null, null, 5).then((result) => {
+                    (result.contentRange == null).should.be.true
+                    result.applications.length.should.be.eql(0)
+                    done()
+                })
             })
         });
     })
 
     describe('adminGetApplication()', () => {
         it('should return an Application', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetApplication('id1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(application.id)
-                result.creationTime.should.be.eql(application.creation_time)
-                result.applicationName.should.be.eql(application.application_name)
-                result.applicationType.should.be.eql(application.application_type)
-                result.email.should.be.eql(application.email)
-                result.firstname.should.be.eql(application.first_name)
-                result.lastname.should.be.eql(application.last_name)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetApplication('id1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(application.id)
+                    result.creationTime.should.be.eql(application.creation_time)
+                    result.applicationName.should.be.eql(application.application_name)
+                    result.applicationType.should.be.eql(application.application_type)
+                    result.email.should.be.eql(application.email)
+                    result.firstname.should.be.eql(application.first_name)
+                    result.lastname.should.be.eql(application.last_name)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetApplication('id2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetApplication('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetApplication('id4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetApplication('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('adminResetApplicationApiKey()', () => {
         it('should return an Application', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminResetApplicationApiKey('id1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(application.id)
-                result.creationTime.should.be.eql(application.creation_time)
-                result.applicationName.should.be.eql(application.application_name)
-                result.applicationType.should.be.eql(application.application_type)
-                result.email.should.be.eql(application.email)
-                result.firstname.should.be.eql(application.first_name)
-                result.lastname.should.be.eql(application.last_name)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminResetApplicationApiKey('id1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(application.id)
+                    result.creationTime.should.be.eql(application.creation_time)
+                    result.applicationName.should.be.eql(application.application_name)
+                    result.applicationType.should.be.eql(application.application_type)
+                    result.email.should.be.eql(application.email)
+                    result.firstname.should.be.eql(application.first_name)
+                    result.lastname.should.be.eql(application.last_name)
+                    done()
+                })
             })
         });
 
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminResetApplicationApiKey('id5').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(400)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminResetApplicationApiKey('id5').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(400)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminResetApplicationApiKey('id2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminResetApplicationApiKey('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminResetApplicationApiKey('id3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminResetApplicationApiKey('id3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminResetApplicationApiKey('id4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminResetApplicationApiKey('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('adminAddApplication()', () => {
         it('should return an Application', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddApplication("test@test.com", "appName", "admin", "jean", "test").then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(application.id)
-                result.creationTime.should.be.eql(application.creation_time)
-                result.applicationName.should.be.eql(application.application_name)
-                result.applicationType.should.be.eql(application.application_type)
-                result.email.should.be.eql(application.email)
-                result.firstname.should.be.eql(application.first_name)
-                result.lastname.should.be.eql(application.last_name)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddApplication("test@test.com", "appName", "admin", "jean", "test").then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(application.id)
+                    result.creationTime.should.be.eql(application.creation_time)
+                    result.applicationName.should.be.eql(application.application_name)
+                    result.applicationType.should.be.eql(application.application_type)
+                    result.email.should.be.eql(application.email)
+                    result.firstname.should.be.eql(application.first_name)
+                    result.lastname.should.be.eql(application.last_name)
+                    done()
+                })
             })
         });
 
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddApplication("test@test.com", "appName4", "admin", "jean", "test").then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(400)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddApplication("test@test.com", "appName4", "admin", "jean", "test").then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(400)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddApplication("test@test.com", "appName2", "admin", "jean", "test").then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddApplication("test@test.com", "appName2", "admin", "jean", "test").then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 409 status when LeiaAPI returns a 409 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddApplication("test@test.com", "appName3", "admin", "jean", "test").then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(409)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddApplication("test@test.com", "appName3", "admin", "jean", "test").then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(409)
+                    done()
+                })
             })
         })
 
@@ -1389,71 +1432,85 @@ describe('LeIA Application API', () => {
 
     describe('adminGetApplication()', () => {
         it('should return an Application', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetApplication('id1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(application.id)
-                result.creationTime.should.be.eql(application.creation_time)
-                result.applicationName.should.be.eql(application.application_name)
-                result.applicationType.should.be.eql(application.application_type)
-                result.email.should.be.eql(application.email)
-                result.firstname.should.be.eql(application.first_name)
-                result.lastname.should.be.eql(application.last_name)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetApplication('id1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(application.id)
+                    result.creationTime.should.be.eql(application.creation_time)
+                    result.applicationName.should.be.eql(application.application_name)
+                    result.applicationType.should.be.eql(application.application_type)
+                    result.email.should.be.eql(application.email)
+                    result.firstname.should.be.eql(application.first_name)
+                    result.lastname.should.be.eql(application.last_name)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetApplication('id2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetApplication('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetApplication('id4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetApplication('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('adminDeleteApplication()', () => {
         it('should call the right url', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminDeleteApplication('id1').then((_) => {
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminDeleteApplication('id1').then((_) => {
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminDeleteApplication('id2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminDeleteApplication('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminDeleteApplication('id3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminDeleteApplication('id3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminDeleteApplication('id4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminDeleteApplication('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
@@ -1468,177 +1525,197 @@ describe('LeIA Model API', () => {
 
     describe('adminGetModels()', () => {
         it('should return a list of models', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetModels().then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.models.should.be.a('array');
-                result.models.length.should.be.eql(1)
-                result.models[0].id.should.be.eql(model.id)
-                result.models[0].creationTime.should.be.eql(model.creation_time)
-                result.models[0].name.should.be.eql(model.name)
-                result.models[0].description.should.be.eql(model.description)
-                result.models[0].modelType.should.be.eql(model.model_type)
-                result.models[0].applicationId.should.be.eql(model.application_id)
-                result.models[0].inputTypes.should.be.eql(model.input_types)
-                result.models[0].tags.should.be.eql(model.tags)
-                done()
+                leiaAPI.adminGetModels().then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of models when offset is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetModels(null, null, 20).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.models.should.be.a('array');
-                result.models.length.should.be.eql(1)
-                result.models[0].id.should.be.eql(model.id)
-                result.models[0].creationTime.should.be.eql(model.creation_time)
-                result.models[0].name.should.be.eql(model.name)
-                result.models[0].description.should.be.eql(model.description)
-                result.models[0].modelType.should.be.eql(model.model_type)
-                result.models[0].applicationId.should.be.eql(model.application_id)
-                result.models[0].inputTypes.should.be.eql(model.input_types)
-                result.models[0].tags.should.be.eql(model.tags)
-                done()
+                leiaAPI.adminGetModels(null, null, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of models when limit is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetModels(null, null, null, 20).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.models.should.be.a('array');
-                result.models.length.should.be.eql(1)
-                result.models[0].id.should.be.eql(model.id)
-                result.models[0].creationTime.should.be.eql(model.creation_time)
-                result.models[0].name.should.be.eql(model.name)
-                result.models[0].description.should.be.eql(model.description)
-                result.models[0].modelType.should.be.eql(model.model_type)
-                result.models[0].applicationId.should.be.eql(model.application_id)
-                result.models[0].inputTypes.should.be.eql(model.input_types)
-                result.models[0].tags.should.be.eql(model.tags)
-                done()
+                leiaAPI.adminGetModels(null, null, null, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of models when sort is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetModels(null, ['name', '-description']).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.models.should.be.a('array');
-                result.models.length.should.be.eql(1)
-                result.models[0].id.should.be.eql(model.id)
-                result.models[0].creationTime.should.be.eql(model.creation_time)
-                result.models[0].name.should.be.eql(model.name)
-                result.models[0].description.should.be.eql(model.description)
-                result.models[0].modelType.should.be.eql(model.model_type)
-                result.models[0].applicationId.should.be.eql(model.application_id)
-                result.models[0].inputTypes.should.be.eql(model.input_types)
-                result.models[0].tags.should.be.eql(model.tags)
-                done()
+                leiaAPI.adminGetModels(null, ['name', '-description']).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of models when tags is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetModels(['tag1', 'tag2']).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.models.should.be.a('array');
-                result.models.length.should.be.eql(1)
-                result.models[0].id.should.be.eql(model.id)
-                result.models[0].creationTime.should.be.eql(model.creation_time)
-                result.models[0].name.should.be.eql(model.name)
-                result.models[0].description.should.be.eql(model.description)
-                result.models[0].modelType.should.be.eql(model.model_type)
-                result.models[0].applicationId.should.be.eql(model.application_id)
-                result.models[0].inputTypes.should.be.eql(model.input_types)
-                result.models[0].tags.should.be.eql(model.tags)
-                done()
+                leiaAPI.adminGetModels(['tag1', 'tag2']).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of models when applicationId is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetModels(null, null, null, null, 'appId1').then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.models.should.be.a('array');
-                result.models.length.should.be.eql(1)
-                result.models[0].id.should.be.eql(model.id)
-                result.models[0].creationTime.should.be.eql(model.creation_time)
-                result.models[0].name.should.be.eql(model.name)
-                result.models[0].description.should.be.eql(model.description)
-                result.models[0].modelType.should.be.eql(model.model_type)
-                result.models[0].applicationId.should.be.eql(model.application_id)
-                result.models[0].inputTypes.should.be.eql(model.input_types)
-                result.models[0].tags.should.be.eql(model.tags)
-                done()
+                leiaAPI.adminGetModels(null, null, null, null, 'appId1').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
 
         it('should return a list of models when all parameters are provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetModels(['tag1', 'tag2'], ['name', '-description'], 20, 20, 'appId1').then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.models.should.be.a('array');
-                result.models.length.should.be.eql(1)
-                result.models[0].id.should.be.eql(model.id)
-                result.models[0].creationTime.should.be.eql(model.creation_time)
-                result.models[0].name.should.be.eql(model.name)
-                result.models[0].description.should.be.eql(model.description)
-                result.models[0].modelType.should.be.eql(model.model_type)
-                result.models[0].applicationId.should.be.eql(model.application_id)
-                result.models[0].inputTypes.should.be.eql(model.input_types)
-                result.models[0].tags.should.be.eql(model.tags)
-                done()
+                leiaAPI.adminGetModels(['tag1', 'tag2'], ['name', '-description'], 20, 20, 'appId1').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetModels(null, null, null, 6).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(400)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetModels(null, null, null, 6).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(400)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetModels(null, null, null, 3).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetModels(null, null, null, 3).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         });
 
         it('should return an empty list LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetModels(null, null, null, 5).then((result) => {
-                (result.contentRange == null).should.be.true
-                result.models.length.should.be.eql(0)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetModels(null, null, null, 5).then((result) => {
+                    (result.contentRange == null).should.be.true
+                    result.models.length.should.be.eql(0)
+                    done()
+                })
             })
         });
 
@@ -1646,155 +1723,173 @@ describe('LeIA Model API', () => {
 
     describe('getModels()', () => {
         it('should return a list of models', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getModels().then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.models.should.be.a('array');
-                result.models.length.should.be.eql(1)
-                result.models[0].id.should.be.eql(model.id)
-                result.models[0].creationTime.should.be.eql(model.creation_time)
-                result.models[0].name.should.be.eql(model.name)
-                result.models[0].description.should.be.eql(model.description)
-                result.models[0].modelType.should.be.eql(model.model_type)
-                result.models[0].applicationId.should.be.eql(model.application_id)
-                result.models[0].inputTypes.should.be.eql(model.input_types)
-                result.models[0].tags.should.be.eql(model.tags)
-                done()
+                leiaAPI.getModels().then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of models when offset is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getModels(null, null, 20).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.models.should.be.a('array');
-                result.models.length.should.be.eql(1)
-                result.models[0].id.should.be.eql(model.id)
-                result.models[0].creationTime.should.be.eql(model.creation_time)
-                result.models[0].name.should.be.eql(model.name)
-                result.models[0].description.should.be.eql(model.description)
-                result.models[0].modelType.should.be.eql(model.model_type)
-                result.models[0].applicationId.should.be.eql(model.application_id)
-                result.models[0].inputTypes.should.be.eql(model.input_types)
-                result.models[0].tags.should.be.eql(model.tags)
-                done()
+                leiaAPI.getModels(null, null, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of models when limit is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getModels(null, null, null, 20).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.models.should.be.a('array');
-                result.models.length.should.be.eql(1)
-                result.models[0].id.should.be.eql(model.id)
-                result.models[0].creationTime.should.be.eql(model.creation_time)
-                result.models[0].name.should.be.eql(model.name)
-                result.models[0].description.should.be.eql(model.description)
-                result.models[0].modelType.should.be.eql(model.model_type)
-                result.models[0].applicationId.should.be.eql(model.application_id)
-                result.models[0].inputTypes.should.be.eql(model.input_types)
-                result.models[0].tags.should.be.eql(model.tags)
-                done()
+                leiaAPI.getModels(null, null, null, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of models when sort is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getModels(null, ['name', '-description']).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.models.should.be.a('array');
-                result.models.length.should.be.eql(1)
-                result.models[0].id.should.be.eql(model.id)
-                result.models[0].creationTime.should.be.eql(model.creation_time)
-                result.models[0].name.should.be.eql(model.name)
-                result.models[0].description.should.be.eql(model.description)
-                result.models[0].modelType.should.be.eql(model.model_type)
-                result.models[0].applicationId.should.be.eql(model.application_id)
-                result.models[0].inputTypes.should.be.eql(model.input_types)
-                result.models[0].tags.should.be.eql(model.tags)
-                done()
+                leiaAPI.getModels(null, ['name', '-description']).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of models when tags is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getModels(['tag1', 'tag2']).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.models.should.be.a('array');
-                result.models.length.should.be.eql(1)
-                result.models[0].id.should.be.eql(model.id)
-                result.models[0].creationTime.should.be.eql(model.creation_time)
-                result.models[0].name.should.be.eql(model.name)
-                result.models[0].description.should.be.eql(model.description)
-                result.models[0].modelType.should.be.eql(model.model_type)
-                result.models[0].applicationId.should.be.eql(model.application_id)
-                result.models[0].inputTypes.should.be.eql(model.input_types)
-                result.models[0].tags.should.be.eql(model.tags)
-                done()
+                leiaAPI.getModels(['tag1', 'tag2']).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of models when all parameters are provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getModels(['tag1', 'tag2'], ['name', '-description'], 20, 20).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.models.should.be.a('array');
-                result.models.length.should.be.eql(1)
-                result.models[0].id.should.be.eql(model.id)
-                result.models[0].creationTime.should.be.eql(model.creation_time)
-                result.models[0].name.should.be.eql(model.name)
-                result.models[0].description.should.be.eql(model.description)
-                result.models[0].modelType.should.be.eql(model.model_type)
-                result.models[0].applicationId.should.be.eql(model.application_id)
-                result.models[0].inputTypes.should.be.eql(model.input_types)
-                result.models[0].tags.should.be.eql(model.tags)
-                done()
+                leiaAPI.getModels(['tag1', 'tag2'], ['name', '-description'], 20, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.getModels(null, null, null, 6).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(400)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getModels(null, null, null, 6).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(400)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.getModels(null, null, null, 3).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getModels(null, null, null, 3).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         });
 
         it('should return an empty list LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getModels(null, null, null, 5).then((result) => {
-                (result.contentRange == null).should.be.true
-                result.models.length.should.be.eql(0)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getModels(null, null, null, 5).then((result) => {
+                    (result.contentRange == null).should.be.true
+                    result.models.length.should.be.eql(0)
+                    done()
+                })
             })
         });
 
@@ -1802,117 +1897,137 @@ describe('LeIA Model API', () => {
 
     describe('adminGetModel()', () => {
         it('should return a Model', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetModel('id1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(model.id)
-                result.creationTime.should.be.eql(model.creation_time)
-                result.name.should.be.eql(model.name)
-                result.description.should.be.eql(model.description)
-                result.modelType.should.be.eql(model.model_type)
-                result.applicationId.should.be.eql(model.application_id)
-                result.inputTypes.should.be.eql(model.input_types)
-                result.tags.should.be.eql(model.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetModel('id1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(model.id)
+                    result.creationTime.should.be.eql(model.creation_time)
+                    result.name.should.be.eql(model.name)
+                    result.description.should.be.eql(model.description)
+                    result.modelType.should.be.eql(model.model_type)
+                    result.applicationId.should.be.eql(model.application_id)
+                    result.inputTypes.should.be.eql(model.input_types)
+                    result.tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetModel('id2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetModel('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetModel('id4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetModel('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('getModel()', () => {
         it('should return a Model', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getModel('id1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(model.id)
-                result.creationTime.should.be.eql(model.creation_time)
-                result.name.should.be.eql(model.name)
-                result.description.should.be.eql(model.description)
-                result.modelType.should.be.eql(model.model_type)
-                result.applicationId.should.be.eql(model.application_id)
-                result.inputTypes.should.be.eql(model.input_types)
-                result.tags.should.be.eql(model.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getModel('id1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(model.id)
+                    result.creationTime.should.be.eql(model.creation_time)
+                    result.name.should.be.eql(model.name)
+                    result.description.should.be.eql(model.description)
+                    result.modelType.should.be.eql(model.model_type)
+                    result.applicationId.should.be.eql(model.application_id)
+                    result.inputTypes.should.be.eql(model.input_types)
+                    result.tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getModel('id2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getModel('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getModel('id4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getModel('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('adminAddModel()', () => {
         it('should return a model', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddModel('modelName', 'appId1', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2']).then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(model.id)
-                result.creationTime.should.be.eql(model.creation_time)
-                result.name.should.be.eql(model.name)
-                result.description.should.be.eql(model.description)
-                result.modelType.should.be.eql(model.model_type)
-                result.applicationId.should.be.eql(model.application_id)
-                result.inputTypes.should.be.eql(model.input_types)
-                result.tags.should.be.eql(model.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddModel('modelName', 'appId1', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2']).then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(model.id)
+                    result.creationTime.should.be.eql(model.creation_time)
+                    result.name.should.be.eql(model.name)
+                    result.description.should.be.eql(model.description)
+                    result.modelType.should.be.eql(model.model_type)
+                    result.applicationId.should.be.eql(model.application_id)
+                    result.inputTypes.should.be.eql(model.input_types)
+                    result.tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddModel('modelName4', 'appId1', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2']).then((result) => {
-            }).catch((error) => {
-                error.status.should.be.eql(400)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddModel('modelName4', 'appId1', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2']).then((result) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(400)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddModel('modelName2', 'appId1', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2']).then((result) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddModel('modelName2', 'appId1', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2']).then((result) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 409 status when LeiaAPI returns a 409 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddModel('modelName3', 'appId1', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2']).then((result) => {
-            }).catch((error) => {
-                error.status.should.be.eql(409)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddModel('modelName3', 'appId1', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2']).then((result) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(409)
+                    done()
+                })
             })
         })
 
@@ -1921,36 +2036,44 @@ describe('LeIA Model API', () => {
 
     describe('adminDeleteModel()', () => {
         it('should call the right url', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminDeleteModel('id1').then((_) => {
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminDeleteModel('id1').then((_) => {
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminDeleteModel('id2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminDeleteModel('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminDeleteModel('id3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminDeleteModel('id3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminDeleteModel('id4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminDeleteModel('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
@@ -1958,56 +2081,68 @@ describe('LeIA Model API', () => {
 
     describe('adminApplyModelToDocument()', () => {
         it('should return a prediction result object', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminApplyModelToDocument('modelId1', ['documentId1']).then((result) => {
-                result.should.be.a('object');
-                result.classification.should.be.eql('test')
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminApplyModelToDocument('modelId1', ['documentId1']).then((result) => {
+                    result.should.be.a('object');
+                    result.classification.should.be.eql('test')
+                    done()
+                })
             })
         });
 
         it('should return a prediction result object when providing a tag', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminApplyModelToDocument('modelId1', ['documentId1'], 'tag1').then((result) => {
-                result.should.be.a('object');
-                result.classification.should.be.eql('test')
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminApplyModelToDocument('modelId1', ['documentId1'], 'tag1').then((result) => {
+                    result.should.be.a('object');
+                    result.classification.should.be.eql('test')
+                    done()
+                })
             })
         });
 
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminApplyModelToDocument('modelId1', ['documentId2']).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(400)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminApplyModelToDocument('modelId1', ['documentId2']).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(400)
+                    done()
+                })
             })
         })
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminApplyModelToDocument('modelId1', ['documentId3']).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminApplyModelToDocument('modelId1', ['documentId3']).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminApplyModelToDocument('modelId1', ['documentId4']).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminApplyModelToDocument('modelId1', ['documentId4']).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminApplyModelToDocument('modelId1', ['documentId5']).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminApplyModelToDocument('modelId1', ['documentId5']).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
@@ -2015,236 +2150,280 @@ describe('LeIA Model API', () => {
 
     describe('applyModelToDocument()', () => {
         it('should return a prediction result object', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.applyModelToDocument('modelId1', ['documentId1']).then((result) => {
-                result.should.be.a('object');
-                result.classification.should.be.eql('test')
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.applyModelToDocument('modelId1', ['documentId1']).then((result) => {
+                    result.should.be.a('object');
+                    result.classification.should.be.eql('test')
+                    done()
+                })
             })
         });
 
         it('should return a prediction result object when providing a tag', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.applyModelToDocument('modelId1', ['documentId1'], 'tag1').then((result) => {
-                result.should.be.a('object');
-                result.classification.should.be.eql('test')
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.applyModelToDocument('modelId1', ['documentId1'], 'tag1').then((result) => {
+                    result.should.be.a('object');
+                    result.classification.should.be.eql('test')
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 400 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.applyModelToDocument('modelId1', ['documentId2']).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(400)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.applyModelToDocument('modelId1', ['documentId2']).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(400)
+                    done()
+                })
             })
         })
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.applyModelToDocument('modelId1', ['documentId3']).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.applyModelToDocument('modelId1', ['documentId3']).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.applyModelToDocument('modelId1', ['documentId4']).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.applyModelToDocument('modelId1', ['documentId4']).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.applyModelToDocument('modelId1', ['documentId5']).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.applyModelToDocument('modelId1', ['documentId5']).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('adminAddTagToModel()', () => {
         it('should return a Model', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddTagToModel('modelId1', 'tag1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(model.id)
-                result.creationTime.should.be.eql(model.creation_time)
-                result.name.should.be.eql(model.name)
-                result.description.should.be.eql(model.description)
-                result.modelType.should.be.eql(model.model_type)
-                result.applicationId.should.be.eql(model.application_id)
-                result.inputTypes.should.be.eql(model.input_types)
-                result.tags.should.be.eql(model.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddTagToModel('modelId1', 'tag1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(model.id)
+                    result.creationTime.should.be.eql(model.creation_time)
+                    result.name.should.be.eql(model.name)
+                    result.description.should.be.eql(model.description)
+                    result.modelType.should.be.eql(model.model_type)
+                    result.applicationId.should.be.eql(model.application_id)
+                    result.inputTypes.should.be.eql(model.input_types)
+                    result.tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddTagToModel('modelId1', 'tag2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddTagToModel('modelId1', 'tag2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddTagToModel('modelId1', 'tag3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddTagToModel('modelId1', 'tag3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddTagToModel('modelId1', 'tag4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddTagToModel('modelId1', 'tag4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('addTagToModel()', () => {
         it('should return a Model', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addTagToModel('modelId1', 'tag1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(model.id)
-                result.creationTime.should.be.eql(model.creation_time)
-                result.name.should.be.eql(model.name)
-                result.description.should.be.eql(model.description)
-                result.modelType.should.be.eql(model.model_type)
-                result.applicationId.should.be.eql(model.application_id)
-                result.inputTypes.should.be.eql(model.input_types)
-                result.tags.should.be.eql(model.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addTagToModel('modelId1', 'tag1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(model.id)
+                    result.creationTime.should.be.eql(model.creation_time)
+                    result.name.should.be.eql(model.name)
+                    result.description.should.be.eql(model.description)
+                    result.modelType.should.be.eql(model.model_type)
+                    result.applicationId.should.be.eql(model.application_id)
+                    result.inputTypes.should.be.eql(model.input_types)
+                    result.tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addTagToModel('modelId1', 'tag2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addTagToModel('modelId1', 'tag2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addTagToModel('modelId1', 'tag3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addTagToModel('modelId1', 'tag3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addTagToModel('modelId1', 'tag4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addTagToModel('modelId1', 'tag4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('adminRemoveTagFromModel()', () => {
         it('should return a Model', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminRemoveTagFromModel('modelId1', 'tag1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(model.id)
-                result.creationTime.should.be.eql(model.creation_time)
-                result.name.should.be.eql(model.name)
-                result.description.should.be.eql(model.description)
-                result.modelType.should.be.eql(model.model_type)
-                result.applicationId.should.be.eql(model.application_id)
-                result.inputTypes.should.be.eql(model.input_types)
-                result.tags.should.be.eql(model.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminRemoveTagFromModel('modelId1', 'tag1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(model.id)
+                    result.creationTime.should.be.eql(model.creation_time)
+                    result.name.should.be.eql(model.name)
+                    result.description.should.be.eql(model.description)
+                    result.modelType.should.be.eql(model.model_type)
+                    result.applicationId.should.be.eql(model.application_id)
+                    result.inputTypes.should.be.eql(model.input_types)
+                    result.tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminRemoveTagFromModel('modelId1', 'tag2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminRemoveTagFromModel('modelId1', 'tag2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminRemoveTagFromModel('modelId1', 'tag3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminRemoveTagFromModel('modelId1', 'tag3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminRemoveTagFromModel('modelId1', 'tag4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminRemoveTagFromModel('modelId1', 'tag4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('removeTagFromModel()', () => {
         it('should return a Model', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.removeTagFromModel('modelId1', 'tag1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(model.id)
-                result.creationTime.should.be.eql(model.creation_time)
-                result.name.should.be.eql(model.name)
-                result.description.should.be.eql(model.description)
-                result.modelType.should.be.eql(model.model_type)
-                result.applicationId.should.be.eql(model.application_id)
-                result.inputTypes.should.be.eql(model.input_types)
-                result.tags.should.be.eql(model.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.removeTagFromModel('modelId1', 'tag1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(model.id)
+                    result.creationTime.should.be.eql(model.creation_time)
+                    result.name.should.be.eql(model.name)
+                    result.description.should.be.eql(model.description)
+                    result.modelType.should.be.eql(model.model_type)
+                    result.applicationId.should.be.eql(model.application_id)
+                    result.inputTypes.should.be.eql(model.input_types)
+                    result.tags.should.be.eql(model.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.removeTagFromModel('modelId1', 'tag2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.removeTagFromModel('modelId1', 'tag2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.removeTagFromModel('modelId1', 'tag3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.removeTagFromModel('modelId1', 'tag3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.removeTagFromModel('modelId1', 'tag4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.removeTagFromModel('modelId1', 'tag4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
@@ -2258,460 +2437,516 @@ describe('LeIA Document API', () => {
 
     describe('adminGetDocuments()', () => {
         it('should return a list of documents', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-
-            leiaAPI.adminGetDocuments().then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.documents.should.be.a('array');
-                result.documents.length.should.be.eql(1)
-                result.documents[0].id.should.be.eql(document.id)
-                result.documents[0].creationTime.should.be.eql(document.creation_time)
-                result.documents[0].filename.should.be.eql(document.filename)
-                result.documents[0].extension.should.be.eql(document.extension)
-                result.documents[0].correctAngle.should.be.eql(document.correct_angle)
-                result.documents[0].applicationId.should.be.eql(document.application_id)
-                result.documents[0].mimeType.should.be.eql(document.mime_type)
-                result.documents[0].tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetDocuments().then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].correctAngle.should.be.eql(document.correct_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when offset is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-
-            leiaAPI.adminGetDocuments(null, null, 20).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.documents.should.be.a('array');
-                result.documents.length.should.be.eql(1)
-                result.documents[0].id.should.be.eql(document.id)
-                result.documents[0].creationTime.should.be.eql(document.creation_time)
-                result.documents[0].filename.should.be.eql(document.filename)
-                result.documents[0].extension.should.be.eql(document.extension)
-                result.documents[0].correctAngle.should.be.eql(document.correct_angle)
-                result.documents[0].applicationId.should.be.eql(document.application_id)
-                result.documents[0].mimeType.should.be.eql(document.mime_type)
-                result.documents[0].tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetDocuments(null, null, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].correctAngle.should.be.eql(document.correct_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when limit is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetDocuments(null, null, null, 20).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.documents.should.be.a('array');
-                result.documents.length.should.be.eql(1)
-                result.documents[0].id.should.be.eql(document.id)
-                result.documents[0].creationTime.should.be.eql(document.creation_time)
-                result.documents[0].filename.should.be.eql(document.filename)
-                result.documents[0].extension.should.be.eql(document.extension)
-                result.documents[0].correctAngle.should.be.eql(document.correct_angle)
-                result.documents[0].applicationId.should.be.eql(document.application_id)
-                result.documents[0].mimeType.should.be.eql(document.mime_type)
-                result.documents[0].tags.should.be.eql(document.tags)
-                done()
+                leiaAPI.adminGetDocuments(null, null, null, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].correctAngle.should.be.eql(document.correct_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when sort is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetDocuments(null, ['filename', '-extension']).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.documents.should.be.a('array');
-                result.documents.length.should.be.eql(1)
-                result.documents[0].id.should.be.eql(document.id)
-                result.documents[0].creationTime.should.be.eql(document.creation_time)
-                result.documents[0].filename.should.be.eql(document.filename)
-                result.documents[0].extension.should.be.eql(document.extension)
-                result.documents[0].correctAngle.should.be.eql(document.correct_angle)
-                result.documents[0].applicationId.should.be.eql(document.application_id)
-                result.documents[0].mimeType.should.be.eql(document.mime_type)
-                result.documents[0].tags.should.be.eql(document.tags)
-                done()
+                leiaAPI.adminGetDocuments(null, ['filename', '-extension']).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].correctAngle.should.be.eql(document.correct_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when tags is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetDocuments(['tag1', 'tag2']).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.documents.should.be.a('array');
-                result.documents.length.should.be.eql(1)
-                result.documents[0].id.should.be.eql(document.id)
-                result.documents[0].creationTime.should.be.eql(document.creation_time)
-                result.documents[0].filename.should.be.eql(document.filename)
-                result.documents[0].extension.should.be.eql(document.extension)
-                result.documents[0].correctAngle.should.be.eql(document.correct_angle)
-                result.documents[0].applicationId.should.be.eql(document.application_id)
-                result.documents[0].mimeType.should.be.eql(document.mime_type)
-                result.documents[0].tags.should.be.eql(document.tags)
-                done()
+                leiaAPI.adminGetDocuments(['tag1', 'tag2']).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].correctAngle.should.be.eql(document.correct_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when applicationId is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetDocuments(null, null, null, null, 'appId1').then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.documents.should.be.a('array');
-                result.documents.length.should.be.eql(1)
-                result.documents[0].id.should.be.eql(document.id)
-                result.documents[0].creationTime.should.be.eql(document.creation_time)
-                result.documents[0].filename.should.be.eql(document.filename)
-                result.documents[0].extension.should.be.eql(document.extension)
-                result.documents[0].correctAngle.should.be.eql(document.correct_angle)
-                result.documents[0].applicationId.should.be.eql(document.application_id)
-                result.documents[0].mimeType.should.be.eql(document.mime_type)
-                result.documents[0].tags.should.be.eql(document.tags)
-                done()
+                leiaAPI.adminGetDocuments(null, null, null, null, 'appId1').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].correctAngle.should.be.eql(document.correct_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when all parameters are provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.adminGetDocuments(['tag1', 'tag2'], ['filename', '-extension'], 20, 20, 'appId1').then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.documents.should.be.a('array');
-                result.documents.length.should.be.eql(1)
-                result.documents[0].id.should.be.eql(document.id)
-                result.documents[0].creationTime.should.be.eql(document.creation_time)
-                result.documents[0].filename.should.be.eql(document.filename)
-                result.documents[0].extension.should.be.eql(document.extension)
-                result.documents[0].correctAngle.should.be.eql(document.correct_angle)
-                result.documents[0].applicationId.should.be.eql(document.application_id)
-                result.documents[0].mimeType.should.be.eql(document.mime_type)
-                result.documents[0].tags.should.be.eql(document.tags)
-                done()
+                leiaAPI.adminGetDocuments(['tag1', 'tag2'], ['filename', '-extension'], 20, 20, 'appId1').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].correctAngle.should.be.eql(document.correct_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetDocuments(null, null, null, 3).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetDocuments(null, null, null, 3).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return an empty list when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetDocuments(null, null, null, 5).then((result) => {
-                (result.contentRange == null).should.be.true
-                result.documents.length.should.be.eql(0)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetDocuments(null, null, null, 5).then((result) => {
+                    (result.contentRange == null).should.be.true
+                    result.documents.length.should.be.eql(0)
+                    done()
+                })
             })
         })
     })
 
     describe('getDocuments()', () => {
         it('should return a list of documents', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getDocuments().then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.documents.should.be.a('array');
-                result.documents.length.should.be.eql(1)
-                result.documents[0].id.should.be.eql(document.id)
-                result.documents[0].creationTime.should.be.eql(document.creation_time)
-                result.documents[0].filename.should.be.eql(document.filename)
-                result.documents[0].extension.should.be.eql(document.extension)
-                result.documents[0].correctAngle.should.be.eql(document.correct_angle)
-                result.documents[0].applicationId.should.be.eql(document.application_id)
-                result.documents[0].mimeType.should.be.eql(document.mime_type)
-                result.documents[0].tags.should.be.eql(document.tags)
-                done()
+                leiaAPI.getDocuments().then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].correctAngle.should.be.eql(document.correct_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when offset is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getDocuments(null, null, 20).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.documents.should.be.a('array');
-                result.documents.length.should.be.eql(1)
-                result.documents[0].id.should.be.eql(document.id)
-                result.documents[0].creationTime.should.be.eql(document.creation_time)
-                result.documents[0].filename.should.be.eql(document.filename)
-                result.documents[0].extension.should.be.eql(document.extension)
-                result.documents[0].correctAngle.should.be.eql(document.correct_angle)
-                result.documents[0].applicationId.should.be.eql(document.application_id)
-                result.documents[0].mimeType.should.be.eql(document.mime_type)
-                result.documents[0].tags.should.be.eql(document.tags)
-                done()
+                leiaAPI.getDocuments(null, null, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].correctAngle.should.be.eql(document.correct_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when limit is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getDocuments(null, null, null, 20).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.documents.should.be.a('array');
-                result.documents.length.should.be.eql(1)
-                result.documents[0].id.should.be.eql(document.id)
-                result.documents[0].creationTime.should.be.eql(document.creation_time)
-                result.documents[0].filename.should.be.eql(document.filename)
-                result.documents[0].extension.should.be.eql(document.extension)
-                result.documents[0].correctAngle.should.be.eql(document.correct_angle)
-                result.documents[0].applicationId.should.be.eql(document.application_id)
-                result.documents[0].mimeType.should.be.eql(document.mime_type)
-                result.documents[0].tags.should.be.eql(document.tags)
-                done()
+                leiaAPI.getDocuments(null, null, null, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].correctAngle.should.be.eql(document.correct_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when sort is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getDocuments(null, ['filename', '-extension']).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.documents.should.be.a('array');
-                result.documents.length.should.be.eql(1)
-                result.documents[0].id.should.be.eql(document.id)
-                result.documents[0].creationTime.should.be.eql(document.creation_time)
-                result.documents[0].filename.should.be.eql(document.filename)
-                result.documents[0].extension.should.be.eql(document.extension)
-                result.documents[0].correctAngle.should.be.eql(document.correct_angle)
-                result.documents[0].applicationId.should.be.eql(document.application_id)
-                result.documents[0].mimeType.should.be.eql(document.mime_type)
-                result.documents[0].tags.should.be.eql(document.tags)
-                done()
+                leiaAPI.getDocuments(null, ['filename', '-extension']).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].correctAngle.should.be.eql(document.correct_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when tags is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getDocuments(['tag1', 'tag2']).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.documents.should.be.a('array');
-                result.documents.length.should.be.eql(1)
-                result.documents[0].id.should.be.eql(document.id)
-                result.documents[0].creationTime.should.be.eql(document.creation_time)
-                result.documents[0].filename.should.be.eql(document.filename)
-                result.documents[0].extension.should.be.eql(document.extension)
-                result.documents[0].correctAngle.should.be.eql(document.correct_angle)
-                result.documents[0].applicationId.should.be.eql(document.application_id)
-                result.documents[0].mimeType.should.be.eql(document.mime_type)
-                result.documents[0].tags.should.be.eql(document.tags)
-                done()
+                leiaAPI.getDocuments(['tag1', 'tag2']).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].correctAngle.should.be.eql(document.correct_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when applicationId is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getDocuments(null, null, null, null, 'appId1').then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.documents.should.be.a('array');
-                result.documents.length.should.be.eql(1)
-                result.documents[0].id.should.be.eql(document.id)
-                result.documents[0].creationTime.should.be.eql(document.creation_time)
-                result.documents[0].filename.should.be.eql(document.filename)
-                result.documents[0].extension.should.be.eql(document.extension)
-                result.documents[0].correctAngle.should.be.eql(document.correct_angle)
-                result.documents[0].applicationId.should.be.eql(document.application_id)
-                result.documents[0].mimeType.should.be.eql(document.mime_type)
-                result.documents[0].tags.should.be.eql(document.tags)
-                done()
+                leiaAPI.getDocuments(null, null, null, null, 'appId1').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].correctAngle.should.be.eql(document.correct_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when all parameters are provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getDocuments(['tag1', 'tag2'], ['filename', '-extension'], 20, 20, 'appId1').then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.documents.should.be.a('array');
-                result.documents.length.should.be.eql(1)
-                result.documents[0].id.should.be.eql(document.id)
-                result.documents[0].creationTime.should.be.eql(document.creation_time)
-                result.documents[0].filename.should.be.eql(document.filename)
-                result.documents[0].extension.should.be.eql(document.extension)
-                result.documents[0].correctAngle.should.be.eql(document.correct_angle)
-                result.documents[0].applicationId.should.be.eql(document.application_id)
-                result.documents[0].mimeType.should.be.eql(document.mime_type)
-                result.documents[0].tags.should.be.eql(document.tags)
-                done()
+                leiaAPI.getDocuments(['tag1', 'tag2'], ['filename', '-extension'], 20, 20, 'appId1').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].correctAngle.should.be.eql(document.correct_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getDocuments(null, null, null, 3).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getDocuments(null, null, null, 3).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return an empty list when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getDocuments(null, null, null, 5).then((result) => {
-                (result.contentRange == null).should.be.true
-                result.documents.length.should.be.eql(0)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getDocuments(null, null, null, 5).then((result) => {
+                    (result.contentRange == null).should.be.true
+                    result.documents.length.should.be.eql(0)
+                    done()
+                })
             })
         })
     })
 
     describe('adminGetDocument()', () => {
         it('should return a Document', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetDocument('id1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(document.id)
-                result.creationTime.should.be.eql(document.creation_time)
-                result.filename.should.be.eql(document.filename)
-                result.extension.should.be.eql(document.extension)
-                result.correctAngle.should.be.eql(document.correct_angle)
-                result.applicationId.should.be.eql(document.application_id)
-                result.mimeType.should.be.eql(document.mime_type)
-                result.tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetDocument('id1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(document.id)
+                    result.creationTime.should.be.eql(document.creation_time)
+                    result.filename.should.be.eql(document.filename)
+                    result.extension.should.be.eql(document.extension)
+                    result.correctAngle.should.be.eql(document.correct_angle)
+                    result.applicationId.should.be.eql(document.application_id)
+                    result.mimeType.should.be.eql(document.mime_type)
+                    result.tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetDocument('id2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetDocument('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         });
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetDocument('id3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetDocument('id3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminGetDocument('id4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminGetDocument('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('getDocument()', () => {
         it('should return a Document', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getDocument('id1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(document.id)
-                result.creationTime.should.be.eql(document.creation_time)
-                result.filename.should.be.eql(document.filename)
-                result.extension.should.be.eql(document.extension)
-                result.correctAngle.should.be.eql(document.correct_angle)
-                result.applicationId.should.be.eql(document.application_id)
-                result.mimeType.should.be.eql(document.mime_type)
-                result.tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getDocument('id1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(document.id)
+                    result.creationTime.should.be.eql(document.creation_time)
+                    result.filename.should.be.eql(document.filename)
+                    result.extension.should.be.eql(document.extension)
+                    result.correctAngle.should.be.eql(document.correct_angle)
+                    result.applicationId.should.be.eql(document.application_id)
+                    result.mimeType.should.be.eql(document.mime_type)
+                    result.tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getDocument('id2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getDocument('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         });
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getDocument('id3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getDocument('id3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getDocument('id4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getDocument('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('adminAddDocument()', () => {
         it('should return a Document', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddDocument('test.jpg', Buffer.from([0xff, 0x11]), 'appId1', ['tag1']).then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(document.id)
-                result.creationTime.should.be.eql(document.creation_time)
-                result.filename.should.be.eql(document.filename)
-                result.extension.should.be.eql(document.extension)
-                result.correctAngle.should.be.eql(document.correct_angle)
-                result.applicationId.should.be.eql(document.application_id)
-                result.mimeType.should.be.eql(document.mime_type)
-                result.tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddDocument('test.jpg', Buffer.from([0xff, 0x11]), 'appId1', ['tag1']).then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(document.id)
+                    result.creationTime.should.be.eql(document.creation_time)
+                    result.filename.should.be.eql(document.filename)
+                    result.extension.should.be.eql(document.extension)
+                    result.correctAngle.should.be.eql(document.correct_angle)
+                    result.applicationId.should.be.eql(document.application_id)
+                    result.mimeType.should.be.eql(document.mime_type)
+                    result.tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddDocument('test.jpg', Buffer.from([0xff, 0x11]), 'appId0', ['tag0']).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(400)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddDocument('test.jpg', Buffer.from([0xff, 0x11]), 'appId0', ['tag0']).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(400)
+                    done()
+                })
             })
         })
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddDocument('test.jpg', Buffer.from([0xff, 0x11]), 'appId2', ['tag2']).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddDocument('test.jpg', Buffer.from([0xff, 0x11]), 'appId2', ['tag2']).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
@@ -2719,116 +2954,134 @@ describe('LeIA Document API', () => {
 
     describe('addDocument()', () => {
         it('should return a Document', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addDocument('test.jpg', Buffer.from([0xff, 0x11]), ['tag1']).then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(document.id)
-                result.creationTime.should.be.eql(document.creation_time)
-                result.filename.should.be.eql(document.filename)
-                result.extension.should.be.eql(document.extension)
-                result.correctAngle.should.be.eql(document.correct_angle)
-                result.applicationId.should.be.eql(document.application_id)
-                result.mimeType.should.be.eql(document.mime_type)
-                result.tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addDocument('test.jpg', Buffer.from([0xff, 0x11]), ['tag1']).then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(document.id)
+                    result.creationTime.should.be.eql(document.creation_time)
+                    result.filename.should.be.eql(document.filename)
+                    result.extension.should.be.eql(document.extension)
+                    result.correctAngle.should.be.eql(document.correct_angle)
+                    result.applicationId.should.be.eql(document.application_id)
+                    result.mimeType.should.be.eql(document.mime_type)
+                    result.tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addDocument('test.jpg', Buffer.from([0xff, 0x11]), ['tag0']).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(400)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addDocument('test.jpg', Buffer.from([0xff, 0x11]), ['tag0']).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(400)
+                    done()
+                })
             })
         })
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addDocument('test.jpg', Buffer.from([0xff, 0x11]), ['tag2']).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addDocument('test.jpg', Buffer.from([0xff, 0x11]), ['tag2']).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
     })
 
     describe('adminTransformPDF()', () => {
         it('should return a list of documents', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminTransformPDF(['id1'], 'image').then((result) => {
-                result.should.be.a('array');
-                result.length.should.be.eql(1)
-                result[0].id.should.be.eql(document.id)
-                result[0].creationTime.should.be.eql(document.creation_time)
-                result[0].filename.should.be.eql(document.filename)
-                result[0].extension.should.be.eql(document.extension)
-                result[0].correctAngle.should.be.eql(document.correct_angle)
-                result[0].applicationId.should.be.eql(document.application_id)
-                result[0].mimeType.should.be.eql(document.mime_type)
-                result[0].tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminTransformPDF(['id1'], 'image').then((result) => {
+                    result.should.be.a('array');
+                    result.length.should.be.eql(1)
+                    result[0].id.should.be.eql(document.id)
+                    result[0].creationTime.should.be.eql(document.creation_time)
+                    result[0].filename.should.be.eql(document.filename)
+                    result[0].extension.should.be.eql(document.extension)
+                    result[0].correctAngle.should.be.eql(document.correct_angle)
+                    result[0].applicationId.should.be.eql(document.application_id)
+                    result[0].mimeType.should.be.eql(document.mime_type)
+                    result[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when providing an inputTag', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminTransformPDF(['id1'], 'image', 'tag1').then((result) => {
-                result.should.be.a('array');
-                result.length.should.be.eql(1)
-                result[0].id.should.be.eql(document.id)
-                result[0].creationTime.should.be.eql(document.creation_time)
-                result[0].filename.should.be.eql(document.filename)
-                result[0].extension.should.be.eql(document.extension)
-                result[0].correctAngle.should.be.eql(document.correct_angle)
-                result[0].applicationId.should.be.eql(document.application_id)
-                result[0].mimeType.should.be.eql(document.mime_type)
-                result[0].tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminTransformPDF(['id1'], 'image', 'tag1').then((result) => {
+                    result.should.be.a('array');
+                    result.length.should.be.eql(1)
+                    result[0].id.should.be.eql(document.id)
+                    result[0].creationTime.should.be.eql(document.creation_time)
+                    result[0].filename.should.be.eql(document.filename)
+                    result[0].extension.should.be.eql(document.extension)
+                    result[0].correctAngle.should.be.eql(document.correct_angle)
+                    result[0].applicationId.should.be.eql(document.application_id)
+                    result[0].mimeType.should.be.eql(document.mime_type)
+                    result[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when providing an outputTag', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminTransformPDF(['id1'], 'image', null, 'tag1').then((result) => {
-                result.should.be.a('array');
-                result.length.should.be.eql(1)
-                result[0].id.should.be.eql(document.id)
-                result[0].creationTime.should.be.eql(document.creation_time)
-                result[0].filename.should.be.eql(document.filename)
-                result[0].extension.should.be.eql(document.extension)
-                result[0].correctAngle.should.be.eql(document.correct_angle)
-                result[0].applicationId.should.be.eql(document.application_id)
-                result[0].mimeType.should.be.eql(document.mime_type)
-                result[0].tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminTransformPDF(['id1'], 'image', null, 'tag1').then((result) => {
+                    result.should.be.a('array');
+                    result.length.should.be.eql(1)
+                    result[0].id.should.be.eql(document.id)
+                    result[0].creationTime.should.be.eql(document.creation_time)
+                    result[0].filename.should.be.eql(document.filename)
+                    result[0].extension.should.be.eql(document.extension)
+                    result[0].correctAngle.should.be.eql(document.correct_angle)
+                    result[0].applicationId.should.be.eql(document.application_id)
+                    result[0].mimeType.should.be.eql(document.mime_type)
+                    result[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminTransformPDF(['id2'], 'image', null, 'tag2').then((result) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminTransformPDF(['id2'], 'image', null, 'tag2').then((result) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminTransformPDF(['id3'], 'image', null, 'tag3').then((result) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminTransformPDF(['id3'], 'image', null, 'tag3').then((result) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         })
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminTransformPDF(['id4'], 'image', null, 'tag4').then((result) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminTransformPDF(['id4'], 'image', null, 'tag4').then((result) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         })
 
@@ -2836,80 +3089,92 @@ describe('LeIA Document API', () => {
 
     describe('transformPDF()', () => {
         it('should return a list of documents', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.transformPDF(['id1'], 'image').then((result) => {
-                result.should.be.a('array');
-                result.length.should.be.eql(1)
-                result[0].id.should.be.eql(document.id)
-                result[0].creationTime.should.be.eql(document.creation_time)
-                result[0].filename.should.be.eql(document.filename)
-                result[0].extension.should.be.eql(document.extension)
-                result[0].correctAngle.should.be.eql(document.correct_angle)
-                result[0].applicationId.should.be.eql(document.application_id)
-                result[0].mimeType.should.be.eql(document.mime_type)
-                result[0].tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.transformPDF(['id1'], 'image').then((result) => {
+                    result.should.be.a('array');
+                    result.length.should.be.eql(1)
+                    result[0].id.should.be.eql(document.id)
+                    result[0].creationTime.should.be.eql(document.creation_time)
+                    result[0].filename.should.be.eql(document.filename)
+                    result[0].extension.should.be.eql(document.extension)
+                    result[0].correctAngle.should.be.eql(document.correct_angle)
+                    result[0].applicationId.should.be.eql(document.application_id)
+                    result[0].mimeType.should.be.eql(document.mime_type)
+                    result[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when providing an inputTag', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.transformPDF(['id1'], 'image', 'tag1').then((result) => {
-                result.should.be.a('array');
-                result.length.should.be.eql(1)
-                result[0].id.should.be.eql(document.id)
-                result[0].creationTime.should.be.eql(document.creation_time)
-                result[0].filename.should.be.eql(document.filename)
-                result[0].extension.should.be.eql(document.extension)
-                result[0].correctAngle.should.be.eql(document.correct_angle)
-                result[0].applicationId.should.be.eql(document.application_id)
-                result[0].mimeType.should.be.eql(document.mime_type)
-                result[0].tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.transformPDF(['id1'], 'image', 'tag1').then((result) => {
+                    result.should.be.a('array');
+                    result.length.should.be.eql(1)
+                    result[0].id.should.be.eql(document.id)
+                    result[0].creationTime.should.be.eql(document.creation_time)
+                    result[0].filename.should.be.eql(document.filename)
+                    result[0].extension.should.be.eql(document.extension)
+                    result[0].correctAngle.should.be.eql(document.correct_angle)
+                    result[0].applicationId.should.be.eql(document.application_id)
+                    result[0].mimeType.should.be.eql(document.mime_type)
+                    result[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when providing an outputTag', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.transformPDF(['id1'], 'image', null, 'tag1').then((result) => {
-                result.should.be.a('array');
-                result.length.should.be.eql(1)
-                result[0].id.should.be.eql(document.id)
-                result[0].creationTime.should.be.eql(document.creation_time)
-                result[0].filename.should.be.eql(document.filename)
-                result[0].extension.should.be.eql(document.extension)
-                result[0].correctAngle.should.be.eql(document.correct_angle)
-                result[0].applicationId.should.be.eql(document.application_id)
-                result[0].mimeType.should.be.eql(document.mime_type)
-                result[0].tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.transformPDF(['id1'], 'image', null, 'tag1').then((result) => {
+                    result.should.be.a('array');
+                    result.length.should.be.eql(1)
+                    result[0].id.should.be.eql(document.id)
+                    result[0].creationTime.should.be.eql(document.creation_time)
+                    result[0].filename.should.be.eql(document.filename)
+                    result[0].extension.should.be.eql(document.extension)
+                    result[0].correctAngle.should.be.eql(document.correct_angle)
+                    result[0].applicationId.should.be.eql(document.application_id)
+                    result[0].mimeType.should.be.eql(document.mime_type)
+                    result[0].tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.transformPDF(['id2'], 'image', null, 'tag2').then((result) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.transformPDF(['id2'], 'image', null, 'tag2').then((result) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.transformPDF(['id3'], 'image', null, 'tag3').then((result) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.transformPDF(['id3'], 'image', null, 'tag3').then((result) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         })
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.transformPDF(['id4'], 'image', null, 'tag4').then((result) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.transformPDF(['id4'], 'image', null, 'tag4').then((result) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         })
 
@@ -2918,406 +3183,478 @@ describe('LeIA Document API', () => {
 
     describe('adminDeleteDocument()', () => {
         it('should call the right url', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminDeleteDocument('id1').then((result) => {
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminDeleteDocument('id1').then((result) => {
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminDeleteDocument('id2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminDeleteDocument('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         });
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminDeleteDocument('id3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminDeleteDocument('id3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminDeleteDocument('id4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminDeleteDocument('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('deleteDocument()', () => {
         it('should call the right url', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.deleteDocument('id1').then((result) => {
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteDocument('id1').then((result) => {
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.deleteDocument('id2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteDocument('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         });
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.deleteDocument('id3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteDocument('id3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.deleteDocument('id4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteDocument('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('adminAddTagToDocument()', () => {
         it('should return a Document', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddTagToDocument('documentId1', 'tag1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(document.id)
-                result.creationTime.should.be.eql(document.creation_time)
-                result.filename.should.be.eql(document.filename)
-                result.extension.should.be.eql(document.extension)
-                result.correctAngle.should.be.eql(document.correct_angle)
-                result.applicationId.should.be.eql(document.application_id)
-                result.mimeType.should.be.eql(document.mime_type)
-                result.tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddTagToDocument('documentId1', 'tag1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(document.id)
+                    result.creationTime.should.be.eql(document.creation_time)
+                    result.filename.should.be.eql(document.filename)
+                    result.extension.should.be.eql(document.extension)
+                    result.correctAngle.should.be.eql(document.correct_angle)
+                    result.applicationId.should.be.eql(document.application_id)
+                    result.mimeType.should.be.eql(document.mime_type)
+                    result.tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddTagToDocument('documentId1', 'tag2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddTagToDocument('documentId1', 'tag2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddTagToDocument('documentId1', 'tag3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddTagToDocument('documentId1', 'tag3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminAddTagToDocument('documentId1', 'tag4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminAddTagToDocument('documentId1', 'tag4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('addTagToDocument()', () => {
         it('should return a Document', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addTagToDocument('documentId1', 'tag1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(document.id)
-                result.creationTime.should.be.eql(document.creation_time)
-                result.filename.should.be.eql(document.filename)
-                result.extension.should.be.eql(document.extension)
-                result.correctAngle.should.be.eql(document.correct_angle)
-                result.applicationId.should.be.eql(document.application_id)
-                result.mimeType.should.be.eql(document.mime_type)
-                result.tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addTagToDocument('documentId1', 'tag1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(document.id)
+                    result.creationTime.should.be.eql(document.creation_time)
+                    result.filename.should.be.eql(document.filename)
+                    result.extension.should.be.eql(document.extension)
+                    result.correctAngle.should.be.eql(document.correct_angle)
+                    result.applicationId.should.be.eql(document.application_id)
+                    result.mimeType.should.be.eql(document.mime_type)
+                    result.tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addTagToDocument('documentId1', 'tag2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addTagToDocument('documentId1', 'tag2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addTagToDocument('documentId1', 'tag3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addTagToDocument('documentId1', 'tag3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addTagToDocument('documentId1', 'tag4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addTagToDocument('documentId1', 'tag4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('adminRemoveTagFromDocument()', () => {
         it('should return a Document', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminRemoveTagFromDocument('documentId1', 'tag1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(document.id)
-                result.creationTime.should.be.eql(document.creation_time)
-                result.filename.should.be.eql(document.filename)
-                result.extension.should.be.eql(document.extension)
-                result.correctAngle.should.be.eql(document.correct_angle)
-                result.applicationId.should.be.eql(document.application_id)
-                result.mimeType.should.be.eql(document.mime_type)
-                result.tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminRemoveTagFromDocument('documentId1', 'tag1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(document.id)
+                    result.creationTime.should.be.eql(document.creation_time)
+                    result.filename.should.be.eql(document.filename)
+                    result.extension.should.be.eql(document.extension)
+                    result.correctAngle.should.be.eql(document.correct_angle)
+                    result.applicationId.should.be.eql(document.application_id)
+                    result.mimeType.should.be.eql(document.mime_type)
+                    result.tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminRemoveTagFromDocument('documentId1', 'tag2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminRemoveTagFromDocument('documentId1', 'tag2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminRemoveTagFromDocument('documentId1', 'tag3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminRemoveTagFromDocument('documentId1', 'tag3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminRemoveTagFromDocument('documentId1', 'tag4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminRemoveTagFromDocument('documentId1', 'tag4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('removeTagFromDocument()', () => {
         it('should return a Document', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.removeTagFromDocument('documentId1', 'tag1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(document.id)
-                result.creationTime.should.be.eql(document.creation_time)
-                result.filename.should.be.eql(document.filename)
-                result.extension.should.be.eql(document.extension)
-                result.correctAngle.should.be.eql(document.correct_angle)
-                result.applicationId.should.be.eql(document.application_id)
-                result.mimeType.should.be.eql(document.mime_type)
-                result.tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.removeTagFromDocument('documentId1', 'tag1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(document.id)
+                    result.creationTime.should.be.eql(document.creation_time)
+                    result.filename.should.be.eql(document.filename)
+                    result.extension.should.be.eql(document.extension)
+                    result.correctAngle.should.be.eql(document.correct_angle)
+                    result.applicationId.should.be.eql(document.application_id)
+                    result.mimeType.should.be.eql(document.mime_type)
+                    result.tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.removeTagFromDocument('documentId1', 'tag2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.removeTagFromDocument('documentId1', 'tag2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.removeTagFromDocument('documentId1', 'tag3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.removeTagFromDocument('documentId1', 'tag3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.removeTagFromDocument('documentId1', 'tag4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.removeTagFromDocument('documentId1', 'tag4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('adminUpdateDocument()', () => {
         it('should return a Document when providing fileName', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminUpdateDocument('documentId1', 'test.jpg').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(document.id)
-                result.creationTime.should.be.eql(document.creation_time)
-                result.filename.should.be.eql(document.filename)
-                result.extension.should.be.eql(document.extension)
-                result.correctAngle.should.be.eql(document.correct_angle)
-                result.applicationId.should.be.eql(document.application_id)
-                result.mimeType.should.be.eql(document.mime_type)
-                result.tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminUpdateDocument('documentId1', 'test.jpg').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(document.id)
+                    result.creationTime.should.be.eql(document.creation_time)
+                    result.filename.should.be.eql(document.filename)
+                    result.extension.should.be.eql(document.extension)
+                    result.correctAngle.should.be.eql(document.correct_angle)
+                    result.applicationId.should.be.eql(document.application_id)
+                    result.mimeType.should.be.eql(document.mime_type)
+                    result.tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a Document when providing rotationAngle', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminUpdateDocument('documentId1', null, 90).then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(document.id)
-                result.creationTime.should.be.eql(document.creation_time)
-                result.filename.should.be.eql(document.filename)
-                result.extension.should.be.eql(document.extension)
-                result.correctAngle.should.be.eql(document.correct_angle)
-                result.applicationId.should.be.eql(document.application_id)
-                result.mimeType.should.be.eql(document.mime_type)
-                result.tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminUpdateDocument('documentId1', null, 90).then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(document.id)
+                    result.creationTime.should.be.eql(document.creation_time)
+                    result.filename.should.be.eql(document.filename)
+                    result.extension.should.be.eql(document.extension)
+                    result.correctAngle.should.be.eql(document.correct_angle)
+                    result.applicationId.should.be.eql(document.application_id)
+                    result.mimeType.should.be.eql(document.mime_type)
+                    result.tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a Document when providing all parameters', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminUpdateDocument('documentId1', 'test.jpg', 90).then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(document.id)
-                result.creationTime.should.be.eql(document.creation_time)
-                result.filename.should.be.eql(document.filename)
-                result.extension.should.be.eql(document.extension)
-                result.correctAngle.should.be.eql(document.correct_angle)
-                result.applicationId.should.be.eql(document.application_id)
-                result.mimeType.should.be.eql(document.mime_type)
-                result.tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminUpdateDocument('documentId1', 'test.jpg', 90).then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(document.id)
+                    result.creationTime.should.be.eql(document.creation_time)
+                    result.filename.should.be.eql(document.filename)
+                    result.extension.should.be.eql(document.extension)
+                    result.correctAngle.should.be.eql(document.correct_angle)
+                    result.applicationId.should.be.eql(document.application_id)
+                    result.mimeType.should.be.eql(document.mime_type)
+                    result.tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminUpdateDocument('documentId1', 'test2.jpg').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(400)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminUpdateDocument('documentId1', 'test2.jpg').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(400)
+                    done()
+                })
             })
         })
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminUpdateDocument('documentId1', 'test3.jpg').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminUpdateDocument('documentId1', 'test3.jpg').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.adminUpdateDocument('documentId1', 'test4.jpg').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminUpdateDocument('documentId1', 'test4.jpg').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         })
     })
 
     describe('updateDocument()', () => {
         it('should return a Document when providing fileName', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.updateDocument('documentId1', 'test.jpg').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(document.id)
-                result.creationTime.should.be.eql(document.creation_time)
-                result.filename.should.be.eql(document.filename)
-                result.extension.should.be.eql(document.extension)
-                result.correctAngle.should.be.eql(document.correct_angle)
-                result.applicationId.should.be.eql(document.application_id)
-                result.mimeType.should.be.eql(document.mime_type)
-                result.tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.updateDocument('documentId1', 'test.jpg').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(document.id)
+                    result.creationTime.should.be.eql(document.creation_time)
+                    result.filename.should.be.eql(document.filename)
+                    result.extension.should.be.eql(document.extension)
+                    result.correctAngle.should.be.eql(document.correct_angle)
+                    result.applicationId.should.be.eql(document.application_id)
+                    result.mimeType.should.be.eql(document.mime_type)
+                    result.tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a Document when providing rotationAngle', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.updateDocument('documentId1', null, 90).then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(document.id)
-                result.creationTime.should.be.eql(document.creation_time)
-                result.filename.should.be.eql(document.filename)
-                result.extension.should.be.eql(document.extension)
-                result.correctAngle.should.be.eql(document.correct_angle)
-                result.applicationId.should.be.eql(document.application_id)
-                result.mimeType.should.be.eql(document.mime_type)
-                result.tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.updateDocument('documentId1', null, 90).then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(document.id)
+                    result.creationTime.should.be.eql(document.creation_time)
+                    result.filename.should.be.eql(document.filename)
+                    result.extension.should.be.eql(document.extension)
+                    result.correctAngle.should.be.eql(document.correct_angle)
+                    result.applicationId.should.be.eql(document.application_id)
+                    result.mimeType.should.be.eql(document.mime_type)
+                    result.tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a Document when providing all parameters', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.updateDocument('documentId1', 'test.jpg', 90).then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(document.id)
-                result.creationTime.should.be.eql(document.creation_time)
-                result.filename.should.be.eql(document.filename)
-                result.extension.should.be.eql(document.extension)
-                result.correctAngle.should.be.eql(document.correct_angle)
-                result.applicationId.should.be.eql(document.application_id)
-                result.mimeType.should.be.eql(document.mime_type)
-                result.tags.should.be.eql(document.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.updateDocument('documentId1', 'test.jpg', 90).then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(document.id)
+                    result.creationTime.should.be.eql(document.creation_time)
+                    result.filename.should.be.eql(document.filename)
+                    result.extension.should.be.eql(document.extension)
+                    result.correctAngle.should.be.eql(document.correct_angle)
+                    result.applicationId.should.be.eql(document.application_id)
+                    result.mimeType.should.be.eql(document.mime_type)
+                    result.tags.should.be.eql(document.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.updateDocument('documentId1', 'test2.jpg').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(400)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.updateDocument('documentId1', 'test2.jpg').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(400)
+                    done()
+                })
             })
         })
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.updateDocument('documentId1', 'test3.jpg').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.updateDocument('documentId1', 'test3.jpg').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.updateDocument('documentId1', 'test4.jpg').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.updateDocument('documentId1', 'test4.jpg').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         })
     })
@@ -3333,472 +3670,542 @@ describe('LeIA Annotation API', () => {
 
     describe('getAnnotations()', () => {
         it('should return a list of annotations', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getAnnotations().then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.annotations.should.be.a('array');
-                result.annotations.length.should.be.eql(1)
-                result.annotations[0].id.should.be.eql(annotation.id)
-                result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
-                result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
-                result.annotations[0].applicationId.should.be.eql(annotation.application_id)
-                result.annotations[0].documentId.should.be.eql(annotation.document_id)
-                result.annotations[0].name.should.be.eql(annotation.name)
-                result.annotations[0].prediction.should.be.eql(annotation.prediction)
-                result.annotations[0].tags.should.be.eql(annotation.tags)
-                done()
+                leiaAPI.getAnnotations().then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.annotations.should.be.a('array');
+                    result.annotations.length.should.be.eql(1)
+                    result.annotations[0].id.should.be.eql(annotation.id)
+                    result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
+                    result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
+                    result.annotations[0].applicationId.should.be.eql(annotation.application_id)
+                    result.annotations[0].documentId.should.be.eql(annotation.document_id)
+                    result.annotations[0].name.should.be.eql(annotation.name)
+                    result.annotations[0].prediction.should.be.eql(annotation.prediction)
+                    result.annotations[0].tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of annotations when offset is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getAnnotations(null, null, null, null, 20).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.annotations.should.be.a('array');
-                result.annotations.length.should.be.eql(1)
-                result.annotations[0].id.should.be.eql(annotation.id)
-                result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
-                result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
-                result.annotations[0].applicationId.should.be.eql(annotation.application_id)
-                result.annotations[0].documentId.should.be.eql(annotation.document_id)
-                result.annotations[0].name.should.be.eql(annotation.name)
-                result.annotations[0].prediction.should.be.eql(annotation.prediction)
-                result.annotations[0].tags.should.be.eql(annotation.tags)
-                done()
+                leiaAPI.getAnnotations(null, null, null, null, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.annotations.should.be.a('array');
+                    result.annotations.length.should.be.eql(1)
+                    result.annotations[0].id.should.be.eql(annotation.id)
+                    result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
+                    result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
+                    result.annotations[0].applicationId.should.be.eql(annotation.application_id)
+                    result.annotations[0].documentId.should.be.eql(annotation.document_id)
+                    result.annotations[0].name.should.be.eql(annotation.name)
+                    result.annotations[0].prediction.should.be.eql(annotation.prediction)
+                    result.annotations[0].tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when limit is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getAnnotations(null, null, null, null, null, 20).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.annotations.should.be.a('array');
-                result.annotations.length.should.be.eql(1)
-                result.annotations[0].id.should.be.eql(annotation.id)
-                result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
-                result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
-                result.annotations[0].applicationId.should.be.eql(annotation.application_id)
-                result.annotations[0].documentId.should.be.eql(annotation.document_id)
-                result.annotations[0].name.should.be.eql(annotation.name)
-                result.annotations[0].prediction.should.be.eql(annotation.prediction)
-                result.annotations[0].tags.should.be.eql(annotation.tags)
-                done()
+                leiaAPI.getAnnotations(null, null, null, null, null, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.annotations.should.be.a('array');
+                    result.annotations.length.should.be.eql(1)
+                    result.annotations[0].id.should.be.eql(annotation.id)
+                    result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
+                    result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
+                    result.annotations[0].applicationId.should.be.eql(annotation.application_id)
+                    result.annotations[0].documentId.should.be.eql(annotation.document_id)
+                    result.annotations[0].name.should.be.eql(annotation.name)
+                    result.annotations[0].prediction.should.be.eql(annotation.prediction)
+                    result.annotations[0].tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when tags is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getAnnotations(['tag1', 'tag2']).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.annotations.should.be.a('array');
-                result.annotations.length.should.be.eql(1)
-                result.annotations[0].id.should.be.eql(annotation.id)
-                result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
-                result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
-                result.annotations[0].applicationId.should.be.eql(annotation.application_id)
-                result.annotations[0].documentId.should.be.eql(annotation.document_id)
-                result.annotations[0].name.should.be.eql(annotation.name)
-                result.annotations[0].prediction.should.be.eql(annotation.prediction)
-                result.annotations[0].tags.should.be.eql(annotation.tags)
-                done()
+                leiaAPI.getAnnotations(['tag1', 'tag2']).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.annotations.should.be.a('array');
+                    result.annotations.length.should.be.eql(1)
+                    result.annotations[0].id.should.be.eql(annotation.id)
+                    result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
+                    result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
+                    result.annotations[0].applicationId.should.be.eql(annotation.application_id)
+                    result.annotations[0].documentId.should.be.eql(annotation.document_id)
+                    result.annotations[0].name.should.be.eql(annotation.name)
+                    result.annotations[0].prediction.should.be.eql(annotation.prediction)
+                    result.annotations[0].tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when annotationType is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getAnnotations(null, 'BOX').then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.annotations.should.be.a('array');
-                result.annotations.length.should.be.eql(1)
-                result.annotations[0].id.should.be.eql(annotation.id)
-                result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
-                result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
-                result.annotations[0].applicationId.should.be.eql(annotation.application_id)
-                result.annotations[0].documentId.should.be.eql(annotation.document_id)
-                result.annotations[0].name.should.be.eql(annotation.name)
-                result.annotations[0].prediction.should.be.eql(annotation.prediction)
-                result.annotations[0].tags.should.be.eql(annotation.tags)
-                done()
+                leiaAPI.getAnnotations(null, 'BOX').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.annotations.should.be.a('array');
+                    result.annotations.length.should.be.eql(1)
+                    result.annotations[0].id.should.be.eql(annotation.id)
+                    result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
+                    result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
+                    result.annotations[0].applicationId.should.be.eql(annotation.application_id)
+                    result.annotations[0].documentId.should.be.eql(annotation.document_id)
+                    result.annotations[0].name.should.be.eql(annotation.name)
+                    result.annotations[0].prediction.should.be.eql(annotation.prediction)
+                    result.annotations[0].tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when name is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getAnnotations(null, null, 'test').then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.annotations.should.be.a('array');
-                result.annotations.length.should.be.eql(1)
-                result.annotations[0].id.should.be.eql(annotation.id)
-                result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
-                result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
-                result.annotations[0].applicationId.should.be.eql(annotation.application_id)
-                result.annotations[0].documentId.should.be.eql(annotation.document_id)
-                result.annotations[0].name.should.be.eql(annotation.name)
-                result.annotations[0].prediction.should.be.eql(annotation.prediction)
-                result.annotations[0].tags.should.be.eql(annotation.tags)
-                done()
+                leiaAPI.getAnnotations(null, null, 'test').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.annotations.should.be.a('array');
+                    result.annotations.length.should.be.eql(1)
+                    result.annotations[0].id.should.be.eql(annotation.id)
+                    result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
+                    result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
+                    result.annotations[0].applicationId.should.be.eql(annotation.application_id)
+                    result.annotations[0].documentId.should.be.eql(annotation.document_id)
+                    result.annotations[0].name.should.be.eql(annotation.name)
+                    result.annotations[0].prediction.should.be.eql(annotation.prediction)
+                    result.annotations[0].tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when documentId is provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getAnnotations(null, null, null, 'documentId1').then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.annotations.should.be.a('array');
-                result.annotations.length.should.be.eql(1)
-                result.annotations[0].id.should.be.eql(annotation.id)
-                result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
-                result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
-                result.annotations[0].applicationId.should.be.eql(annotation.application_id)
-                result.annotations[0].documentId.should.be.eql(annotation.document_id)
-                result.annotations[0].name.should.be.eql(annotation.name)
-                result.annotations[0].prediction.should.be.eql(annotation.prediction)
-                result.annotations[0].tags.should.be.eql(annotation.tags)
-                done()
+                leiaAPI.getAnnotations(null, null, null, 'documentId1').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.annotations.should.be.a('array');
+                    result.annotations.length.should.be.eql(1)
+                    result.annotations[0].id.should.be.eql(annotation.id)
+                    result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
+                    result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
+                    result.annotations[0].applicationId.should.be.eql(annotation.application_id)
+                    result.annotations[0].documentId.should.be.eql(annotation.document_id)
+                    result.annotations[0].name.should.be.eql(annotation.name)
+                    result.annotations[0].prediction.should.be.eql(annotation.prediction)
+                    result.annotations[0].tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return a list of documents when all parameters are provided', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
 
-            leiaAPI.getAnnotations(['tag1', 'tag2'], 'BOX', 'test', 'documentId1', 20, 20).then((result) => {
-                result.contentRange.offset.should.be.eql(0)
-                result.contentRange.limit.should.be.eql(1)
-                result.contentRange.total.should.be.eql(1)
-                result.annotations.should.be.a('array');
-                result.annotations.length.should.be.eql(1)
-                result.annotations[0].id.should.be.eql(annotation.id)
-                result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
-                result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
-                result.annotations[0].applicationId.should.be.eql(annotation.application_id)
-                result.annotations[0].documentId.should.be.eql(annotation.document_id)
-                result.annotations[0].name.should.be.eql(annotation.name)
-                result.annotations[0].prediction.should.be.eql(annotation.prediction)
-                result.annotations[0].tags.should.be.eql(annotation.tags)
-                done()
+                leiaAPI.getAnnotations(['tag1', 'tag2'], 'BOX', 'test', 'documentId1', 20, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.annotations.should.be.a('array');
+                    result.annotations.length.should.be.eql(1)
+                    result.annotations[0].id.should.be.eql(annotation.id)
+                    result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
+                    result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
+                    result.annotations[0].applicationId.should.be.eql(annotation.application_id)
+                    result.annotations[0].documentId.should.be.eql(annotation.document_id)
+                    result.annotations[0].name.should.be.eql(annotation.name)
+                    result.annotations[0].prediction.should.be.eql(annotation.prediction)
+                    result.annotations[0].tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getAnnotations(null, null, null, null, null, 3).then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getAnnotations(null, null, null, null, null, 3).then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return an empty list when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getAnnotations(null, null, null, null, null, 5).then((result) => {
-                (result.contentRange == null).should.be.true
-                result.annotations.length.should.be.eql(0)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getAnnotations(null, null, null, null, null, 5).then((result) => {
+                    (result.contentRange == null).should.be.true
+                    result.annotations.length.should.be.eql(0)
+                    done()
+                })
             })
         })
     })
 
     describe('getAnnotation()', () => {
         it('should return an Annotation', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getAnnotation('id1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(annotation.id)
-                result.creationTime.should.be.eql(annotation.creation_time)
-                result.annotationType.should.be.eql(annotation.annotation_type)
-                result.applicationId.should.be.eql(annotation.application_id)
-                result.documentId.should.be.eql(annotation.document_id)
-                result.name.should.be.eql(annotation.name)
-                result.prediction.should.be.eql(annotation.prediction)
-                result.tags.should.be.eql(annotation.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getAnnotation('id1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(annotation.id)
+                    result.creationTime.should.be.eql(annotation.creation_time)
+                    result.annotationType.should.be.eql(annotation.annotation_type)
+                    result.applicationId.should.be.eql(annotation.application_id)
+                    result.documentId.should.be.eql(annotation.document_id)
+                    result.name.should.be.eql(annotation.name)
+                    result.prediction.should.be.eql(annotation.prediction)
+                    result.tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getAnnotation('id2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getAnnotation('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         });
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getAnnotation('id3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getAnnotation('id3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.getAnnotation('id4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getAnnotation('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('addAnnotation()', () => {
         it('should return an Annotation', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addAnnotation('documentId1', 'BOX', { category: 'TEST' }, 'test', ['tag1']).then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(annotation.id)
-                result.creationTime.should.be.eql(annotation.creation_time)
-                result.annotationType.should.be.eql(annotation.annotation_type)
-                result.applicationId.should.be.eql(annotation.application_id)
-                result.documentId.should.be.eql(annotation.document_id)
-                result.name.should.be.eql(annotation.name)
-                result.prediction.should.be.eql(annotation.prediction)
-                result.tags.should.be.eql(annotation.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addAnnotation('documentId1', 'BOX', { category: 'TEST' }, 'test', ['tag1']).then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(annotation.id)
+                    result.creationTime.should.be.eql(annotation.creation_time)
+                    result.annotationType.should.be.eql(annotation.annotation_type)
+                    result.applicationId.should.be.eql(annotation.application_id)
+                    result.documentId.should.be.eql(annotation.document_id)
+                    result.name.should.be.eql(annotation.name)
+                    result.prediction.should.be.eql(annotation.prediction)
+                    result.tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addAnnotation('documentId1', 'BOX', { category: 'TEST' }, 'test2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(400)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addAnnotation('documentId1', 'BOX', { category: 'TEST' }, 'test2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(400)
+                    done()
+                })
             })
         })
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addAnnotation('documentId1', 'BOX', { category: 'TEST' }, 'test3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addAnnotation('documentId1', 'BOX', { category: 'TEST' }, 'test3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
     })
 
     describe('deleteAnnotation()', () => {
         it('should call the right url', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.deleteAnnotation('id1').then((_) => {
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteAnnotation('id1').then((_) => {
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.deleteAnnotation('id2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteAnnotation('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         });
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.deleteAnnotation('id3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteAnnotation('id3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKey', serverURL)
-            leiaAPI.deleteAnnotation('id4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteAnnotation('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('addTagToDocument()', () => {
         it('should return an Annotation', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addTagToAnnotation('annotationId1', 'tag1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(annotation.id)
-                result.creationTime.should.be.eql(annotation.creation_time)
-                result.annotationType.should.be.eql(annotation.annotation_type)
-                result.applicationId.should.be.eql(annotation.application_id)
-                result.documentId.should.be.eql(annotation.document_id)
-                result.name.should.be.eql(annotation.name)
-                result.prediction.should.be.eql(annotation.prediction)
-                result.tags.should.be.eql(annotation.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addTagToAnnotation('annotationId1', 'tag1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(annotation.id)
+                    result.creationTime.should.be.eql(annotation.creation_time)
+                    result.annotationType.should.be.eql(annotation.annotation_type)
+                    result.applicationId.should.be.eql(annotation.application_id)
+                    result.documentId.should.be.eql(annotation.document_id)
+                    result.name.should.be.eql(annotation.name)
+                    result.prediction.should.be.eql(annotation.prediction)
+                    result.tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addTagToAnnotation('annotationId1', 'tag2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addTagToAnnotation('annotationId1', 'tag2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addTagToAnnotation('annotationId1', 'tag3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addTagToAnnotation('annotationId1', 'tag3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.addTagToAnnotation('annotationId1', 'tag4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.addTagToAnnotation('annotationId1', 'tag4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('removeTagFromAnnotation()', () => {
         it('should return a Document', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.removeTagFromAnnotation('annotationId1', 'tag1').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(annotation.id)
-                result.creationTime.should.be.eql(annotation.creation_time)
-                result.annotationType.should.be.eql(annotation.annotation_type)
-                result.applicationId.should.be.eql(annotation.application_id)
-                result.documentId.should.be.eql(annotation.document_id)
-                result.name.should.be.eql(annotation.name)
-                result.prediction.should.be.eql(annotation.prediction)
-                result.tags.should.be.eql(annotation.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.removeTagFromAnnotation('annotationId1', 'tag1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(annotation.id)
+                    result.creationTime.should.be.eql(annotation.creation_time)
+                    result.annotationType.should.be.eql(annotation.annotation_type)
+                    result.applicationId.should.be.eql(annotation.application_id)
+                    result.documentId.should.be.eql(annotation.document_id)
+                    result.name.should.be.eql(annotation.name)
+                    result.prediction.should.be.eql(annotation.prediction)
+                    result.tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.removeTagFromAnnotation('annotationId1', 'tag2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.removeTagFromAnnotation('annotationId1', 'tag2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.removeTagFromAnnotation('annotationId1', 'tag3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(403)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.removeTagFromAnnotation('annotationId1', 'tag3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
             })
         });
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.removeTagFromAnnotation('annotationId1', 'tag4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.removeTagFromAnnotation('annotationId1', 'tag4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         });
     })
 
     describe('updateAnnotation()', () => {
         it('should return an Annotation when providing name', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.updateAnnotation('annotationId1', 'test').then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(annotation.id)
-                result.creationTime.should.be.eql(annotation.creation_time)
-                result.annotationType.should.be.eql(annotation.annotation_type)
-                result.applicationId.should.be.eql(annotation.application_id)
-                result.documentId.should.be.eql(annotation.document_id)
-                result.name.should.be.eql(annotation.name)
-                result.prediction.should.be.eql(annotation.prediction)
-                result.tags.should.be.eql(annotation.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.updateAnnotation('annotationId1', 'test').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(annotation.id)
+                    result.creationTime.should.be.eql(annotation.creation_time)
+                    result.annotationType.should.be.eql(annotation.annotation_type)
+                    result.applicationId.should.be.eql(annotation.application_id)
+                    result.documentId.should.be.eql(annotation.document_id)
+                    result.name.should.be.eql(annotation.name)
+                    result.prediction.should.be.eql(annotation.prediction)
+                    result.tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return an Annotation when providing a prediction', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.updateAnnotation('annotationId1', null, { category: 'TEXT' }).then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(annotation.id)
-                result.creationTime.should.be.eql(annotation.creation_time)
-                result.annotationType.should.be.eql(annotation.annotation_type)
-                result.applicationId.should.be.eql(annotation.application_id)
-                result.documentId.should.be.eql(annotation.document_id)
-                result.name.should.be.eql(annotation.name)
-                result.prediction.should.be.eql(annotation.prediction)
-                result.tags.should.be.eql(annotation.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.updateAnnotation('annotationId1', null, { category: 'TEXT' }).then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(annotation.id)
+                    result.creationTime.should.be.eql(annotation.creation_time)
+                    result.annotationType.should.be.eql(annotation.annotation_type)
+                    result.applicationId.should.be.eql(annotation.application_id)
+                    result.documentId.should.be.eql(annotation.document_id)
+                    result.name.should.be.eql(annotation.name)
+                    result.prediction.should.be.eql(annotation.prediction)
+                    result.tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return an Annotation when providing all parameters', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.updateAnnotation('annotationId1', 'test', { category: 'TEXT' }).then((result) => {
-                result.should.be.a('object');
-                result.id.should.be.eql(annotation.id)
-                result.creationTime.should.be.eql(annotation.creation_time)
-                result.annotationType.should.be.eql(annotation.annotation_type)
-                result.applicationId.should.be.eql(annotation.application_id)
-                result.documentId.should.be.eql(annotation.document_id)
-                result.name.should.be.eql(annotation.name)
-                result.prediction.should.be.eql(annotation.prediction)
-                result.tags.should.be.eql(annotation.tags)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.updateAnnotation('annotationId1', 'test', { category: 'TEXT' }).then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(annotation.id)
+                    result.creationTime.should.be.eql(annotation.creation_time)
+                    result.annotationType.should.be.eql(annotation.annotation_type)
+                    result.applicationId.should.be.eql(annotation.application_id)
+                    result.documentId.should.be.eql(annotation.document_id)
+                    result.name.should.be.eql(annotation.name)
+                    result.prediction.should.be.eql(annotation.prediction)
+                    result.tags.should.be.eql(annotation.tags)
+                    done()
+                })
             })
         });
 
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.updateAnnotation('annotationId1', 'test2').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(400)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.updateAnnotation('annotationId1', 'test2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(400)
+                    done()
+                })
             })
         })
 
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.updateAnnotation('annotationId1', 'test3').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(401)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.updateAnnotation('annotationId1', 'test3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
             })
         })
 
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
-            var leiaAPI = new LeiaAPI('mockApiKeyDev', serverURL)
-            leiaAPI.updateAnnotation('annotationId1', 'test4').then((_) => {
-            }).catch((error) => {
-                error.status.should.be.eql(404)
-                done()
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.updateAnnotation('annotationId1', 'test4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
             })
         })
     })

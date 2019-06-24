@@ -3,83 +3,9 @@ var streamifier = require('streamifier')
 
 module.exports = class LeiaAPIRequest {
 
-    constructor(apiKey, serverURL, refreshToken) {
+    constructor(apiKey, serverURL) {
         this.apiKey = apiKey
         this.serverURL = serverURL
-        this.refreshToken = refreshToken
-        this.token = null
-    }
-    
-    loggedGet (url, json, contentRange) {
-        if (!this.token) {
-            var that = this
-            return this.login().then((result) => {
-                that.token = result.token
-                return that.get(url, json, contentRange, that.refreshToken)
-            })
-        } else {
-            return this.get(url, json, contentRange, this.refreshToken)
-        }
-    }
-    
-    loggedGetFile(url) {
-        if (!this.token) {
-            var that = this
-            return this.login().then((result) => {
-                that.token = result.token
-                return that.getFile(url, that.refreshToken)
-            })
-        } else {
-            return this.getFile(url, this.refreshToken)
-        }
-    }
-    
-    loggedPatch(url, body, json) {
-        if (!this.token) {
-            var that = this
-            return this.login().then((result) => {
-                that.token = result.token
-                return that.patch(url, body, json, that.refreshToken)
-            })
-        } else {
-            return this.patch(url, body, json, this.refreshToken)
-        }
-    }
-    
-    loggedDelete(url, json) {
-        if (!this.token) {
-            var that = this
-            return this.login().then((result) => {
-                that.token = result.token
-                return that.del(url, json, that.refreshToken)
-            })
-        } else {
-            return this.del(url, json, this.refreshToken)
-        }
-    }
-    
-    loggedPost(url, body, json) {
-        if (!this.token) {
-            var that = this
-            return this.login().then((result) => {
-                that.token = result.token
-                return that.post(url, body, json, that.refreshToken)
-            })
-        } else {
-            return this.post(url, body, json, this.refreshToken)
-        }
-    }
-    
-    loggedStreamPost (url, dataStream, json) {
-        if (!this.token) {
-            var that = this
-            return this.login().then((result) => {
-                that.token = result.token
-                return that.streamPost(url, dataStream, json, that.refreshToken)
-            })
-        } else {
-            return this.streamPost(url, dataStream, json, this.refreshToken)
-        }
     }
     
     post(url, body, json, refreshToken) {
