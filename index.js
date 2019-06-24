@@ -30,7 +30,7 @@ module.exports = class LeiaAPI {
 
     /**
      * Log in
-     * @return {Application}
+     * @returns {Application}
      */
 
     login() {

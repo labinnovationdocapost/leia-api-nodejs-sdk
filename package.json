@@ -1,7 +1,7 @@
 {
   "name": "leia-api-sdk",
   "version": "0.1.0",
-  "description": "Use LeIA API",
+  "description": "LEIA API allows you to use a wide range of Deep Learning tools to inject intelligence into your projects.",
   "main": "index.js",
   "scripts": {
     "test": "mocha --timeout 10000"
