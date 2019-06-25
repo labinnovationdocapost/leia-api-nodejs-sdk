@@ -25,7 +25,7 @@ leiaAPI.getDocuments().then((results) => {
 })
 ```
 
-You can also read the [LEIA API documentation](https://api.leia.io) on leia.io.
+You can also read the [LEIA API documentation](https://api.leia.io) on [leia.io](https://leia.io).
 
 
 
