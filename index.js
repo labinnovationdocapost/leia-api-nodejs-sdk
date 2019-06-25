@@ -506,7 +506,7 @@ module.exports = class LeiaAPI {
         var applicationIdStr = ""
         var firstChar = "&"
 
-        for (var i = 0; i < tags.length; i++) {
+        for (var i = 0; tags && i < tags.length; i++) {
             tagsStr += firstChar + 'tags=' + tags[i]
         }
 
@@ -539,7 +539,7 @@ module.exports = class LeiaAPI {
         var tagsStr = ""
         var firstChar = "&"
 
-        for (var i = 0; i < tags.length; i++) {
+        for (var i = 0; tags && i < tags.length; i++) {
             tagsStr += firstChar + 'tags=' + tags[i]
         }
 
