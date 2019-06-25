@@ -32,7 +32,8 @@ leiaAPI.addDocument('test.jpg', image.buffer).then((document) => {
 
 You can also read the [LEIA API documentation](https://api.leia.io) on [leia.io](https://leia.io).
 
-
+### Licence
+Apache 2.0
 
 
 

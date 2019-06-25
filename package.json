@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "LEIA API allows you to use a wide range of Deep Learning tools to inject intelligence into your projects.",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/labinnovationdocapost/leia-api-nodejs-sdk.git"
+  },
   "scripts": {
     "test": "mocha --timeout 10000"
   },
@@ -27,6 +31,6 @@
     "mongo-unit": "1.3.4",
     "nock": "10.0.6"
   },
-  "author": "Docaposte",
-  "license": "ISC"
+  "author": "Sébastien Cano",
+  "license": "Apache-2.0"
 }
