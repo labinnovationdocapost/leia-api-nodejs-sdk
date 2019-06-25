@@ -20,8 +20,13 @@ leiaAPI.login('apiKey').then((application) => {
     console.log("you", application)
 })
 ...
-leiaAPI.getDocuments().then((results) => {
-   ...
+leiaAPI.addDocument('test.jpg', image.buffer).then((document) => {
+   documentId = document.id
+   return leiaAPI.addModel('my model', model.buffer)
+}).then((model) => {
+   return leiaAPI.applyModelToDocument(model.id, [documentId])
+}).then((results) => {
+   console.log(results)
 })
 ```
 
