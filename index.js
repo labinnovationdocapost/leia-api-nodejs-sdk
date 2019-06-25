@@ -35,7 +35,7 @@ module.exports = class LeiaAPI {
         const leiaAPIRequest = new LeiaAPIRequest(apiKey, this.serverURL)
         var that = this
         return new Promise(function (resolve, reject) {
-            leiaAPIRequest.get(that.serverURL + '/login/' + apiKey, true, false, false).then((body) => {
+            leiaAPIRequest.login().then((body) => {
                 that.leiaAPIRequest = leiaAPIRequest
                 resolve(new Application(body.application.id, body.application.creation_time, body.application.application_type, body.application.email, body.application.application_name, body.application.first_name, body.application.last_name, body.application.api_key))
             }).catch((error) => {
@@ -114,7 +114,7 @@ module.exports = class LeiaAPI {
                 resolve({ contentRange, applications })
             }).catch((error) => {
                 if (error.status == 404) {
-                    return resolve({ contentRange: null, applications: [] })
+                    return resolve({ contentRange: { offset: 0, limit: 0, total: 0 }, applications: [] })
                 }
                 reject(error)
             })
@@ -355,7 +355,7 @@ module.exports = class LeiaAPI {
                 resolve({ contentRange, models })
             }).catch((error) => {
                 if (error.status == 404) {
-                    return resolve({ contentRange: null, models: [] })
+                    return resolve({ contentRange: { offset: 0, limit: 0, total: 0 }, models: [] })
                 }
                 reject(error)
             })
@@ -418,7 +418,7 @@ module.exports = class LeiaAPI {
                 resolve({ contentRange, models })
             }).catch((error) => {
                 if (error.status == 404) {
-                    return resolve({ contentRange: null, models: [] })
+                    return resolve({ contentRange: { offset: 0, limit: 0, total: 0 }, models: [] })
                 }
                 reject(error)
             })
@@ -904,7 +904,7 @@ module.exports = class LeiaAPI {
                 resolve({ contentRange, documents })
             }).catch((error) => {
                 if (error.status == 404) {
-                    return resolve({ contentRange: null, documents: [] })
+                    return resolve({ contentRange: { offset: 0, limit: 0, total: 0 }, documents: [] })
                 }
                 reject(error)
             })
@@ -968,7 +968,7 @@ module.exports = class LeiaAPI {
                 resolve({ contentRange, documents })
             }).catch((error) => {
                 if (error.status == 404) {
-                    return resolve({ contentRange: null, documents: [] })
+                    return resolve({ contentRange: { offset: 0, limit: 0, total: 0 }, documents: [] })
                 }
                 reject(error)
             })
@@ -1368,7 +1368,7 @@ module.exports = class LeiaAPI {
                 resolve({ contentRange, annotations })
             }).catch((error) => {
                 if (error.status == 404) {
-                    return resolve({ contentRange: null, annotations: [] })
+                    return resolve({ contentRange: { offset: 0, limit: 0, total: 0 }, annotations: [] })
                 }
                 reject(error)
             })

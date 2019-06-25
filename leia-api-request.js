@@ -162,6 +162,7 @@ module.exports = class LeiaAPIRequest {
         var that = this
         return new Promise(function (resolve, reject) {
             that.get(that.serverURL + '/login/' + that.apiKey, true, false, false).then((body) => {
+                that.token = body.token
                 resolve(body)
             }).catch((error) => {
                 reject(error)

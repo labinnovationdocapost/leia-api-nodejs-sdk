@@ -1265,7 +1265,9 @@ describe('LeIA Application API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
                 leiaAPI.adminGetApplications(null, null, null, null, 5).then((result) => {
-                    (result.contentRange == null).should.be.true
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(0)
+                    result.contentRange.total.should.be.eql(0)
                     result.applications.length.should.be.eql(0)
                     done()
                 })
@@ -1712,7 +1714,9 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
                 leiaAPI.adminGetModels(null, null, null, 5).then((result) => {
-                    (result.contentRange == null).should.be.true
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(0)
+                    result.contentRange.total.should.be.eql(0)
                     result.models.length.should.be.eql(0)
                     done()
                 })
@@ -1886,7 +1890,9 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
                 leiaAPI.getModels(null, null, null, 5).then((result) => {
-                    (result.contentRange == null).should.be.true
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(0)
+                    result.contentRange.total.should.be.eql(0)
                     result.models.length.should.be.eql(0)
                     done()
                 })
@@ -2610,7 +2616,9 @@ describe('LeIA Document API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
                 leiaAPI.adminGetDocuments(null, null, null, 5).then((result) => {
-                    (result.contentRange == null).should.be.true
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(0)
+                    result.contentRange.total.should.be.eql(0)
                     result.documents.length.should.be.eql(0)
                     done()
                 })
@@ -2795,7 +2803,9 @@ describe('LeIA Document API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
                 leiaAPI.getDocuments(null, null, null, 5).then((result) => {
-                    (result.contentRange == null).should.be.true
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(0)
+                    result.contentRange.total.should.be.eql(0)
                     result.documents.length.should.be.eql(0)
                     done()
                 })
@@ -3868,7 +3878,9 @@ describe('LeIA Annotation API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
                 leiaAPI.getAnnotations(null, null, null, null, null, 5).then((result) => {
-                    (result.contentRange == null).should.be.true
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(0)
+                    result.contentRange.total.should.be.eql(0)
                     result.annotations.length.should.be.eql(0)
                     done()
                 })
