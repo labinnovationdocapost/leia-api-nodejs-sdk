@@ -147,7 +147,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/model?name=' + name + '&application_id=' + applicationId + (description ? '&description=' + description : '') + (ttl ? '&ttl=' + ttl : '') + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/model?name=' + name + '&application_id=' + applicationId + (description ? '&description=' + description : '') + (ttl !== null ? '&ttl=' + ttl : '') + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -252,7 +252,7 @@ module.exports = class LeiaAPI {
             query += firstChar + 'description=' + description
             firstChar = "&"
         }
-        if (ttl) {
+        if (ttl != null) {
             query += firstChar + 'ttl=' + ttl
             firstChar = "&"
         }
@@ -1252,7 +1252,7 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (rotationAngle) {
+        if (rotationAngle != null) {
             rotationAngleStr = firstChar + "rotation_angle=" + rotationAngle
             firstChar = "&"
         }
@@ -1290,7 +1290,7 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (rotationAngle) {
+        if (rotationAngle != null) {
             rotationAngleStr = firstChar + "rotation_angle=" + rotationAngle
             firstChar = "&"
         }
@@ -1504,7 +1504,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/annotation?document_id=' + documentId + '&annotation_type=' + annotationType + (name ? ('&name=' + name) : '') + tagsStr, prediction, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/annotation/'+ documentId + '?annotation_type=' + annotationType + (name ? ('&name=' + name) : '') + tagsStr, prediction, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {

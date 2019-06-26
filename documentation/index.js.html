@@ -63,7 +63,7 @@ class LeiaAPI {
         const leiaAPIRequest = new LeiaAPIRequest(apiKey, this.serverURL)
         var that = this
         return new Promise(function (resolve, reject) {
-            leiaAPIRequest.get(that.serverURL + '/login/' + apiKey, true, false, false).then((body) => {
+            leiaAPIRequest.login().then((body) => {
                 that.leiaAPIRequest = leiaAPIRequest
                 resolve(new Application(body.application.id, body.application.creation_time, body.application.application_type, body.application.email, body.application.application_name, body.application.first_name, body.application.last_name, body.application.api_key))
             }).catch((error) => {
@@ -142,7 +142,7 @@ class LeiaAPI {
                 resolve({ contentRange, applications })
             }).catch((error) => {
                 if (error.status == 404) {
-                    return resolve({ contentRange: null, applications: [] })
+                    return resolve({ contentRange: { offset: 0, limit: 0, total: 0 }, applications: [] })
                 }
                 reject(error)
             })
@@ -175,7 +175,7 @@ class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/model?name=' + name + '&amp;application_id=' + applicationId + (description ? '&amp;description=' + description : '') + (ttl ? '&amp;ttl=' + ttl : '') + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/model?name=' + name + '&amp;application_id=' + applicationId + (description ? '&amp;description=' + description : '') + (ttl !== null ? '&amp;ttl=' + ttl : '') + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -280,7 +280,7 @@ class LeiaAPI {
             query += firstChar + 'description=' + description
             firstChar = "&amp;"
         }
-        if (ttl) {
+        if (ttl != null) {
             query += firstChar + 'ttl=' + ttl
             firstChar = "&amp;"
         }
@@ -383,7 +383,7 @@ class LeiaAPI {
                 resolve({ contentRange, models })
             }).catch((error) => {
                 if (error.status == 404) {
-                    return resolve({ contentRange: null, models: [] })
+                    return resolve({ contentRange: { offset: 0, limit: 0, total: 0 }, models: [] })
                 }
                 reject(error)
             })
@@ -446,7 +446,7 @@ class LeiaAPI {
                 resolve({ contentRange, models })
             }).catch((error) => {
                 if (error.status == 404) {
-                    return resolve({ contentRange: null, models: [] })
+                    return resolve({ contentRange: { offset: 0, limit: 0, total: 0 }, models: [] })
                 }
                 reject(error)
             })
@@ -534,7 +534,7 @@ class LeiaAPI {
         var applicationIdStr = ""
         var firstChar = "&amp;"
 
-        for (var i = 0; i &lt; tags.length; i++) {
+        for (var i = 0; tags &amp;&amp; i &lt; tags.length; i++) {
             tagsStr += firstChar + 'tags=' + tags[i]
         }
 
@@ -567,7 +567,7 @@ class LeiaAPI {
         var tagsStr = ""
         var firstChar = "&amp;"
 
-        for (var i = 0; i &lt; tags.length; i++) {
+        for (var i = 0; tags &amp;&amp; i &lt; tags.length; i++) {
             tagsStr += firstChar + 'tags=' + tags[i]
         }
 
@@ -878,15 +878,17 @@ class LeiaAPI {
     * @param {integer} offset (optional) - list offset number for pagination
     * @param {integer} limit (optional) - max per page
     * @param {string} applicationId (optional) - an Application id to filter documents
+    * @param {string} tagResult (optional) - a tag to add to fetched documents
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
     */
 
-    adminGetDocuments(tags = null, sort = null, offset = null, limit = null, applicationId = null) {
+    adminGetDocuments(tags = null, sort = null, offset = null, limit = null, applicationId = null, tagResult = null) {
         var offsetStr = ""
         var limitStr = ""
         var tagsStr = ""
         var applicationIdStr = ""
         var sortStr = ""
+        var tagResultStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -914,6 +916,10 @@ class LeiaAPI {
             firstChar = "&amp;"
         }
 
+        if (tagResult) {
+            tagResultStr = firstChar + "tag_result=" + tagResult
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -921,7 +927,7 @@ class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/document' + offsetStr + limitStr + tagsStr + applicationIdStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/document' + offsetStr + limitStr + tagsStr + applicationIdStr + sortStr + tagResultStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
@@ -932,7 +938,7 @@ class LeiaAPI {
                 resolve({ contentRange, documents })
             }).catch((error) => {
                 if (error.status == 404) {
-                    return resolve({ contentRange: null, documents: [] })
+                    return resolve({ contentRange: { offset: 0, limit: 0, total: 0 }, documents: [] })
                 }
                 reject(error)
             })
@@ -948,14 +954,16 @@ class LeiaAPI {
     * If a parameter is preceded by '-' it means descending order.
     * @param {integer} offset (optional) - list offset number for pagination
     * @param {integer} limit (optional) - max per page
+    * @param {string} tagResult (optional) - a tag to add to fetched documents
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
     */
 
-    getDocuments(tags = null, sort = null, offset = null, limit = null) {
+    getDocuments(tags = null, sort = null, offset = null, limit = null, tagResult = null) {
         var offsetStr = ""
         var limitStr = ""
         var tagsStr = ""
         var sortStr = ""
+        var tagResultStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -978,6 +986,10 @@ class LeiaAPI {
             firstChar = "&amp;"
         }
 
+        if (tagResult) {
+            tagResultStr = firstChar + "tag_result=" + tagResult
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -985,7 +997,7 @@ class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/document' + offsetStr + limitStr + tagsStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/document' + offsetStr + limitStr + tagsStr + sortStr + tagResultStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
@@ -996,7 +1008,7 @@ class LeiaAPI {
                 resolve({ contentRange, documents })
             }).catch((error) => {
                 if (error.status == 404) {
-                    return resolve({ contentRange: null, documents: [] })
+                    return resolve({ contentRange: { offset: 0, limit: 0, total: 0 }, documents: [] })
                 }
                 reject(error)
             })
@@ -1268,7 +1280,7 @@ class LeiaAPI {
             firstChar = "&amp;"
         }
 
-        if (rotationAngle) {
+        if (rotationAngle != null) {
             rotationAngleStr = firstChar + "rotation_angle=" + rotationAngle
             firstChar = "&amp;"
         }
@@ -1306,7 +1318,7 @@ class LeiaAPI {
             firstChar = "&amp;"
         }
 
-        if (rotationAngle) {
+        if (rotationAngle != null) {
             rotationAngleStr = firstChar + "rotation_angle=" + rotationAngle
             firstChar = "&amp;"
         }
@@ -1396,7 +1408,7 @@ class LeiaAPI {
                 resolve({ contentRange, annotations })
             }).catch((error) => {
                 if (error.status == 404) {
-                    return resolve({ contentRange: null, annotations: [] })
+                    return resolve({ contentRange: { offset: 0, limit: 0, total: 0 }, annotations: [] })
                 }
                 reject(error)
             })
@@ -1520,7 +1532,7 @@ class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/annotation?document_id=' + documentId + '&amp;annotation_type=' + annotationType + (name ? ('&amp;name=' + name) : '') + tagsStr, prediction, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/annotation/'+ documentId + '?annotation_type=' + annotationType + (name ? ('&amp;name=' + name) : '') + tagsStr, prediction, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -1585,7 +1597,7 @@ class LeiaAPI {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.2</a> on Mon Jun 24 2019 10:46:51 GMT+0100 (GMT+01:00)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.2</a> on Wed Jun 26 2019 15:22:03 GMT+0100 (GMT+01:00)
 </footer>
 
 <script> prettyPrint(); </script>

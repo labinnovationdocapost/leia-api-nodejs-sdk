@@ -960,27 +960,27 @@ function mockAnnotationAPI() {
         .reply(404, null);
 
     nock(serverURL)
-        .post('/annotation?document_id=documentId1&annotation_type=BOX')
+        .post('/annotation/documentId1?annotation_type=BOX')
         .reply(200, annotation);
 
     nock(serverURL)
-        .post('/annotation?document_id=documentId1&annotation_type=BOX&name=test')
+        .post('/annotation/documentId1?annotation_type=BOX&name=test')
         .reply(200, annotation);
 
     nock(serverURL)
-        .post('/annotation?document_id=documentId1&annotation_type=BOX&tags=tag1')
+        .post('/annotation/documentId1?annotation_type=BOX&tags=tag1')
         .reply(200, annotation);
 
     nock(serverURL)
-        .post('/annotation?document_id=documentId1&annotation_type=BOX&name=test&tags=tag1')
+        .post('/annotation/documentId1?annotation_type=BOX&name=test&tags=tag1')
         .reply(200, annotation);
 
     nock(serverURL)
-        .post('/annotation?document_id=documentId1&annotation_type=BOX&name=test2')
+        .post('/annotation/documentId1?annotation_type=BOX&name=test2')
         .reply(400, null);
 
     nock(serverURL)
-        .post('/annotation?document_id=documentId1&annotation_type=BOX&name=test3')
+        .post('/annotation/documentId1?annotation_type=BOX&name=test3')
         .reply(401, null);
 
     nock(serverURL)
