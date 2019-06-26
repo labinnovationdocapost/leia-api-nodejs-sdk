@@ -850,15 +850,17 @@ module.exports = class LeiaAPI {
     * @param {integer} offset (optional) - list offset number for pagination
     * @param {integer} limit (optional) - max per page
     * @param {string} applicationId (optional) - an Application id to filter documents
+    * @param {string} tagResult (optional) - a tag to add to fetched documents
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
     */
 
-    adminGetDocuments(tags = null, sort = null, offset = null, limit = null, applicationId = null) {
+    adminGetDocuments(tags = null, sort = null, offset = null, limit = null, applicationId = null, tagResult = null) {
         var offsetStr = ""
         var limitStr = ""
         var tagsStr = ""
         var applicationIdStr = ""
         var sortStr = ""
+        var tagResultStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -886,6 +888,10 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
+        if (tagResult) {
+            tagResultStr = firstChar + "tag_result=" + tagResult
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -893,7 +899,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/document' + offsetStr + limitStr + tagsStr + applicationIdStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/document' + offsetStr + limitStr + tagsStr + applicationIdStr + sortStr + tagResultStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
@@ -920,14 +926,16 @@ module.exports = class LeiaAPI {
     * If a parameter is preceded by '-' it means descending order.
     * @param {integer} offset (optional) - list offset number for pagination
     * @param {integer} limit (optional) - max per page
+    * @param {string} tagResult (optional) - a tag to add to fetched documents
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
     */
 
-    getDocuments(tags = null, sort = null, offset = null, limit = null) {
+    getDocuments(tags = null, sort = null, offset = null, limit = null, tagResult = null) {
         var offsetStr = ""
         var limitStr = ""
         var tagsStr = ""
         var sortStr = ""
+        var tagResultStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -950,6 +958,10 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
+        if (tagResult) {
+            tagResultStr = firstChar + "tag_result=" + tagResult
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -957,7 +969,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/document' + offsetStr + limitStr + tagsStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/document' + offsetStr + limitStr + tagsStr + sortStr + tagResultStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
