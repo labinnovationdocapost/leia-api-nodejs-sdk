@@ -2,6 +2,7 @@ var Model = require('./models/model')
 var Application = require('./models/application')
 var Document = require('./models/document')
 var Annotation = require('./models/annotation')
+var Job = require('./models/job')
 var LeiaAPIRequest = require('./leia-api-request')
 var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils')
 
@@ -123,8 +124,8 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Add a Model (admin)
-    * @param {string} name - a Model name
     * @param {string} applicationId - an Application id
+    * @param {string} name - a Model name
     * @param {Buffer} fileBuffer - a model file zip buffer. The model inside the zip should have a valid name.
     * @param {string} description (optional) - a Model description
     * @param {integer} ttl (optional) - a ttl value in seconds
@@ -132,7 +133,7 @@ module.exports = class LeiaAPI {
     * @returns {Model}
     */
 
-    adminAddModel(name, applicationId, fileBuffer, description = null, ttl = null, tags = null) {
+    adminAddModel(applicationId, name, fileBuffer, description = null, ttl = null, tags = null) {
         var that = this
         var tagsStr = ""
         var firstChar = "&"
@@ -147,7 +148,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/model?name=' + name + '&application_id=' + applicationId + (description ? '&description=' + description : '') + (ttl !== null ? '&ttl=' + ttl : '') + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/model?name=' + name + (description ? '&description=' + description : '') + (ttl ? '&ttl=' + ttl : '') + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -191,11 +192,11 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Reset an Application API Key and get a new one (admin)
-    * @param {string} id - an Application id
+    * @param {string} applicationId - an Application id
     * @returns {Application} an Application object with the new API Key
     */
 
-    adminResetApplicationApiKey(id) {
+    adminResetApplicationApiKey(applicationId) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -203,7 +204,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/application/' + id + '/reset_api_key', {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/application/' + applicationId + '/reset_api_key', {}, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.api_key))
             }).catch((error) => {
                 reject(error)
@@ -213,10 +214,11 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Delete a Model (admin)
-    * @param {string} id - a Model id
+    * @param {string} applicationId - an Application id
+    * @param {string} modelId - a Model id
      */
 
-    adminDeleteModel(id) {
+    adminDeleteModel(applicationId, modelId) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -224,7 +226,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/model/' + id, true, false, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/model/' + modelId, true, false, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -234,14 +236,15 @@ module.exports = class LeiaAPI {
 
     /**
      * (promise) Update a Model (admin)
-     * @param {string} id - a Model id
+     * @param {string} applicationId - an Application id
+     * @param {string} modelId - a Model id
      * @param {string} name - a Model name
      * @param {string} description - a Model description
      * @param {integer} ttl - a TTL value in seconds
      * @returns {Model}
      */
 
-    adminUpdateModel(id, name = null, description = null, ttl = null) {
+    adminUpdateModel(applicationId, modelId, name = null, description = null, ttl = null) {
         var query = ""
         var firstChar = "?"
         if (name) {
@@ -252,7 +255,7 @@ module.exports = class LeiaAPI {
             query += firstChar + 'description=' + description
             firstChar = "&"
         }
-        if (ttl != null) {
+        if (ttl) {
             query += firstChar + 'ttl=' + ttl
             firstChar = "&"
         }
@@ -264,7 +267,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.patch(that.serverURL + '/admin/model/' + id + query, {}, true, false, that.autoRefreshToken).then((model) => {
+            that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + query, {}, true, false, that.autoRefreshToken).then((model) => {
                 resolve(model)
             }).catch((error) => {
                 reject(error)
@@ -274,10 +277,10 @@ module.exports = class LeiaAPI {
 
     /**
      * (promise) Delete an Application (admin)
-     * @param {string} id - an Application id
+     * @param {string} applicationId - an Application id
      */
 
-    adminDeleteApplication(id) {
+    adminDeleteApplication(applicationId) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -285,7 +288,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/application/' + id, true, false, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/application/' + applicationId, true, false, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -427,11 +430,11 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Return a Model (admin)
-    * @param {string} id - a Model id
+    * @param {string} modelId - a Model id
     * @returns {Model}
     */
 
-    adminGetModel(id) {
+    adminGetModel(modelId) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -439,7 +442,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/model/' + id, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/model/' + modelId, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -449,11 +452,11 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Return a Model
-    * @param {string} id - a Model id
+    * @param {string} modelId - a Model id
     * @returns {Model}
     */
 
-    getModel(id) {
+    getModel(modelId) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -461,7 +464,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/model/' + id, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/model/' + modelId, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -472,11 +475,11 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Return an Application (admin)
-    * @param {string} id - an Application id
+    * @param {string} applicationId - an Application id
     * @returns {Application}
     */
 
-    adminGetApplication(id) {
+    adminGetApplication(applicationId) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -484,7 +487,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/application/' + id, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/application/' + applicationId, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.api_key))
             }).catch((error) => {
                 reject(error)
@@ -494,23 +497,20 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Add a Document (admin)
+    * @param {string} applicationId - an Application id
     * @param {string} fileName - a document file name
     * @param {Buffer} fileBuffer - a document file buffer
-    * @param {string} applicationId - an Application id
     * @param {string[]} tags (optional) - a list of tags
     * @returns {Model}
     */
 
-    adminAddDocument(fileName, fileBuffer, applicationId, tags = null) {
+    adminAddDocument(applicationId, fileName, fileBuffer, tags = null) {
         var tagsStr = ""
-        var applicationIdStr = ""
         var firstChar = "&"
 
         for (var i = 0; tags && i < tags.length; i++) {
             tagsStr += firstChar + 'tags=' + tags[i]
         }
-
-        applicationIdStr = firstChar + "application_id=" + applicationId
 
         var that = this
         return new Promise(function (resolve, reject) {
@@ -519,7 +519,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/document?filename=' + fileName + tagsStr + applicationIdStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/document?filename=' + fileName + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -559,17 +559,18 @@ module.exports = class LeiaAPI {
     }
 
     /**
-     * (promise) Transform a PDF into an image or text (admin)
+     * (promise) Transform a list of PDF into images or text (admin)
+     * @param {string} applicationId - an Application id
      * @param {string[]} documentIds - a list of Document ids
      * @param {string} outputType - an output type. 
      * @param {string} inputTag (optional) - The tag of the documents to process. 
      * If inputTag is present, document_ids should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
      * @param {string} outputTag (optional) - an output tag for the new documents
-     * @returns {Document[]}
+     * @returns {Job} a job with the processing info
      */
 
-    adminTransformPDF(documentIds, outputType, inputTag = null, outputTag = null) {
+    adminTransformPDF(applicationId, documentIds, outputType, inputTag = null, outputTag = null) {
         var documentIdsString = documentIds.join(',')
         var inputTagStr = ""
         var outputTagStr = ""
@@ -592,12 +593,8 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr, {}, true, false, that.autoRefreshToken).then((body) => {
-                var documents = []
-                for (var i = 0; i < body.length; i++) {
-                    documents.push(new Document(body[i].id, body[i].creation_time, body[i].application_id, body[i].filename, body[i].extension, body[i].mime_type, body[i].correct_angle, body[i].tags))
-                }
-                resolve(documents)
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr, {}, true, false, that.autoRefreshToken).then((body) => {
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, body.result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -605,14 +602,14 @@ module.exports = class LeiaAPI {
     }
 
     /**
-     * (promise) Transform a PDF into an image or text
+     * (promise) Transform a list of PDF into images or text
      * @param {string[]} documentIds - a list of Document ids
      * @param {string} outputType - an output type. 
      * @param {string} inputTag (optional) - The tag of the documents to process. 
      * If inputTag is present, document_ids should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
      * @param {string} outputTag (optional) - an output tag for the new documents
-     * @returns {Document[]}
+     * @returns {Job} a job with the processing info
      */
 
     transformPDF(documentIds, outputType, inputTag = null, outputTag = null) {
@@ -640,11 +637,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.post(that.serverURL + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr, {}, true, false, that.autoRefreshToken).then((body) => {
-                var documents = []
-                for (var i = 0; i < body.length; i++) {
-                    documents.push(new Document(body[i].id, body[i].creation_time, body[i].application_id, body[i].filename, body[i].extension, body[i].mime_type, body[i].correct_angle, body[i].tags))
-                }
-                resolve(documents)
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, body.result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -652,16 +645,17 @@ module.exports = class LeiaAPI {
     }
 
     /**
-     * (promise) Apply a Model to a Document (admin)
+     * (promise) Apply a Model to a list of Documents (admin)
+     * @param {string} applicationId - an Application id
      * @param {string} modelId - a Model id
      * @param {string[]} documentIds - a list of Document ids
      * @param {string} tag (optional) - The tag of the documents to process.
      * If tag is present, documentIds should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
-     * @returns {object} a result object
+     * @returns {Job} a job with the processing info
      */
 
-    adminApplyModelToDocument(modelId, documentIds, tag = null) {
+    adminApplyModelToDocuments(applicationId, modelId, documentIds, tag = null) {
         var documentIdsString = documentIds.join(',')
         var that = this
         return new Promise(function (resolve, reject) {
@@ -670,8 +664,8 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/model/' + modelId + '/apply/' + documentIdsString + (tag ? '?tag=' + tag : ''), true, false, that.autoRefreshToken).then((body) => {
-                resolve(body)
+            that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/apply/' + documentIdsString + (tag ? '?tag=' + tag : ''), true, false, that.autoRefreshToken).then((body) => {
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, body.result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -679,16 +673,16 @@ module.exports = class LeiaAPI {
     }
 
     /**
-     * (promise) Apply a Model to a Document
+     * (promise) Apply a Model to a list of Documents
      * @param {string} modelId - a Model id
      * @param {string[]} documentIds - a list of Document ids
      * @param {string} tag (optional) - The tag of the documents to process.
      * If tag is present, documentIds should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
-     * @returns {object} a result object
+     * @returns {Job} a job with the processing info
      */
 
-    applyModelToDocument(modelId, documentIds, tag = null) {
+    applyModelToDocuments(modelId, documentIds, tag = null) {
         var documentIdsString = documentIds.join(',')
         var that = this
         return new Promise(function (resolve, reject) {
@@ -698,7 +692,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + (tag ? '?tag=' + tag : ''), true, false, that.autoRefreshToken).then((body) => {
-                resolve(body)
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, body.result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -707,11 +701,12 @@ module.exports = class LeiaAPI {
 
     /**
      * Delete a Document (admin)
+     * @param {string} applicationId - an Application id
      * @param {string} documentId - a Document id
      * 
      */
 
-    adminDeleteDocument(documentId) {
+    adminDeleteDocument(applicationId, documentId) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -719,7 +714,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/document/' + documentId, false, false, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/document/' + documentId, false, false, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -751,12 +746,13 @@ module.exports = class LeiaAPI {
 
     /**
      * (promise) Add a tag to a Model (admin
+     * @param {string} applicationId - an Application id
      * @param {string} modelId - a Model id
      * @param {string} tag - the tag to add
      * @returns {Model}
      */
 
-    adminAddTagToModel(modelId, tag) {
+    adminAddTagToModel(applicationId, modelId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -764,7 +760,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/model/' + modelId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -797,12 +793,13 @@ module.exports = class LeiaAPI {
 
     /**
      * (promise) Remove a tag from a Model (admin)
+     * @param {string} applicationId - an Application id
      * @param {string} modelId - a Model id
      * @param {string} tag - the tag to add
      * @returns {Model}
      */
 
-    adminRemoveTagFromModel(modelId, tag) {
+    adminRemoveTagFromModel(applicationId, modelId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -810,7 +807,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/model/' + modelId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -850,17 +847,15 @@ module.exports = class LeiaAPI {
     * @param {integer} offset (optional) - list offset number for pagination
     * @param {integer} limit (optional) - max per page
     * @param {string} applicationId (optional) - an Application id to filter documents
-    * @param {string} tagResult (optional) - a tag to add to fetched documents
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
     */
 
-    adminGetDocuments(tags = null, sort = null, offset = null, limit = null, applicationId = null, tagResult = null) {
+    adminGetDocuments(tags = null, sort = null, offset = null, limit = null, applicationId = null) {
         var offsetStr = ""
         var limitStr = ""
         var tagsStr = ""
         var applicationIdStr = ""
         var sortStr = ""
-        var tagResultStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -888,10 +883,6 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (tagResult) {
-            tagResultStr = firstChar + "tag_result=" + tagResult
-        }
-
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -899,7 +890,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/document' + offsetStr + limitStr + tagsStr + applicationIdStr + sortStr + tagResultStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/document' + offsetStr + limitStr + tagsStr + applicationIdStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
@@ -926,16 +917,14 @@ module.exports = class LeiaAPI {
     * If a parameter is preceded by '-' it means descending order.
     * @param {integer} offset (optional) - list offset number for pagination
     * @param {integer} limit (optional) - max per page
-    * @param {string} tagResult (optional) - a tag to add to fetched documents
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
     */
 
-    getDocuments(tags = null, sort = null, offset = null, limit = null, tagResult = null) {
+    getDocuments(tags = null, sort = null, offset = null, limit = null) {
         var offsetStr = ""
         var limitStr = ""
         var tagsStr = ""
         var sortStr = ""
-        var tagResultStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -958,10 +947,6 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (tagResult) {
-            tagResultStr = firstChar + "tag_result=" + tagResult
-        }
-
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -969,7 +954,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/document' + offsetStr + limitStr + tagsStr + sortStr + tagResultStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/document' + offsetStr + limitStr + tagsStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
@@ -1143,12 +1128,13 @@ module.exports = class LeiaAPI {
 
     /**
      * (promise) Add a tag to a Document (admin)
+     * @param {string} applicationId - an Application id
      * @param {string} documentId - a Document id
      * @param {string} tag - a tag
      * @returns {Document}
      */
 
-    adminAddTagToDocument(documentId, tag) {
+    adminAddTagToDocument(applicationId, documentId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -1156,7 +1142,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/document/' + documentId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -1166,12 +1152,13 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Remove a tag from a Document (admin)
+    *  @param {string} applicationId - an Application id
      * @param {string} documentId - a Document id
      * @param {string} tag - a tag
      * @returns {Document}
     */
 
-    adminRemoveTagFromDocument(documentId, tag) {
+    adminRemoveTagFromDocument(applicationId, documentId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -1179,7 +1166,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/document/' + documentId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -1236,13 +1223,14 @@ module.exports = class LeiaAPI {
 
     /**
      * (promise) Update a Document (admin)
-     * @param {string} id - a Document id
+     * @param {string} applicationId - an Application id
+     * @param {string} documentId - a Document id
      * @param {string} fileName (optional) - a new file name
      * @param {integer} rotationAngle (optional) - a new rotation angle
      * @returns {Document}
      */
 
-    adminUpdateDocument(id, fileName = null, rotationAngle = null) {
+    adminUpdateDocument(applicationId, documentId, fileName = null, rotationAngle = null) {
         var filenameStr = ""
         var rotationAngleStr = ""
         var firstChar = "?"
@@ -1252,7 +1240,7 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (rotationAngle != null) {
+        if (rotationAngle) {
             rotationAngleStr = firstChar + "rotation_angle=" + rotationAngle
             firstChar = "&"
         }
@@ -1264,7 +1252,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.patch(that.serverURL + '/admin/document/' + id + filenameStr + rotationAngleStr, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + filenameStr + rotationAngleStr, {}, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -1274,13 +1262,13 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Update a Document
-     * @param {string} id - a Document id
+     * @param {string} documentId - a Document id
      * @param {string} fileName (optional) - a new file name
      * @param {integer} rotationAngle (optional) - a new rotation angle
      * @returns {Document}
     */
 
-    updateDocument(id, fileName = null, rotationAngle = null) {
+    updateDocument(documentId, fileName = null, rotationAngle = null) {
         var filenameStr = ""
         var rotationAngleStr = ""
         var firstChar = "?"
@@ -1290,7 +1278,7 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (rotationAngle != null) {
+        if (rotationAngle) {
             rotationAngleStr = firstChar + "rotation_angle=" + rotationAngle
             firstChar = "&"
         }
@@ -1302,7 +1290,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.patch(that.serverURL + '/document/' + id + filenameStr + rotationAngleStr, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.patch(that.serverURL + '/document/' + documentId + filenameStr + rotationAngleStr, {}, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
                 resolve(document)
             }).catch((error) => {
@@ -1390,11 +1378,11 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Return an Annotation
-    * @param {string} id - an Annotation id
+    * @param {string} annotationId - an Annotation id
     * @returns {Annotation}
     */
 
-    getAnnotation(id) {
+    getAnnotation(annotationId) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -1402,7 +1390,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/annotation/' + id, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/annotation/' + annotationId, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -1413,10 +1401,10 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Delete an Annotation 
-    * @param {string} id - an Annotation id
+    * @param {string} annotationId - an Annotation id
     */
 
-    deleteAnnotation(id) {
+    deleteAnnotation(annotationId) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -1424,7 +1412,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/annotation/' + id, true, false, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.get(that.serverURL + '/annotation/' + annotationId, true, false, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -1434,12 +1422,12 @@ module.exports = class LeiaAPI {
 
     /**
      * (promise) Add a tag to a Document
-     * @param {string} id - an Annotation id
+     * @param {string} annotationId - an Annotation id
      * @param {string} tag - a tag
      * @returns {Annotation}
      */
 
-    addTagToAnnotation(id, tag) {
+    addTagToAnnotation(annotationId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -1447,7 +1435,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/annotation/' + id + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/annotation/' + annotationId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -1458,12 +1446,12 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Remove a tag from an Annotation
-     * @param {string} id - an Annotation id
+     * @param {string} annotationId - an Annotation id
      * @param {string} tag - a tag
      * @returns {Annotation}
     */
 
-    removeTagFromAnnotation(id, tag) {
+    removeTagFromAnnotation(annotationId, tag) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -1471,7 +1459,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/annotation/' + id + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.del(that.serverURL + '/annotation/' + annotationId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -1504,7 +1492,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/annotation/'+ documentId + '?annotation_type=' + annotationType + (name ? ('&name=' + name) : '') + tagsStr, prediction, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/annotation?document_id=' + documentId + '&annotation_type=' + annotationType + (name ? ('&name=' + name) : '') + tagsStr, prediction, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -1515,13 +1503,13 @@ module.exports = class LeiaAPI {
 
     /**
      * (promise) Update an Annotation
-     * @param {string} id - an Annotation id
+     * @param {string} annotationId - an Annotation id
      * @param {string} name (optional) - an Annotation name
      * @param {object} prediction (optional - a predictionn object
      * @returns {Annotation}
      */
 
-    updateAnnotation(id, name = null, prediction = null) {
+    updateAnnotation(annotationId, name = null, prediction = null) {
         var nameStr = ""
         var firstChar = "?"
 
@@ -1537,9 +1525,149 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.patch(that.serverURL + '/annotation/' + id + nameStr, prediction, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.patch(that.serverURL + '/annotation/' + annotationId + nameStr, prediction, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+    
+    /**
+     * (promise) Get a list of jobs
+     * @param {string} applicationId 
+     * @param {string} jobType 
+     * @param {string} modelId 
+     * @param {string} documentId 
+     * @param {string} executeAfterId 
+     * @param {string} parentJobId 
+     * @param {string} status 
+     * @param {integer} offset 
+     * @param {integer} limit 
+     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, jobs: [Job]}]
+     */
+
+    getJobs(applicationId = null, jobType = null, modelId = null, documentId = null, executeAfterId = null, parentJobId = null, status = null, offset = null, limit = null) {
+        var offsetStr = ""
+        var limitStr = ""
+        var applicationIdStr = ""
+        var jobTypeStr = ""
+        var modelIdStr = ""
+        var documentIdStr = ""
+        var executeAfterIdStr = ""
+        var parentJobIdStr = ""
+        var statusStr = ""
+        var firstChar = "?"
+
+        if (offset !== null) {
+            offsetStr += firstChar + 'offset=' + offset
+            firstChar = "&"
+        }
+
+        if (limit !== null) {
+            limitStr += firstChar + 'limit=' + limit
+            firstChar = "&"
+        }
+
+        if (applicationId !== null) {
+            applicationIdStr += firstChar + 'application_id=' + applicationId
+            firstChar = "&"
+        }
+
+        if (jobType !== null) {
+            jobTypeStr += firstChar + 'job_type=' + jobType
+            firstChar = "&"
+        }
+
+        if (modelId !== null) {
+            modelIdStr += firstChar + 'model_id=' + modelId
+            firstChar = "&"
+        }
+
+        if (documentId !== null) {
+            documentIdStr += firstChar + 'document_id=' + documentId
+            firstChar = "&"
+        }
+
+        if (executeAfterId !== null) {
+            executeAfterIdStr += firstChar + 'execute_after_id=' + executeAfterId
+            firstChar = "&"
+        }
+
+        if (parentJobId !== null) {
+            parentJobIdStr += firstChar + 'parent_job_id=' + parentJobId
+            firstChar = "&"
+        }
+
+        if (status !== null) {
+            statusStr += firstChar + 'status=' + status
+            firstChar = "&"
+        }
+
+        var that = this
+        return new Promise(function (resolve, reject) {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/job' + offsetStr + limitStr + applicationIdStr + jobTypeStr + modelIdStr + documentIdStr + executeAfterIdStr + parentJobIdStr + statusStr, true, true, that.autoRefreshToken).then((result) => {
+                var body = result.body
+                var contentRange = extractContentRangeInfo(result.contentRange)
+                var jobs = []
+                for (var i = 0; i < body.length; i++) {
+                    jobs.push(new Job(body[i].id, body[i].creation_time, body[i].application_id, body[i].document_ids, body[i].starting_time, body[i].finished_time, body[i].http_code, body[i].job_type, body[i].model_id, body[i].result, body[i].result_type, body[i].status, body[i].parent_job_id, body[i].execute_after_id, body[i].submitted_id, body[i].ws_id))
+                }
+                resolve({ contentRange, jobs })
+            }).catch((error) => {
+                if (error.status == 404) {
+                    return resolve({ contentRange: { offset: 0, limit: 0, total: 0 }, jobs: [] })
+                }
+                reject(error)
+            })
+
+        })
+    }
+
+    /**
+     * (promise) Get a Job
+     * @param {string} jobId - a Job id
+     * @returns {Job}
+     */
+
+    getJob(jobId) {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/job/' + jobId, true, false, that.autoRefreshToken).then((body) => {
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, body.result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+      /**
+     * (promise) Delete a Job
+     * @param {string} jobId - a Job id
+     * @returns {Job}
+     */
+
+    deleteJob(jobId) {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.del(that.serverURL + '/job/' + jobId, true, false, that.autoRefreshToken).then(() => {
+                resolve()
             }).catch((error) => {
                 reject(error)
             })
