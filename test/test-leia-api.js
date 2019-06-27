@@ -2917,6 +2917,104 @@ describe('LeIA Job API', () => {
             })
         })
     })
+
+    describe('getJob()', () => {
+        it('should return a Job', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getJob('id1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(transformPDFProcessedJob.id)
+                    result.creationTime.should.be.eql(transformPDFProcessedJob.creation_time)
+                    result.applicationId.should.be.eql(transformPDFProcessedJob.application_id)
+                    result.documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
+                    result.jobType.should.be.eql(transformPDFProcessedJob.job_type)
+                    result.result.should.be.eql(transformPDFProcessedJob.result)
+                    result.startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
+                    result.status.should.be.eql(transformPDFProcessedJob.status)
+                    result.executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
+                    done()
+                })
+            })
+        });
+
+        it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getJob('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
+            })
+        });
+
+        it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getJob('id3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
+            })
+        });
+
+        it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.getJob('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
+            })
+        });
+    })
+
+    describe('deleteJob()', () => {
+        it('should call the right url', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteJob('id1').then((_) => {
+                    done()
+                })
+            })
+        });
+
+        it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteJob('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
+            })
+        });
+
+        it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteJob('id3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
+            })
+        });
+
+        it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteJob('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
+            })
+        });
+    })
 })
 
 
