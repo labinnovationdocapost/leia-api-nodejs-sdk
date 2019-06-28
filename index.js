@@ -594,7 +594,18 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr, {}, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, body.result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
+                var result = body.result
+                if (result !== null) {
+                    if (body.result_type === 'document') {
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.mime_type, body.result.correct_angle, body.result.tags)
+                    } else if (body.result_type === 'list[document]') {
+                        result = []
+                        for (var i = 0; i < body.result.length; i++) {
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags))
+                        }
+                    }
+                }
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -637,7 +648,18 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.post(that.serverURL + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr, {}, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, body.result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
+                var result = body.result
+                if (result !== null) {
+                    if (body.result_type === 'document') {
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.mime_type, body.result.correct_angle, body.result.tags)
+                    } else if (body.result_type === 'list[document]') {
+                        result = []
+                        for (var i = 0; i < body.result.length; i++) {
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags))
+                        }
+                    }
+                }
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -665,7 +687,18 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/apply/' + documentIdsString + (tag ? '?tag=' + tag : ''), true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, body.result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
+                var result = body.result
+                if (result !== null) {
+                    if (body.result_type === 'document') {
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.mime_type, body.result.correct_angle, body.result.tags)
+                    } else if (body.result_type === 'list[document]') {
+                        result = []
+                        for (var i = 0; i < body.result.length; i++) {
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags))
+                        }
+                    }
+                }
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -692,7 +725,18 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + (tag ? '?tag=' + tag : ''), true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, body.result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
+                var result = body.result
+                if (result !== null) {
+                    if (body.result_type === 'document') {
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.mime_type, body.result.correct_angle, body.result.tags)
+                    } else if (body.result_type === 'list[document]') {
+                        result = []
+                        for (var i = 0; i < body.result.length; i++) {
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags))
+                        }
+                    }
+                }
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -1533,7 +1577,7 @@ module.exports = class LeiaAPI {
             })
         })
     }
-    
+
     /**
      * (promise) Get a list of jobs
      * @param {string} applicationId 
@@ -1617,7 +1661,18 @@ module.exports = class LeiaAPI {
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var jobs = []
                 for (var i = 0; i < body.length; i++) {
-                    jobs.push(new Job(body[i].id, body[i].creation_time, body[i].application_id, body[i].document_ids, body[i].starting_time, body[i].finished_time, body[i].http_code, body[i].job_type, body[i].model_id, body[i].result, body[i].result_type, body[i].status, body[i].parent_job_id, body[i].execute_after_id, body[i].submitted_id, body[i].ws_id))
+                    var result = body[i].result
+                    if (result !== null) {
+                        if (body[i].result_type === 'document') {
+                            result = new Document(body[i].result.id, body[i].result.creation_time, body[i].result.application_id, body[i].result.filename, body[i].result.extension, body[i].result.mime_type, body[i].result.correct_angle, body[i].result.tags)
+                        } else if (body[i].result_type === 'list[document]') {
+                            result = []
+                            for (var j = 0; j < body[i].result.length; j++) {
+                                result.push(new Document(body[i].result[j].id, body[i].result[j].creation_time, body[i].result[j].application_id, body[i].result[j].filename, body[i].result[j].extension, body[i].result[j].mime_type, body[i].result[j].correct_angle, body[i].result[j].tags))
+                            }
+                        }
+                    }
+                    jobs.push(new Job(body[i].id, body[i].creation_time, body[i].application_id, body[i].document_ids, body[i].starting_time, body[i].finished_time, body[i].http_code, body[i].job_type, body[i].model_id, result, body[i].result_type, body[i].status, body[i].parent_job_id, body[i].execute_after_id, body[i].submitted_id, body[i].ws_id))
                 }
                 resolve({ contentRange, jobs })
             }).catch((error) => {
@@ -1645,18 +1700,29 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/job/' + jobId, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, body.result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
+                var result = body.result
+                if (result !== null) {
+                    if (body.result_type === 'document') {
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.mime_type, body.result.correct_angle, body.result.tags)
+                    } else if (body.result_type === 'list[document]') {
+                        result = []
+                        for (var i = 0; i < body.result.length; i++) {
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags))
+                        }
+                    }
+                }
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitted_id, body.ws_id))
             }).catch((error) => {
                 reject(error)
             })
         })
     }
 
-      /**
-     * (promise) Delete a Job
-     * @param {string} jobId - a Job id
-     * @returns {Job}
-     */
+    /**
+   * (promise) Delete a Job
+   * @param {string} jobId - a Job id
+   * @returns {Job}
+   */
 
     deleteJob(jobId) {
         var that = this

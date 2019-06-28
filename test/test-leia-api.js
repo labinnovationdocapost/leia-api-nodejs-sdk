@@ -90,6 +90,7 @@ const transformPDFProcessedJob = {
     "execute_after_id": "507f191e810c19729de860ed",
     "id": "id1",
     "job_type": "pdf-images",
+    "result_type": "list[document]",
     "result": [{
         "application_id": "507f191e810c19729de860ea",
         "creation_time": "2018-11-07T16:02:29.761Z",
@@ -99,15 +100,12 @@ const transformPDFProcessedJob = {
         "mime_type": "image/jpeg",
         "original_id": "607f191e810c19729de860ea",
         "page": 0,
-        "rotation_angle": 0,
-        "size": 1000000
+        "correct_angle": 0,
+        "size": 1000000,
+        "tags": ['tag1']
     }],
     "starting_time": "2018-11-07T16:02:29.761Z",
     "status": "PROCESSED"
-}
-
-const predictionResult = {
-    "classification": "test"
 }
 
 function mockApplicationAPI() {
@@ -2634,7 +2632,17 @@ describe('LeIA Job API', () => {
                     result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
                     result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
                     result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
-                    result.jobs[0].result.should.be.eql(transformPDFProcessedJob.result)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].correctAngle.should.be.eql(transformPDFProcessedJob.result[0].correct_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
                     result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
                     result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
                     result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
@@ -2657,7 +2665,17 @@ describe('LeIA Job API', () => {
                     result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
                     result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
                     result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
-                    result.jobs[0].result.should.be.eql(transformPDFProcessedJob.result)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].correctAngle.should.be.eql(transformPDFProcessedJob.result[0].correct_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
                     result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
                     result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
                     result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
@@ -2681,7 +2699,17 @@ describe('LeIA Job API', () => {
                     result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
                     result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
                     result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
-                    result.jobs[0].result.should.be.eql(transformPDFProcessedJob.result)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].correctAngle.should.be.eql(transformPDFProcessedJob.result[0].correct_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
                     result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
                     result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
                     result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
@@ -2705,7 +2733,17 @@ describe('LeIA Job API', () => {
                     result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
                     result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
                     result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
-                    result.jobs[0].result.should.be.eql(transformPDFProcessedJob.result)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].correctAngle.should.be.eql(transformPDFProcessedJob.result[0].correct_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
                     result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
                     result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
                     result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
@@ -2729,7 +2767,17 @@ describe('LeIA Job API', () => {
                     result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
                     result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
                     result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
-                    result.jobs[0].result.should.be.eql(transformPDFProcessedJob.result)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].correctAngle.should.be.eql(transformPDFProcessedJob.result[0].correct_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
                     result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
                     result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
                     result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
@@ -2753,7 +2801,17 @@ describe('LeIA Job API', () => {
                     result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
                     result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
                     result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
-                    result.jobs[0].result.should.be.eql(transformPDFProcessedJob.result)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].correctAngle.should.be.eql(transformPDFProcessedJob.result[0].correct_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
                     result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
                     result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
                     result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
@@ -2777,7 +2835,17 @@ describe('LeIA Job API', () => {
                     result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
                     result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
                     result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
-                    result.jobs[0].result.should.be.eql(transformPDFProcessedJob.result)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].correctAngle.should.be.eql(transformPDFProcessedJob.result[0].correct_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
                     result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
                     result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
                     result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
@@ -2801,7 +2869,17 @@ describe('LeIA Job API', () => {
                     result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
                     result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
                     result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
-                    result.jobs[0].result.should.be.eql(transformPDFProcessedJob.result)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].correctAngle.should.be.eql(transformPDFProcessedJob.result[0].correct_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
                     result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
                     result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
                     result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
@@ -2825,7 +2903,17 @@ describe('LeIA Job API', () => {
                     result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
                     result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
                     result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
-                    result.jobs[0].result.should.be.eql(transformPDFProcessedJob.result)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].correctAngle.should.be.eql(transformPDFProcessedJob.result[0].correct_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
                     result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
                     result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
                     result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
@@ -2849,7 +2937,17 @@ describe('LeIA Job API', () => {
                     result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
                     result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
                     result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
-                    result.jobs[0].result.should.be.eql(transformPDFProcessedJob.result)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].correctAngle.should.be.eql(transformPDFProcessedJob.result[0].correct_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
                     result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
                     result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
                     result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
@@ -2873,7 +2971,17 @@ describe('LeIA Job API', () => {
                     result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
                     result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
                     result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
-                    result.jobs[0].result.should.be.eql(transformPDFProcessedJob.result)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].correctAngle.should.be.eql(transformPDFProcessedJob.result[0].correct_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
                     result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
                     result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
                     result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
@@ -2929,7 +3037,17 @@ describe('LeIA Job API', () => {
                     result.applicationId.should.be.eql(transformPDFProcessedJob.application_id)
                     result.documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
                     result.jobType.should.be.eql(transformPDFProcessedJob.job_type)
-                    result.result.should.be.eql(transformPDFProcessedJob.result)
+                    result.resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.result.should.be.a('array');
+                    result.result.length.should.be.eql(1)
+                    result.result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.result[0].correctAngle.should.be.eql(transformPDFProcessedJob.result[0].correct_angle)
+                    result.result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
                     result.startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
                     result.status.should.be.eql(transformPDFProcessedJob.status)
                     result.executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
