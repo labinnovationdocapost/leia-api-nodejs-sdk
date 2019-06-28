@@ -430,11 +430,12 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Return a Model (admin)
+    * @param {string} applicationId - an Application id
     * @param {string} modelId - a Model id
     * @returns {Model}
     */
 
-    adminGetModel(modelId) {
+    adminGetModel(applicationId, modelId) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -442,7 +443,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/model/' + modelId, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/model/' + modelId, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -1019,11 +1020,12 @@ module.exports = class LeiaAPI {
 
     /**
      * (promise) Get a Document (admin)
+     * @param {string} applicationId - an Application id
      * @param {string} documentId - a Document id
      * @returns {Document}
      */
 
-    adminGetDocument(documentId) {
+    adminGetDocument(applicationId, documentId) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -1031,7 +1033,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/document/' + documentId, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/document/' + documentId, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.mime_type, body.correct_angle, body.tags))
             }).catch((error) => {
                 reject(error)
@@ -1063,12 +1065,13 @@ module.exports = class LeiaAPI {
 
     /**
      * (promise) Get the content of a Document (admin)
+     * @param {string} applicationId - an Application id
      * @param {string} documentId - a Document id
      * @param {integer} maxSize (optional) - a max size if the Document is an image
      * @returns {Buffer}
      */
 
-    adminGetDocumentContent(documentId, maxSize = null) {
+    adminGetDocumentContent(applicationId, documentId, maxSize = null) {
         var maxSizeStr = ""
         if (maxSize) {
             maxSizeStr = "&max_size=" + maxSize
@@ -1080,7 +1083,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.getFile(that.serverURL + '/admin/document/' + documentId + '?file_contents=true' + maxSizeStr, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.getFile(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '?file_contents=true' + maxSizeStr, false, that.autoRefreshToken).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 reject(error)
