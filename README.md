@@ -25,8 +25,13 @@ leiaAPI.addDocument('test.jpg', image.buffer).then((document) => {
    return leiaAPI.addModel('my model', model.buffer)
 }).then((model) => {
    return leiaAPI.applyModelToDocument(model.id, [documentId])
-}).then((results) => {
-   console.log(results)
+}).then((job) => {
+   ...
+   // Poll job for result
+   leiaAPI.getJob(job.id).then((job) => {
+      console.log(job.result)
+   })
+   ...
 })
 ```
 

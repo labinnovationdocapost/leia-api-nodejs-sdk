@@ -38,6 +38,7 @@ const applyModelToDocumentProcessingJob = {
     "execute_after_id": "507f191e810c19729de860ed",
     "id": "id1",
     "job_type": "predict",
+    "submitter_id": "submitterId1",
     "starting_time": "2018-11-07T16:02:29.761Z",
     "status": "PROCESSING"
 }
@@ -67,6 +68,7 @@ const transformPDFProcessedJob = {
         "tags": ['tag1']
     }],
     "starting_time": "2018-11-07T16:02:29.761Z",
+    "submitter_id": "submitterId1",
     "status": "PROCESSED"
 }
 
@@ -1042,6 +1044,7 @@ describe('LeIA Model API', () => {
                     result.applicationId.should.be.eql(applyModelToDocumentProcessingJob.application_id)
                     result.documentIds.should.be.eql(applyModelToDocumentProcessingJob.document_ids)
                     result.jobType.should.be.eql(applyModelToDocumentProcessingJob.job_type)
+                    result.submitterId.should.be.eql(applyModelToDocumentProcessingJob.submitter_id)
                     result.startingTime.should.be.eql(applyModelToDocumentProcessingJob.starting_time)
                     result.status.should.be.eql(applyModelToDocumentProcessingJob.status)
                     result.executeAfterId.should.be.eql(applyModelToDocumentProcessingJob.execute_after_id)
@@ -1060,6 +1063,7 @@ describe('LeIA Model API', () => {
                     result.applicationId.should.be.eql(applyModelToDocumentProcessingJob.application_id)
                     result.documentIds.should.be.eql(applyModelToDocumentProcessingJob.document_ids)
                     result.jobType.should.be.eql(applyModelToDocumentProcessingJob.job_type)
+                    result.submitterId.should.be.eql(applyModelToDocumentProcessingJob.submitter_id)
                     result.startingTime.should.be.eql(applyModelToDocumentProcessingJob.starting_time)
                     result.status.should.be.eql(applyModelToDocumentProcessingJob.status)
                     result.executeAfterId.should.be.eql(applyModelToDocumentProcessingJob.execute_after_id)
@@ -1125,6 +1129,7 @@ describe('LeIA Model API', () => {
                     result.applicationId.should.be.eql(applyModelToDocumentProcessingJob.application_id)
                     result.documentIds.should.be.eql(applyModelToDocumentProcessingJob.document_ids)
                     result.jobType.should.be.eql(applyModelToDocumentProcessingJob.job_type)
+                    result.submitterId.should.be.eql(applyModelToDocumentProcessingJob.submitter_id)
                     result.startingTime.should.be.eql(applyModelToDocumentProcessingJob.starting_time)
                     result.status.should.be.eql(applyModelToDocumentProcessingJob.status)
                     result.executeAfterId.should.be.eql(applyModelToDocumentProcessingJob.execute_after_id)
@@ -1143,6 +1148,7 @@ describe('LeIA Model API', () => {
                     result.applicationId.should.be.eql(applyModelToDocumentProcessingJob.application_id)
                     result.documentIds.should.be.eql(applyModelToDocumentProcessingJob.document_ids)
                     result.jobType.should.be.eql(applyModelToDocumentProcessingJob.job_type)
+                    result.submitterId.should.be.eql(applyModelToDocumentProcessingJob.submitter_id)
                     result.startingTime.should.be.eql(applyModelToDocumentProcessingJob.starting_time)
                     result.status.should.be.eql(applyModelToDocumentProcessingJob.status)
                     result.executeAfterId.should.be.eql(applyModelToDocumentProcessingJob.execute_after_id)
