@@ -9,7 +9,7 @@ module.exports = class Job {
      * @param {integer} httpCode 
      * @param {string} jobType 
      * @param {string} modelId 
-     * @param {string} result 
+     * @param {object} result 
      * @param {string} resultType
      * @param {integer} status
      * @param {string} parentJobId
