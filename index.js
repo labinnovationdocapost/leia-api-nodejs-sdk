@@ -11,7 +11,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
  * @class
  */
 
-module.exports = class LeiaAPI {
+class LeiaAPI {
 
     /**
      * @param {string} serverURL  - a LeIA API server URL
@@ -521,7 +521,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/document?filename=' + fileName + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
             })
@@ -552,7 +552,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.streamPost(that.serverURL + '/document?filename=' + fileName + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
             })
@@ -568,22 +568,29 @@ module.exports = class LeiaAPI {
      * If inputTag is present, document_ids should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
      * @param {string} outputTag (optional) - an output tag for the new documents
+     * @param {string} executeAfterId (optional) - should be executed after a certain Job
      * @returns {Job} a job with the processing info
      */
 
-    adminTransformPDF(applicationId, documentIds, outputType, inputTag = null, outputTag = null) {
+    adminTransformPDF(applicationId, documentIds, outputType, inputTag = null, outputTag = null, executeAfterId = null) {
         var documentIdsString = documentIds.join(',')
         var inputTagStr = ""
         var outputTagStr = ""
+        var executeAfterIdStr = ""
         var firstChar = "?"
 
-        if (inputTag) {
+        if (inputTag !== null) {
             inputTagStr = firstChar + 'input_tag=' + inputTag
             firstChar = "&"
         }
 
-        if (outputTag) {
+        if (outputTag !== null) {
             outputTagStr = firstChar + 'output_tag=' + outputTag
+            firstChar = "&"
+        }
+
+        if (executeAfterId !== null) {
+            executeAfterIdStr = firstChar + 'execute_after_id=' + executeAfterId
             firstChar = "&"
         }
 
@@ -594,15 +601,15 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr + executeAfterIdStr, {}, true, false, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
-                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.correct_angle, body.result.tags)
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.correct_angle, body.result.tags, body.result.size)
                     } else if (body.result_type === 'list[document]') {
                         result = []
                         for (var i = 0; i < body.result.length; i++) {
-                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags))
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags, body.result[i].size))
                         }
                     }
                 }
@@ -621,25 +628,31 @@ module.exports = class LeiaAPI {
      * If inputTag is present, document_ids should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
      * @param {string} outputTag (optional) - an output tag for the new documents
+     * @param {string} executeAfterId (optional) - should be executed after a certain Job
      * @returns {Job} a job with the processing info
      */
 
-    transformPDF(documentIds, outputType, inputTag = null, outputTag = null) {
+    transformPDF(documentIds, outputType, inputTag = null, outputTag = null, executeAfterId = null) {
         var documentIdsString = documentIds.join(',')
         var inputTagStr = ""
         var outputTagStr = ""
+        var executeAfterIdStr = ""
         var firstChar = "?"
 
-        if (inputTag) {
+        if (inputTag !== null) {
             inputTagStr = firstChar + 'input_tag=' + inputTag
             firstChar = "&"
         }
 
-        if (outputTag) {
+        if (outputTag !== null) {
             outputTagStr = firstChar + 'output_tag=' + outputTag
             firstChar = "&"
         }
 
+        if (executeAfterId !== null) {
+            executeAfterIdStr = firstChar + 'execute_after_id=' + executeAfterId
+            firstChar = "&"
+        }
 
         var that = this
         return new Promise(function (resolve, reject) {
@@ -648,15 +661,15 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr + executeAfterIdStr, {}, true, false, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
-                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.correct_angle, body.result.tags)
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.correct_angle, body.result.tags, body.result.size)
                     } else if (body.result_type === 'list[document]') {
                         result = []
                         for (var i = 0; i < body.result.length; i++) {
-                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags))
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags, body.result[i].size))
                         }
                     }
                 }
@@ -675,11 +688,26 @@ module.exports = class LeiaAPI {
      * @param {string} tag (optional) - The tag of the documents to process.
      * If tag is present, documentIds should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
+     * @param {string} executeAfterId (optional) - should be executed after a certain Job
      * @returns {Job} a job with the processing info
      */
 
-    adminApplyModelToDocuments(applicationId, modelId, documentIds, tag = null) {
+    adminApplyModelToDocuments(applicationId, modelId, documentIds, tag = null, executeAfterId = null) {
         var documentIdsString = documentIds.join(',')
+        var tagStr = ""
+        var executeAfterIdStr = ""
+        var firstChar = "?"
+
+        if (tag !== null) {
+            tagStr = firstChar + 'tag=' + tag
+            firstChar = "&"
+        }
+
+        if (executeAfterId !== null) {
+            executeAfterIdStr = firstChar + 'execute_after_id=' + executeAfterId
+            firstChar = "&"
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -687,15 +715,15 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/apply/' + documentIdsString + (tag ? '?tag=' + tag : ''), true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr, true, false, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
-                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.correct_angle, body.result.tags)
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.correct_angle, body.result.tags, body.result.size)
                     } else if (body.result_type === 'list[document]') {
                         result = []
                         for (var i = 0; i < body.result.length; i++) {
-                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags))
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags, body.result[i].size))
                         }
                     }
                 }
@@ -713,11 +741,26 @@ module.exports = class LeiaAPI {
      * @param {string} tag (optional) - The tag of the documents to process.
      * If tag is present, documentIds should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
+     * @param {string} executeAfterId (optional) - should be executed after a certain Job
      * @returns {Job} a job with the processing info
      */
 
-    applyModelToDocuments(modelId, documentIds, tag = null) {
+    applyModelToDocuments(modelId, documentIds, tag = null, executeAfterId = null) {
         var documentIdsString = documentIds.join(',')
+        var tagStr = ""
+        var executeAfterIdStr = ""
+        var firstChar = "?"
+
+        if (tag !== null) {
+            tagStr = firstChar + 'tag=' + tag
+            firstChar = "&"
+        }
+
+        if (executeAfterId !== null) {
+            executeAfterIdStr = firstChar + 'execute_after_id=' + executeAfterId
+            firstChar = "&"
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -725,15 +768,15 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + (tag ? '?tag=' + tag : ''), true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr, true, false, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
-                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.correct_angle, body.result.tags)
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.correct_angle, body.result.tags, body.result.size)
                     } else if (body.result_type === 'list[document]') {
                         result = []
                         for (var i = 0; i < body.result.length; i++) {
-                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags))
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags, body.result[i].size))
                         }
                     }
                 }
@@ -918,7 +961,7 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (applicationId) {
+        if (applicationId !== null) {
             applicationIdStr = firstChar + "application_id=" + applicationId
             firstChar = "&"
         }
@@ -941,7 +984,7 @@ module.exports = class LeiaAPI {
                 var documents = []
                 for (var i = 0; i < body.length; i++) {
                     documents.push(new Document(body[i].id, body[i].creation_time, body[i].application_id, body[i].filename, body[i].extension, body[i].original_id, body[i].mime_type, body[i].correct_angle,
-                        body[i].tags))
+                        body[i].tags, body[i].size))
                 }
                 resolve({ contentRange, documents })
             }).catch((error) => {
@@ -1005,7 +1048,7 @@ module.exports = class LeiaAPI {
                 var documents = []
                 for (var i = 0; i < body.length; i++) {
                     documents.push(new Document(body[i].id, body[i].creation_time, body[i].application_id, body[i].filename, body[i].extension, body[i].original_id, body[i].mime_type, body[i].correct_angle,
-                        body[i].tags))
+                        body[i].tags, body[i].size))
                 }
                 resolve({ contentRange, documents })
             }).catch((error) => {
@@ -1034,7 +1077,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/document/' + documentId, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
             })
@@ -1056,7 +1099,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/document/' + documentId, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
             })
@@ -1190,7 +1233,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
             })
@@ -1214,7 +1257,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
             })
@@ -1237,7 +1280,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.post(that.serverURL + '/document/' + documentId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
 
@@ -1261,7 +1304,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.del(that.serverURL + '/document/' + documentId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
             })
@@ -1300,7 +1343,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + filenameStr + rotationAngleStr, {}, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
             })
@@ -1338,7 +1381,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.patch(that.serverURL + '/document/' + documentId + filenameStr + rotationAngleStr, {}, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.correct_angle, body.tags, body.size))
                 resolve(document)
             }).catch((error) => {
                 reject(error)
@@ -1583,16 +1626,16 @@ module.exports = class LeiaAPI {
 
      /**
      * (promise) Get a list of jobs (admin)
-     * @param {string} submitterId - a submitter id
-     * @param {string} applicationId 
-     * @param {string} jobType 
-     * @param {string} modelId 
-     * @param {string} documentId 
-     * @param {string} executeAfterId 
-     * @param {string} parentJobId 
-     * @param {string} status 
-     * @param {integer} offset 
-     * @param {integer} limit 
+     * @param {string} submitterId - a submitter id to filter
+     * @param {string} applicationId - an Application id to filter
+     * @param {string} jobType - a Job type (can be 'predict', 'pdf-images', 'image-text') to filter
+     * @param {string} modelId - a Model id to filter
+     * @param {string} documentId - a Document id to filter
+     * @param {string} executeAfterId - a pre-Job id to filter
+     * @param {string} parentJobId - a parent Job id to filter
+     * @param {string} status - a status (can be WAITING, READY, STARTING, PROCESSED, PROCESSING, CANCELED, FAILED)
+     * @param {integer} offset - an offset for pagination
+     * @param {integer} limit - a limit for pagination
      * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, jobs: [Job]}]
      */
 
@@ -1674,11 +1717,11 @@ module.exports = class LeiaAPI {
                     var result = body[i].result
                     if (result !== null) {
                         if (body[i].result_type === 'document') {
-                            result = new Document(body[i].result.id, body[i].result.creation_time, body[i].result.application_id, body[i].result.filename, body[i].result.extension, body[i].original_id, body[i].result.mime_type, body[i].result.correct_angle, body[i].result.tags)
+                            result = new Document(body[i].result.id, body[i].result.creation_time, body[i].result.application_id, body[i].result.filename, body[i].result.extension, body[i].original_id, body[i].result.mime_type, body[i].result.correct_angle, body[i].result.tags, body[i].result.size)
                         } else if (body[i].result_type === 'list[document]') {
                             result = []
                             for (var j = 0; j < body[i].result.length; j++) {
-                                result.push(new Document(body[i].result[j].id, body[i].result[j].creation_time, body[i].result[j].application_id, body[i].result[j].filename, body[i].result[j].extension, body[i].result[j].original_id, body[i].result[j].mime_type, body[i].result[j].correct_angle, body[i].result[j].tags))
+                                result.push(new Document(body[i].result[j].id, body[i].result[j].creation_time, body[i].result[j].application_id, body[i].result[j].filename, body[i].result[j].extension, body[i].result[j].original_id, body[i].result[j].mime_type, body[i].result[j].correct_angle, body[i].result[j].tags, body[i].result[j].size))
                             }
                         }
                     }
@@ -1714,11 +1757,11 @@ module.exports = class LeiaAPI {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
-                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.correct_angle, body.result.tags)
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.correct_angle, body.result.tags, body.result.size)
                     } else if (body.result_type === 'list[document]') {
                         result = []
                         for (var i = 0; i < body.result.length; i++) {
-                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags))
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags, body.result[i].size))
                         }
                     }
                 }
@@ -1754,15 +1797,15 @@ module.exports = class LeiaAPI {
 
     /**
      * (promise) Get a list of jobs
-     * @param {string} applicationId 
-     * @param {string} jobType 
-     * @param {string} modelId 
-     * @param {string} documentId 
-     * @param {string} executeAfterId 
-     * @param {string} parentJobId 
-     * @param {string} status 
-     * @param {integer} offset 
-     * @param {integer} limit 
+     * @param {string} applicationId - an Application id to filter
+     * @param {string} jobType - a Job type (can be 'predict', 'pdf-images', 'image-text') to filter
+     * @param {string} modelId - a Model id to filter
+     * @param {string} documentId - a Document id to filter
+     * @param {string} executeAfterId - a pre-Job id to filter
+     * @param {string} parentJobId - a parent Job id to filter
+     * @param {string} status - a status (can be WAITING, READY, STARTING, PROCESSED, PROCESSING, CANCELED, FAILED)
+     * @param {integer} offset - an offset for pagination
+     * @param {integer} limit - a limit for pagination
      * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, jobs: [Job]}]
      */
 
@@ -1838,11 +1881,11 @@ module.exports = class LeiaAPI {
                     var result = body[i].result
                     if (result !== null) {
                         if (body[i].result_type === 'document') {
-                            result = new Document(body[i].result.id, body[i].result.creation_time, body[i].result.application_id, body[i].result.filename, body[i].result.extension, body[i].original_id, body[i].result.mime_type, body[i].result.correct_angle, body[i].result.tags)
+                            result = new Document(body[i].result.id, body[i].result.creation_time, body[i].result.application_id, body[i].result.filename, body[i].result.extension, body[i].original_id, body[i].result.mime_type, body[i].result.correct_angle, body[i].result.tags, body[i].result.size)
                         } else if (body[i].result_type === 'list[document]') {
                             result = []
                             for (var j = 0; j < body[i].result.length; j++) {
-                                result.push(new Document(body[i].result[j].id, body[i].result[j].creation_time, body[i].result[j].application_id, body[i].result[j].filename, body[i].result[j].extension, body[i].result[j].original_id, body[i].result[j].mime_type, body[i].result[j].correct_angle, body[i].result[j].tags))
+                                result.push(new Document(body[i].result[j].id, body[i].result[j].creation_time, body[i].result[j].application_id, body[i].result[j].filename, body[i].result[j].extension, body[i].result[j].original_id, body[i].result[j].mime_type, body[i].result[j].correct_angle, body[i].result[j].tags, body[i].result[j].size))
                             }
                         }
                     }
@@ -1877,11 +1920,11 @@ module.exports = class LeiaAPI {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
-                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.correct_angle, body.result.tags)
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.correct_angle, body.result.tags, body.result.size)
                     } else if (body.result_type === 'list[document]') {
                         result = []
                         for (var i = 0; i < body.result.length; i++) {
-                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags))
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].correct_angle, body.result[i].tags, body.result[i].size))
                         }
                     }
                 }

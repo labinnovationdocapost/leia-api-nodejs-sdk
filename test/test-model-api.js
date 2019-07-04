@@ -258,7 +258,15 @@ function mockModelAPI() {
         .reply(200, applyModelToDocumentProcessingJob);
 
     nock(serverURL)
+        .get('/admin/' + application.id + '/model/modelId1/apply/documentId1?execute_after_id=jobId1')
+        .reply(200, applyModelToDocumentProcessingJob);
+
+    nock(serverURL)
         .get('/model/modelId1/apply/documentId1')
+        .reply(200, applyModelToDocumentProcessingJob);
+
+    nock(serverURL)
+        .get('/model/modelId1/apply/documentId1?execute_after_id=jobId1')
         .reply(200, applyModelToDocumentProcessingJob);
 
     nock(serverURL)
@@ -299,6 +307,14 @@ function mockModelAPI() {
 
     nock(serverURL)
         .get('/model/modelId1/apply/documentId1?tag=tag1')
+        .reply(200, applyModelToDocumentProcessingJob);
+
+    nock(serverURL)
+        .get('/admin/' + application.id + '/model/modelId1/apply/documentId1?tag=tag1&execute_after_id=jobId1')
+        .reply(200, applyModelToDocumentProcessingJob);
+
+    nock(serverURL)
+        .get('/model/modelId1/apply/documentId1?tag=tag1&execute_after_id=jobId1')
         .reply(200, applyModelToDocumentProcessingJob);
 
     nock(serverURL)
@@ -1072,6 +1088,44 @@ describe('LeIA Model API', () => {
             })
         });
 
+        it('should return a prediction result object when providing an executeAfterId', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminApplyModelToDocuments(application.id, 'modelId1', ['documentId1'], null, 'jobId1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(applyModelToDocumentProcessingJob.id)
+                    result.creationTime.should.be.eql(applyModelToDocumentProcessingJob.creation_time)
+                    result.applicationId.should.be.eql(applyModelToDocumentProcessingJob.application_id)
+                    result.documentIds.should.be.eql(applyModelToDocumentProcessingJob.document_ids)
+                    result.jobType.should.be.eql(applyModelToDocumentProcessingJob.job_type)
+                    result.submitterId.should.be.eql(applyModelToDocumentProcessingJob.submitter_id)
+                    result.startingTime.should.be.eql(applyModelToDocumentProcessingJob.starting_time)
+                    result.status.should.be.eql(applyModelToDocumentProcessingJob.status)
+                    result.executeAfterId.should.be.eql(applyModelToDocumentProcessingJob.execute_after_id)
+                    done()
+                })
+            })
+        });
+
+        it('should return a prediction result object when providing all parameters', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminApplyModelToDocuments(application.id, 'modelId1', ['documentId1'], 'tag1', 'jobId1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(applyModelToDocumentProcessingJob.id)
+                    result.creationTime.should.be.eql(applyModelToDocumentProcessingJob.creation_time)
+                    result.applicationId.should.be.eql(applyModelToDocumentProcessingJob.application_id)
+                    result.documentIds.should.be.eql(applyModelToDocumentProcessingJob.document_ids)
+                    result.jobType.should.be.eql(applyModelToDocumentProcessingJob.job_type)
+                    result.submitterId.should.be.eql(applyModelToDocumentProcessingJob.submitter_id)
+                    result.startingTime.should.be.eql(applyModelToDocumentProcessingJob.starting_time)
+                    result.status.should.be.eql(applyModelToDocumentProcessingJob.status)
+                    result.executeAfterId.should.be.eql(applyModelToDocumentProcessingJob.execute_after_id)
+                    done()
+                })
+            })
+        });
+
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
@@ -1142,6 +1196,44 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
                 leiaAPI.applyModelToDocuments('modelId1', ['documentId1'], 'tag1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(applyModelToDocumentProcessingJob.id)
+                    result.creationTime.should.be.eql(applyModelToDocumentProcessingJob.creation_time)
+                    result.applicationId.should.be.eql(applyModelToDocumentProcessingJob.application_id)
+                    result.documentIds.should.be.eql(applyModelToDocumentProcessingJob.document_ids)
+                    result.jobType.should.be.eql(applyModelToDocumentProcessingJob.job_type)
+                    result.submitterId.should.be.eql(applyModelToDocumentProcessingJob.submitter_id)
+                    result.startingTime.should.be.eql(applyModelToDocumentProcessingJob.starting_time)
+                    result.status.should.be.eql(applyModelToDocumentProcessingJob.status)
+                    result.executeAfterId.should.be.eql(applyModelToDocumentProcessingJob.execute_after_id)
+                    done()
+                })
+            })
+        });
+
+        it('should return a prediction result object when providing an executeAfterId', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.applyModelToDocuments('modelId1', ['documentId1'], null, 'jobId1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(applyModelToDocumentProcessingJob.id)
+                    result.creationTime.should.be.eql(applyModelToDocumentProcessingJob.creation_time)
+                    result.applicationId.should.be.eql(applyModelToDocumentProcessingJob.application_id)
+                    result.documentIds.should.be.eql(applyModelToDocumentProcessingJob.document_ids)
+                    result.jobType.should.be.eql(applyModelToDocumentProcessingJob.job_type)
+                    result.submitterId.should.be.eql(applyModelToDocumentProcessingJob.submitter_id)
+                    result.startingTime.should.be.eql(applyModelToDocumentProcessingJob.starting_time)
+                    result.status.should.be.eql(applyModelToDocumentProcessingJob.status)
+                    result.executeAfterId.should.be.eql(applyModelToDocumentProcessingJob.execute_after_id)
+                    done()
+                })
+            })
+        });
+
+        it('should return a prediction result object when providing all parameters', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.applyModelToDocuments('modelId1', ['documentId1'], 'tag1', 'jobId1').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(applyModelToDocumentProcessingJob.id)
                     result.creationTime.should.be.eql(applyModelToDocumentProcessingJob.creation_time)

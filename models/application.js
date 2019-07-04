@@ -1,4 +1,4 @@
-module.exports = class Application {
+class Application {
      /**
       * @param {string} id 
      *  @param {string} creationTime - an ISO 8601 date
