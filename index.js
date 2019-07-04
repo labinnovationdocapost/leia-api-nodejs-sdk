@@ -148,7 +148,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/model?name=' + name + (description ? '&description=' + description : '') + (ttl ? '&ttl=' + ttl : '') + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/model?name=' + name + (description ? '&description=' + description : '') + (ttl !== null ? '&ttl=' + ttl : '') + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -247,15 +247,15 @@ module.exports = class LeiaAPI {
     adminUpdateModel(applicationId, modelId, name = null, description = null, ttl = null) {
         var query = ""
         var firstChar = "?"
-        if (name) {
+        if (name !== null) {
             query += firstChar + 'name=' + name
             firstChar = "&"
         }
-        if (description) {
+        if (description !== null) {
             query += firstChar + 'description=' + description
             firstChar = "&"
         }
-        if (ttl) {
+        if (ttl !== null) {
             query += firstChar + 'ttl=' + ttl
             firstChar = "&"
         }
@@ -331,7 +331,7 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (applicationId) {
+        if (applicationId !== null) {
             applicationIdStr = firstChar + "application_id=" + applicationId
             firstChar = "&"
         }
@@ -1425,17 +1425,17 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (documentId) {
+        if (documentId !== null) {
             documentIdStr = firstChar + "document_id=" + documentId
             firstChar = "&"
         }
 
-        if (annotationType) {
+        if (annotationType !== null) {
             annotationTypeStr = firstChar + "annotation_type=" + annotationType
             firstChar = "&"
         }
 
-        if (name) {
+        if (name !== null) {
             nameStr = firstChar + "name=" + name
             firstChar = "&"
         }
@@ -1603,7 +1603,7 @@ module.exports = class LeiaAPI {
         var nameStr = ""
         var firstChar = "?"
 
-        if (name) {
+        if (name !== null) {
             nameStr += firstChar + 'name=' + name
             firstChar = "&"
         }
