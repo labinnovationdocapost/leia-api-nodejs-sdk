@@ -8,12 +8,12 @@ module.exports = class Document {
      * @param {string} extension 
      * @param {string} originalId
      * @param {string} mimeType 
-     * @param {integer} correctAngle 
+     * @param {integer} rotationAngle 
      * @param {string[]} tags 
      * @param {integer} size
      */
 
-    constructor(id, creationTime, applicationId, filename, extension, originalId, mimeType, correctAngle, tags, size) {
+    constructor(id, creationTime, applicationId, filename, extension, originalId, mimeType, rotationAngle, tags, size) {
         this.id = id
         this.creationTime = creationTime
         this.applicationId = applicationId
@@ -21,7 +21,7 @@ module.exports = class Document {
         this.extension = extension
         this.originalId = originalId
         this.mimeType = mimeType
-        this.correctAngle = correctAngle
+        this.rotationAngle = rotationAngle
         this.tags = tags
         this.size = size
     }
