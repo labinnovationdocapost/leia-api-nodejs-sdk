@@ -1,4 +1,4 @@
-class Job {
+module.exports = class Job {
     /**
      * @param {string} id 
      * @param {string} creationTime - an ISO 8601 date
