@@ -45,7 +45,10 @@ module.exports = class LeiaAPIRequest {
         var args = [...arguments]
         var that = this
         return new Promise(function (resolve, reject) {
-            var headers = { 'token': that.token }
+            var headers = {  }
+            if (that.token !== null) {
+                headers['token'] = that.token
+            } 
             request.get({ url: url, json: json, headers: headers },
                 (err, response, body) => {
                     return that.handleLeiaIOResponse(err, response, body, that.get, args, contentRange, refreshToken).then((result) => {
@@ -111,14 +114,12 @@ module.exports = class LeiaAPIRequest {
         var that = this
         return new Promise(function (resolve, reject) {
             if (err) {
-                console.log(err)
                 var error = new Error('Unknown error')
                 error.status = 500
                 reject(error)
             } else {
                 if (response.statusCode != 200 && response.statusCode != 201 && response.statusCode != 204) {
                     if (response.statusCode === 401 && refreshToken) {
-                        that.token = null
                         return that.handle401(fnc, args, true).then((body) => {
                             if (contentRange) {
                                 return resolve({body, contentRange: response['headers']['content-range']})
@@ -161,6 +162,7 @@ module.exports = class LeiaAPIRequest {
     }
 
     login () {
+        this.token = null
         var that = this
         return new Promise(function (resolve, reject) {
             that.get(that.serverURL + '/login/' + that.apiKey, true, false, false).then((body) => {
