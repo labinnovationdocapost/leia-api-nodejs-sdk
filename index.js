@@ -148,7 +148,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/model?name=' + name + (description ? '&description=' + description : '') + (ttl !== null ? '&ttl=' + ttl : '') + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/model?name=' + name + (description ? '&description=' + description : '') + (ttl !== null ? '&ttl=' + ttl : '') + tagsStr, fileBuffer, true, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -182,7 +182,7 @@ module.exports = class LeiaAPI {
                 last_name: lastname
             }
 
-            that.leiaAPIRequest.post(that.serverURL + '/admin/application', application, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/application', application, true, that.autoRefreshToken).then((body) => {
                 resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.api_key))
             }).catch((error) => {
                 reject(error)
@@ -204,7 +204,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/application/' + applicationId + '/reset_api_key', {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/application/' + applicationId + '/reset_api_key', {}, true, that.autoRefreshToken).then((body) => {
                 resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.api_key))
             }).catch((error) => {
                 reject(error)
@@ -226,7 +226,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/model/' + modelId, true, false, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/model/' + modelId, true, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -267,7 +267,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + query, {}, true, false, that.autoRefreshToken).then((model) => {
+            that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + query, {}, true, that.autoRefreshToken).then((model) => {
                 resolve(model)
             }).catch((error) => {
                 reject(error)
@@ -288,7 +288,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/application/' + applicationId, true, false, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/application/' + applicationId, true, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -520,7 +520,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/document?filename=' + fileName + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/document?filename=' + fileName + tagsStr, fileBuffer, true, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
@@ -551,7 +551,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/document?filename=' + fileName + tagsStr, fileBuffer, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.streamPost(that.serverURL + '/document?filename=' + fileName + tagsStr, fileBuffer, true, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
@@ -601,7 +601,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr + executeAfterIdStr, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr + executeAfterIdStr, {}, true, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -661,7 +661,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr + executeAfterIdStr, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr + executeAfterIdStr, {}, true, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -802,7 +802,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/document/' + documentId, false, false, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/document/' + documentId, false, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -824,7 +824,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/document/' + documentId, false, false, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/document/' + documentId, false, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -848,7 +848,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/tag/' + tag, {}, true, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -871,7 +871,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/model/' + modelId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/model/' + modelId + '/tag/' + tag, {}, true, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -895,7 +895,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/tag/' + tag, true, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -918,7 +918,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/model/' + modelId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.del(that.serverURL + '/model/' + modelId + '/tag/' + tag, true, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
             }).catch((error) => {
                 reject(error)
@@ -1246,7 +1246,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/tag/' + tag, {}, true, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
@@ -1270,7 +1270,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/tag/' + tag, true, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
@@ -1293,7 +1293,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentId + '/tag/' + tag, {}, true, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
@@ -1317,7 +1317,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/document/' + documentId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.del(that.serverURL + '/document/' + documentId + '/tag/' + tag, true, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
@@ -1356,7 +1356,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + filenameStr + rotationAngleStr, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + filenameStr + rotationAngleStr, {}, true, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
             }).catch((error) => {
                 reject(error)
@@ -1394,7 +1394,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.patch(that.serverURL + '/document/' + documentId + filenameStr + rotationAngleStr, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.patch(that.serverURL + '/document/' + documentId + filenameStr + rotationAngleStr, {}, true, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
                 resolve(document)
             }).catch((error) => {
@@ -1539,7 +1539,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/annotation/' + annotationId + '/tag/' + tag, {}, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/annotation/' + annotationId + '/tag/' + tag, {}, true, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -1563,7 +1563,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/annotation/' + annotationId + '/tag/' + tag, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.del(that.serverURL + '/annotation/' + annotationId + '/tag/' + tag, true, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -1596,7 +1596,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/annotation?document_id=' + documentId + '&annotation_type=' + annotationType + (name ? ('&name=' + name) : '') + tagsStr, prediction, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/annotation?document_id=' + documentId + '&annotation_type=' + annotationType + (name ? ('&name=' + name) : '') + tagsStr, prediction, true, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -1629,7 +1629,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.patch(that.serverURL + '/annotation/' + annotationId + nameStr, prediction, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.patch(that.serverURL + '/annotation/' + annotationId + nameStr, prediction, true, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -1801,7 +1801,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/' + submitterId + '/job/' + jobId, true, false, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/' + submitterId + '/job/' + jobId, true, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -1963,7 +1963,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/job/' + jobId, true, false, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/job/' + jobId, true, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
