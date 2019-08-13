@@ -929,6 +929,7 @@ module.exports = class LeiaAPI {
     /**
     * (promise) Return a list of paginated Documents (admin)
     * @param {string[]} tags (optional) - an email address to filter documents
+    * @param {string} tagResult (optional) - tag the fetched documents
     * @param {string[]} sort (optional) - a list of parameters 
     * Can be 'applicationId', 'filename', 'extension', 'mimeType', 'originalId', 'page', 'creationTime'. In ascending order by default.
     * If a parameter is preceded by '-' it means descending order.
@@ -938,10 +939,11 @@ module.exports = class LeiaAPI {
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
     */
 
-    adminGetDocuments(tags = null, sort = null, offset = null, limit = null, applicationId = null) {
+    adminGetDocuments(tags = null, tagResult = null, sort = null, offset = null, limit = null, applicationId = null) {
         var offsetStr = ""
         var limitStr = ""
         var tagsStr = ""
+        var tagResultStr = ""
         var applicationIdStr = ""
         var sortStr = ""
         var firstChar = "?"
@@ -958,6 +960,11 @@ module.exports = class LeiaAPI {
 
         for (var i = 0; tags && i < tags.length; i++) {
             tagsStr += firstChar + 'tags=' + tags[i]
+            firstChar = "&"
+        }
+
+        if (tagResult !== null) {
+            tagResultStr = firstChar + "tag_result=" + tagResult
             firstChar = "&"
         }
 
@@ -978,7 +985,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/document' + offsetStr + limitStr + tagsStr + applicationIdStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/document' + offsetStr + limitStr + tagsStr + tagResultStr + applicationIdStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
@@ -1000,6 +1007,7 @@ module.exports = class LeiaAPI {
     /**
     * (promise) Return a list of paginated Documents
     * @param {string[]} tags (optional) - an email address to filter documents
+    * @param {string} tagResult (optional) - tag the fetched documents
     * @param {string[]} sort (optional) - a list of parameters 
     * Can be 'applicationId', 'filename', 'extension', 'mimeType', 'originalId', 'page', 'creationTime'. In ascending order by default.
     * If a parameter is preceded by '-' it means descending order.
@@ -1008,10 +1016,11 @@ module.exports = class LeiaAPI {
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
     */
 
-    getDocuments(tags = null, sort = null, offset = null, limit = null) {
+    getDocuments(tags = null, tagResult = null, sort = null, offset = null, limit = null) {
         var offsetStr = ""
         var limitStr = ""
         var tagsStr = ""
+        var tagResultStr = ""
         var sortStr = ""
         var firstChar = "?"
 
@@ -1022,6 +1031,11 @@ module.exports = class LeiaAPI {
 
         if (limit !== null) {
             limitStr += firstChar + 'limit=' + limit
+            firstChar = "&"
+        }
+
+        if (tagResult !== null) {
+            tagResultStr = firstChar + "tag_result=" + tagResult
             firstChar = "&"
         }
 
@@ -1042,7 +1056,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/document' + offsetStr + limitStr + tagsStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/document' + offsetStr + limitStr + tagsStr + tagResultStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []

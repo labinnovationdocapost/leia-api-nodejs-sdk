@@ -16,7 +16,7 @@ module.exports = class LeiaAPIRequest {
     
             request.post({ url: url, body: body, json: json, headers: headers },
                 (err, response, body) => {
-                    return that.handleLeiaIOResponse(err, response, body, that.post, args, refreshToken).then((body) => {
+                    return that.handleLeiaIOResponse(err, response, body, that.post, args, false, refreshToken).then((body) => {
                         resolve(body)
                     }).catch((error) => {
                         reject(error)
@@ -32,7 +32,7 @@ module.exports = class LeiaAPIRequest {
             var headers = { 'token': that.token }
             request.patch({ url: url, json: json, body: body, headers: headers },
                 (err, response, body) => {
-                    return that.handleLeiaIOResponse(err, response, body, that.patch, args, refreshToken).then((body) => {
+                    return that.handleLeiaIOResponse(err, response, body, that.patch, args, false, refreshToken).then((body) => {
                         resolve(body)
                     }).catch((error) => {
                         reject(error)
@@ -65,7 +65,7 @@ module.exports = class LeiaAPIRequest {
     
             request.defaults({ encoding: null }).get({ url: url, headers: headers },
                 (err, response, body) => {
-                    return that.handleLeiaIOResponse(err, response, body, that.getFile, args, refreshToken).then((body) => {
+                    return that.handleLeiaIOResponse(err, response, body, that.getFile, args, false, refreshToken).then((body) => {
                         resolve(body)
                     }).catch((error) => {
                         reject(error)
@@ -82,7 +82,7 @@ module.exports = class LeiaAPIRequest {
             request.delete({ url: url, json: json, headers: headers },
                 (err, response, body) => {
                     return that.handleLeiaIOResponse(err, response, body, that.del, args
-                        , refreshToken).then((body) => {
+                        , false, refreshToken).then((body) => {
                         resolve(body)
                     }).catch((error) => {
                         reject(error)
@@ -98,7 +98,7 @@ module.exports = class LeiaAPIRequest {
             var headers = { 'content-type': 'application/octet-stream', 'token': that.token }
             streamifier.createReadStream(dataStream).pipe(request.post({ url: url, json: json, headers: headers },
                 (err, response, body) => {
-                    return that.handleLeiaIOResponse(err, response, body, that.streamPost, args, refreshToken).then((body) => {
+                    return that.handleLeiaIOResponse(err, response, body, that.streamPost, args, false, refreshToken).then((body) => {
                         resolve(body)
                     }).catch((error) => {
                         reject(error)
@@ -111,6 +111,7 @@ module.exports = class LeiaAPIRequest {
         var that = this
         return new Promise(function (resolve, reject) {
             if (err) {
+                console.log(err)
                 var error = new Error('Unknown error')
                 error.status = 500
                 reject(error)

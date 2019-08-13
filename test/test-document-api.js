@@ -71,6 +71,10 @@ function mockDocumentAPI() {
         .reply(200, [document], { 'content-range': '0-1/1' });
 
     nock(serverURL)
+        .get('/admin/document?tag_result=tag3')
+        .reply(200, [document], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
         .get('/admin/document?application_id=appId1')
         .reply(200, [document], { 'content-range': '0-1/1' });
 
@@ -79,7 +83,7 @@ function mockDocumentAPI() {
         .reply(200, [document], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/admin/document?offset=20&limit=20&tags=tag1&tags=tag2&application_id=appId1&sort=filename,-extension')
+        .get('/admin/document?offset=20&limit=20&tags=tag1&tags=tag2&tag_result=tag3&application_id=appId1&sort=filename,-extension')
         .reply(200, [document], { 'content-range': '0-1/1' });
 
     nock(serverURL)
@@ -183,11 +187,15 @@ function mockDocumentAPI() {
         .reply(200, [document], { 'content-range': '0-1/1' });
 
     nock(serverURL)
+        .get('/document?tag_result=tag3')
+        .reply(200, [document], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
         .get('/document?sort=filename,-extension')
         .reply(200, [document], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/document?offset=20&limit=20&tags=tag1&tags=tag2&sort=filename,-extension')
+        .get('/document?offset=20&limit=20&tags=tag1&tags=tag2&tag_result=tag3&sort=filename,-extension')
         .reply(200, [document], { 'content-range': '0-1/1' });
 
     nock(serverURL)
@@ -484,7 +492,7 @@ describe('LeIA Document API', () => {
         it('should return a list of documents when offset is provided', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminGetDocuments(null, null, 20).then((result) => {
+                leiaAPI.adminGetDocuments(null, null, null, 20).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -509,7 +517,7 @@ describe('LeIA Document API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetDocuments(null, null, null, 20).then((result) => {
+                leiaAPI.adminGetDocuments(null, null, null, null, 20).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -534,7 +542,7 @@ describe('LeIA Document API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetDocuments(null, ['filename', '-extension']).then((result) => {
+                leiaAPI.adminGetDocuments(null, null, ['filename', '-extension']).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -580,11 +588,36 @@ describe('LeIA Document API', () => {
             })
         });
 
+        it('should return a list of documents when tagResult is provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.adminGetDocuments(null, 'tag3').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].originalId.should.be.eql(document.original_id)
+                    result.documents[0].rotationAngle.should.be.eql(document.rotation_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    result.documents[0].size.should.be.eql(document.size)
+                    done()
+                })
+            })
+        });
+
         it('should return a list of documents when applicationId is provided', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetDocuments(null, null, null, null, 'appId1').then((result) => {
+                leiaAPI.adminGetDocuments(null, null, null, null, null, 'appId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -609,7 +642,7 @@ describe('LeIA Document API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetDocuments(['tag1', 'tag2'], ['filename', '-extension'], 20, 20, 'appId1').then((result) => {
+                leiaAPI.adminGetDocuments(['tag1', 'tag2'], 'tag3', ['filename', '-extension'], 20, 20, 'appId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -633,7 +666,7 @@ describe('LeIA Document API', () => {
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminGetDocuments(null, null, null, 3).then((_) => {
+                leiaAPI.adminGetDocuments(null, null, null, null, 3).then((_) => {
                 }).catch((error) => {
                     error.status.should.be.eql(401)
                     done()
@@ -644,7 +677,7 @@ describe('LeIA Document API', () => {
         it('should return an empty list when LeiaAPI returns a 404 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminGetDocuments(null, null, null, 5).then((result) => {
+                leiaAPI.adminGetDocuments(null, null, null, null, 5).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(0)
                     result.contentRange.total.should.be.eql(0)
@@ -685,7 +718,7 @@ describe('LeIA Document API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getDocuments(null, null, 20).then((result) => {
+                leiaAPI.getDocuments(null, null, null, 20).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -710,7 +743,7 @@ describe('LeIA Document API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getDocuments(null, null, null, 20).then((result) => {
+                leiaAPI.getDocuments(null, null, null, null, 20).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -735,7 +768,7 @@ describe('LeIA Document API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getDocuments(null, ['filename', '-extension']).then((result) => {
+                leiaAPI.getDocuments(null, null, ['filename', '-extension']).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -781,11 +814,36 @@ describe('LeIA Document API', () => {
             })
         });
 
+        it('should return a list of documents when tagResult is provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.getDocuments(null, 'tag3').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.documents.should.be.a('array');
+                    result.documents.length.should.be.eql(1)
+                    result.documents[0].id.should.be.eql(document.id)
+                    result.documents[0].creationTime.should.be.eql(document.creation_time)
+                    result.documents[0].filename.should.be.eql(document.filename)
+                    result.documents[0].extension.should.be.eql(document.extension)
+                    result.documents[0].originalId.should.be.eql(document.original_id)
+                    result.documents[0].rotationAngle.should.be.eql(document.rotation_angle)
+                    result.documents[0].applicationId.should.be.eql(document.application_id)
+                    result.documents[0].mimeType.should.be.eql(document.mime_type)
+                    result.documents[0].tags.should.be.eql(document.tags)
+                    result.documents[0].size.should.be.eql(document.size)
+                    done()
+                })
+            })
+        });
+
         it('should return a list of documents when applicationId is provided', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getDocuments(null, null, null, null, 'appId1').then((result) => {
+                leiaAPI.getDocuments(null, null, null, null, null, 'appId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -810,7 +868,7 @@ describe('LeIA Document API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getDocuments(['tag1', 'tag2'], ['filename', '-extension'], 20, 20, 'appId1').then((result) => {
+                leiaAPI.getDocuments(['tag1', 'tag2'], 'tag3', ['filename', '-extension'], 20, 20, 'appId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -834,7 +892,7 @@ describe('LeIA Document API', () => {
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.getDocuments(null, null, null, 3).then((_) => {
+                leiaAPI.getDocuments(null, null, null, null, 3).then((_) => {
                 }).catch((error) => {
                     error.status.should.be.eql(401)
                     done()
@@ -845,7 +903,7 @@ describe('LeIA Document API', () => {
         it('should return an empty list when LeiaAPI returns a 404 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.getDocuments(null, null, null, 5).then((result) => {
+                leiaAPI.getDocuments(null, null, null, null, 5).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(0)
                     result.contentRange.total.should.be.eql(0)
