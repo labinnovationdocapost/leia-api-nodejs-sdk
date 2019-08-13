@@ -28,7 +28,6 @@
     "chai-http": "4.2.1",
     "mocha": "5.2.0",
     "mocha-prepare": "0.1.0",
-    "mongo-unit": "1.3.4",
     "nock": "10.0.6"
   },
   "author": "Sébastien Cano",
