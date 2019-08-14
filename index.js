@@ -11,7 +11,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
  * @class
  */
 
-module.exports = class LeiaAPI {
+class LeiaAPI {
 
     /**
      * @param {string} serverURL  - a LeIA API server URL

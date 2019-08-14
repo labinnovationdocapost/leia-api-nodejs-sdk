@@ -1,4 +1,4 @@
-module.exports = class Model {
+class Model {
     /**
      * 
      * @param {string} id 
