@@ -112,27 +112,27 @@ function mockAnnotationAPI() {
         .reply(404, null);
 
     nock(serverURL)
-        .post('/annotation?document_id=documentId1&annotation_type=BOX')
+        .post('/annotation/documentId1?annotation_type=BOX')
         .reply(200, annotation);
 
     nock(serverURL)
-        .post('/annotation?document_id=documentId1&annotation_type=BOX&name=test')
+        .post('/annotation/documentId1?annotation_type=BOX&name=test')
         .reply(200, annotation);
 
     nock(serverURL)
-        .post('/annotation?document_id=documentId1&annotation_type=BOX&tags=tag1')
+        .post('/annotation/documentId1?annotation_type=BOX&tags=tag1')
         .reply(200, annotation);
 
     nock(serverURL)
-        .post('/annotation?document_id=documentId1&annotation_type=BOX&name=test&tags=tag1')
+        .post('/annotation/documentId1?annotation_type=BOX&name=test&tags=tag1')
         .reply(200, annotation);
 
     nock(serverURL)
-        .post('/annotation?document_id=documentId1&annotation_type=BOX&name=test2')
+        .post('/annotation/documentId1?annotation_type=BOX&name=test2')
         .reply(400, null);
 
     nock(serverURL)
-        .post('/annotation?document_id=documentId1&annotation_type=BOX&name=test3')
+        .post('/annotation/documentId1?annotation_type=BOX&name=test3')
         .reply(401, null);
 
     nock(serverURL)
@@ -548,7 +548,7 @@ describe('LeIA Annotation API', () => {
         });
     })
 
-    describe('addTagToDocument()', () => {
+    describe('addTagToAnnotation()', () => {
         it('should return an Annotation', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
@@ -741,6 +741,50 @@ describe('LeIA Annotation API', () => {
                 })
             })
         })
+    })
+
+    describe('deleteAnnotation()', () => {
+        it('should call the right url', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteAnnotation('id1').then(() => {
+                    done()
+                })
+            })
+        });
+
+        it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteAnnotation('id2').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(401)
+                    done()
+                })
+            })
+        });
+
+        it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteAnnotation('id3').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(403)
+                    done()
+                })
+            })
+        });
+
+        it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.deleteAnnotation('id4').then((_) => {
+                }).catch((error) => {
+                    error.status.should.be.eql(404)
+                    done()
+                })
+            })
+        });
     })
 
 })

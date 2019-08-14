@@ -1516,7 +1516,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/annotation/' + annotationId, true, false, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/annotation/' + annotationId, true, that.autoRefreshToken).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -1596,7 +1596,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/annotation?document_id=' + documentId + '&annotation_type=' + annotationType + (name ? ('&name=' + name) : '') + tagsStr, prediction, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/annotation/' + documentId + '?annotation_type=' + annotationType + (name ? ('&name=' + name) : '') + tagsStr, prediction, true, that.autoRefreshToken).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
