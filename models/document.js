@@ -1,4 +1,4 @@
-class Document {
+module.exports = class Document {
 
     /**
      * @param {string} id 
