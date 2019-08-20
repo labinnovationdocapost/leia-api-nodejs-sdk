@@ -151,7 +151,11 @@ function mockDocumentAPI() {
         .reply(200, transformPDFProcessingJob);
 
     nock(serverURL)
-        .post('/admin/' + application.id + '/document/id1/transform/image?input_tag=tag1&output_tag=tag1&execute_after_id=jobId1')
+        .post('/admin/' + application.id + '/document/id1/transform/image?callback_url=https://test.com')
+        .reply(200, transformPDFProcessingJob);
+
+    nock(serverURL)
+        .post('/admin/' + application.id + '/document/id1/transform/image?input_tag=tag1&output_tag=tag1&execute_after_id=jobId1&callback_url=https://test.com')
         .reply(200, transformPDFProcessingJob);
 
     nock(serverURL)
@@ -263,7 +267,11 @@ function mockDocumentAPI() {
         .reply(200, transformPDFProcessingJob);
 
     nock(serverURL)
-        .post('/document/id1/transform/image?input_tag=tag1&output_tag=tag1&execute_after_id=jobId1')
+        .post('/document/id1/transform/image?callback_url=https://test.com')
+        .reply(200, transformPDFProcessingJob);
+
+    nock(serverURL)
+        .post('/document/id1/transform/image?input_tag=tag1&output_tag=tag1&execute_after_id=jobId1&callback_url=https://test.com')
         .reply(200, transformPDFProcessingJob);
 
     nock(serverURL)
@@ -1280,10 +1288,29 @@ describe('LeIA Document API', () => {
             })
         });
 
+        it('should return a job when providing a callback url', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminTransformPDF(application.id, ['id1'], 'image', null, null, null, 'https://test.com').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(transformPDFProcessingJob.id)
+                    result.creationTime.should.be.eql(transformPDFProcessingJob.creation_time)
+                    result.applicationId.should.be.eql(transformPDFProcessingJob.application_id)
+                    result.documentIds.should.be.eql(transformPDFProcessingJob.document_ids)
+                    result.jobType.should.be.eql(transformPDFProcessingJob.job_type)
+                    result.submitterId.should.be.eql(transformPDFProcessingJob.submitter_id)
+                    result.startingTime.should.be.eql(transformPDFProcessingJob.starting_time)
+                    result.status.should.be.eql(transformPDFProcessingJob.status)
+                    result.executeAfterId.should.be.eql(transformPDFProcessingJob.execute_after_id)
+                    done()
+                })
+            })
+        });
+
         it('should return a job when providing all parameters', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminTransformPDF(application.id, ['id1'], 'image', 'tag1', 'tag1', 'jobId1').then((result) => {
+                leiaAPI.adminTransformPDF(application.id, ['id1'], 'image', 'tag1', 'tag1', 'jobId1', 'https://test.com').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(transformPDFProcessingJob.id)
                     result.creationTime.should.be.eql(transformPDFProcessingJob.creation_time)
@@ -1392,10 +1419,29 @@ describe('LeIA Document API', () => {
             })
         });
 
+        it('should return a list of documents when providing an executeAfterId', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.transformPDF(['id1'], 'image', null, null, 'jobId1').then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(transformPDFProcessingJob.id)
+                    result.creationTime.should.be.eql(transformPDFProcessingJob.creation_time)
+                    result.applicationId.should.be.eql(transformPDFProcessingJob.application_id)
+                    result.documentIds.should.be.eql(transformPDFProcessingJob.document_ids)
+                    result.jobType.should.be.eql(transformPDFProcessingJob.job_type)
+                    result.submitterId.should.be.eql(transformPDFProcessingJob.submitter_id)
+                    result.startingTime.should.be.eql(transformPDFProcessingJob.starting_time)
+                    result.status.should.be.eql(transformPDFProcessingJob.status)
+                    result.executeAfterId.should.be.eql(transformPDFProcessingJob.execute_after_id)
+                    done()
+                })
+            })
+        });
+
         it('should return a job when providing all parameters', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.transformPDF(['id1'], 'image', 'tag1', 'tag1', 'jobId1').then((result) => {
+                leiaAPI.transformPDF(['id1'], 'image', 'tag1', 'tag1', 'jobId1', 'https://test.com').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(transformPDFProcessingJob.id)
                     result.creationTime.should.be.eql(transformPDFProcessingJob.creation_time)

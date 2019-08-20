@@ -560,23 +560,25 @@ module.exports = class LeiaAPI {
     }
 
     /**
-     * (promise) Transform a list of PDF into images or text (admin)
-     * @param {string} applicationId - an Application id
-     * @param {string[]} documentIds - a list of Document ids
-     * @param {string} outputType - an output type. 
-     * @param {string} inputTag (optional) - The tag of the documents to process. 
-     * If inputTag is present, document_ids should contain a single value, 
-     * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
-     * @param {string} outputTag (optional) - an output tag for the new documents
-     * @param {string} executeAfterId (optional) - should be executed after a certain Job
-     * @returns {Job} a job with the processing info
-     */
+       * (promise) Transform a list of PDF into images or text (admin)
+       * @param {string} applicationId - an Application id
+       * @param {string[]} documentIds - a list of Document ids
+       * @param {string} outputType - an output type. 
+       * @param {string} inputTag (optional) - The tag of the documents to process. 
+       * If inputTag is present, document_ids should contain a single value, 
+       * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
+       * @param {string} outputTag (optional) - an output tag for the new documents
+       * @param {string} executeAfterId (optional) - should be executed after a certain Job
+       * @param {string} callbackUrl (optional) - callback url for when a job is finished
+       * @returns {Job} a job with the processing info
+       */
 
-    adminTransformPDF(applicationId, documentIds, outputType, inputTag = null, outputTag = null, executeAfterId = null) {
+    adminTransformPDF(applicationId, documentIds, outputType, inputTag = null, outputTag = null, executeAfterId = null, callbackUrl = null) {
         var documentIdsString = documentIds.join(',')
         var inputTagStr = ""
         var outputTagStr = ""
         var executeAfterIdStr = ""
+        var callbackUrlStr = ""
         var firstChar = "?"
 
         if (inputTag !== null) {
@@ -594,6 +596,11 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
+        if (callbackUrl !== null) {
+            callbackUrlStr = firstChar + 'callback_url=' + callbackUrl
+            firstChar = "&"
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -601,7 +608,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr + executeAfterIdStr, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr + executeAfterIdStr + callbackUrlStr, {}, true, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -629,14 +636,16 @@ module.exports = class LeiaAPI {
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
      * @param {string} outputTag (optional) - an output tag for the new documents
      * @param {string} executeAfterId (optional) - should be executed after a certain Job
+     * @param {string} callbackUrl (optional) - callback url for when a job is finished
      * @returns {Job} a job with the processing info
      */
 
-    transformPDF(documentIds, outputType, inputTag = null, outputTag = null, executeAfterId = null) {
+    transformPDF(documentIds, outputType, inputTag = null, outputTag = null, executeAfterId = null, callbackUrl = null) {
         var documentIdsString = documentIds.join(',')
         var inputTagStr = ""
         var outputTagStr = ""
         var executeAfterIdStr = ""
+        var callbackUrlStr = ""
         var firstChar = "?"
 
         if (inputTag !== null) {
@@ -654,6 +663,11 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
+        if (callbackUrl !== null) {
+            callbackUrlStr = firstChar + 'callback_url=' + callbackUrl
+            firstChar = "&"
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -661,7 +675,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr + executeAfterIdStr, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr + executeAfterIdStr + callbackUrlStr, {}, true, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -681,21 +695,23 @@ module.exports = class LeiaAPI {
     }
 
     /**
-     * (promise) Apply a Model to a list of Documents (admin)
-     * @param {string} applicationId - an Application id
-     * @param {string} modelId - a Model id
-     * @param {string[]} documentIds - a list of Document ids
-     * @param {string} tag (optional) - The tag of the documents to process.
-     * If tag is present, documentIds should contain a single value, 
-     * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
-     * @param {string} executeAfterId (optional) - should be executed after a certain Job
-     * @returns {Job} a job with the processing info
-     */
+    * (promise) Apply a Model to a list of Documents (admin)
+    * @param {string} applicationId - an Application id
+    * @param {string} modelId - a Model id
+    * @param {string[]} documentIds - a list of Document ids
+    * @param {string} tag (optional) - The tag of the documents to process.
+    * If tag is present, documentIds should contain a single value, 
+    * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
+    * @param {string} executeAfterId (optional) - should be executed after a certain Job
+    * @param {string} callbackUrl (optional) - callback url for when a job is finished
+    * @returns {Job} a job with the processing info
+    */
 
-    adminApplyModelToDocuments(applicationId, modelId, documentIds, tag = null, executeAfterId = null) {
+    adminApplyModelToDocuments(applicationId, modelId, documentIds, tag = null, executeAfterId = null, callbackUrl = null) {
         var documentIdsString = documentIds.join(',')
         var tagStr = ""
         var executeAfterIdStr = ""
+        var callbackUrlStr = ""
         var firstChar = "?"
 
         if (tag !== null) {
@@ -708,6 +724,11 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
+        if (callbackUrl !== null) {
+            callbackUrlStr = firstChar + 'callback_url=' + callbackUrl
+            firstChar = "&"
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -715,7 +736,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr + callbackUrlStr, true, false, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -742,13 +763,15 @@ module.exports = class LeiaAPI {
      * If tag is present, documentIds should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
      * @param {string} executeAfterId (optional) - should be executed after a certain Job
+     * @param {string} callbackUrl (optional) - callback url for when a job is finished
      * @returns {Job} a job with the processing info
      */
 
-    applyModelToDocuments(modelId, documentIds, tag = null, executeAfterId = null) {
+    applyModelToDocuments(modelId, documentIds, tag = null, executeAfterId = null, callbackUrl = null) {
         var documentIdsString = documentIds.join(',')
         var tagStr = ""
         var executeAfterIdStr = ""
+        var callbackUrlStr = ""
         var firstChar = "?"
 
         if (tag !== null) {
@@ -761,6 +784,11 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
+        if (callbackUrl !== null) {
+            callbackUrlStr = firstChar + 'callback_url=' + callbackUrl
+            firstChar = "&"
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -768,7 +796,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr + callbackUrlStr, true, false, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -1638,20 +1666,20 @@ module.exports = class LeiaAPI {
         })
     }
 
-     /**
-     * (promise) Get a list of jobs (admin)
-     * @param {string} submitterId - a submitter id to filter
-     * @param {string} applicationId - an Application id to filter
-     * @param {string} jobType - a Job type (can be 'predict', 'pdf-images', 'image-text') to filter
-     * @param {string} modelId - a Model id to filter
-     * @param {string} documentId - a Document id to filter
-     * @param {string} executeAfterId - a pre-Job id to filter
-     * @param {string} parentJobId - a parent Job id to filter
-     * @param {string} status - a status (can be WAITING, READY, STARTING, PROCESSED, PROCESSING, CANCELED, FAILED)
-     * @param {integer} offset - an offset for pagination
-     * @param {integer} limit - a limit for pagination
-     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, jobs: [Job]}]
-     */
+    /**
+    * (promise) Get a list of jobs (admin)
+    * @param {string} submitterId - a submitter id to filter
+    * @param {string} applicationId - an Application id to filter
+    * @param {string} jobType - a Job type (can be 'predict', 'pdf-images', 'image-text') to filter
+    * @param {string} modelId - a Model id to filter
+    * @param {string} documentId - a Document id to filter
+    * @param {string} executeAfterId - a pre-Job id to filter
+    * @param {string} parentJobId - a parent Job id to filter
+    * @param {string} status - a status (can be WAITING, READY, STARTING, PROCESSED, PROCESSING, CANCELED, FAILED)
+    * @param {integer} offset - an offset for pagination
+    * @param {integer} limit - a limit for pagination
+    * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, jobs: [Job]}]
+    */
 
     adminGetJobs(submitterId = null, applicationId = null, jobType = null, modelId = null, documentId = null, executeAfterId = null, parentJobId = null, status = null, offset = null, limit = null) {
         var offsetStr = ""
