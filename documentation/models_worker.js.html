@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: models/model.js</title>
+    <title>JSDoc: Source: models/worker.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: models/model.js</h1>
+    <h1 class="page-title">Source: models/worker.js</h1>
 
     
 
@@ -26,29 +26,16 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>class Model {
+            <pre class="prettyprint source linenums"><code>class Worker {
     /**
-     * 
-     * @param {string} id 
-     * @param {string} creationTime - an ISO 8601 date
-     * @param {string} description 
-     * @param {integer} ttl 
-     * @param {string[]} inputTypes 
-     * @param {string} name 
-     * @param {string[]} tags 
-     * @param {string} modelType 
-     * @param {string} applicationId 
+     * @param {string} jobType 
+     * @param {number} number
+     * @param {string[]} statuses 
      */
-    constructor(id, creationTime, description, ttl, inputTypes, name, tags, modelType, applicationId) {
-        this.id = id
-        this.creationTime = creationTime
-        this.description = description
-        this.ttl = ttl
-        this.inputTypes = inputTypes
-        this.name = name
-        this.tags = tags
-        this.modelType = modelType
-        this.applicationId = applicationId
+    constructor(jobType, number, statuses) {
+        this.jobType = jobType
+        this.number = number
+        this.statuses = statuses
     }
 }</code></pre>
         </article>

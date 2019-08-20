@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Application</title>
+    <title>JSDoc: Class: Worker</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Application</h1>
+    <h1 class="page-title">Class: Worker</h1>
 
     
 
@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Application<span class="signature">(id, creationTime, applicationType, email, applicationName, firstname, lastname, apiKey)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Worker<span class="signature">(jobType, number, statuses)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -41,7 +41,7 @@
     
 
     
-    <h4 class="name" id="Application"><span class="type-signature"></span>new Application<span class="signature">(id, creationTime, applicationType, email, applicationName, firstname, lastname, apiKey)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Worker"><span class="type-signature"></span>new Worker<span class="signature">(jobType, number, statuses)</span><span class="type-signature"></span></h4>
     
 
     
@@ -81,7 +81,7 @@
 
         <tr>
             
-                <td class="name"><code>id</code></td>
+                <td class="name"><code>jobType</code></td>
             
 
             <td class="type">
@@ -104,36 +104,13 @@
 
         <tr>
             
-                <td class="name"><code>creationTime</code></td>
+                <td class="name"><code>number</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">an ISO 8601 date</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>applicationType</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
+<span class="param-type">number</span>
 
 
             
@@ -150,105 +127,13 @@
 
         <tr>
             
-                <td class="name"><code>email</code></td>
+                <td class="name"><code>statuses</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>applicationName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>firstname</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>lastname</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>apiKey</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
+<span class="param-type">Array.&lt;string></span>
 
 
             
@@ -299,7 +184,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_application.js.html">models/application.js</a>, <a href="models_application.js.html#line12">line 12</a>
+        <a href="models_worker.js.html">models/worker.js</a>, <a href="models_worker.js.html#line7">line 7</a>
     </li></ul></dd>
     
 

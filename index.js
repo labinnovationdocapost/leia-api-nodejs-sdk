@@ -3,6 +3,7 @@ var Application = require('./models/application')
 var Document = require('./models/document')
 var Annotation = require('./models/annotation')
 var Job = require('./models/job')
+var Worker = require('./models/worker')
 var LeiaAPIRequest = require('./leia-api-request')
 var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils')
 
@@ -1993,6 +1994,58 @@ module.exports = class LeiaAPI {
             }
             that.leiaAPIRequest.del(that.serverURL + '/job/' + jobId, true, that.autoRefreshToken).then(() => {
                 resolve()
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+
+    /**
+   * (promise) Get a list of Workers
+   * @returns {Worker[]}
+   */
+
+    getWorkers() {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/worker', true, false, that.autoRefreshToken).then((body) => {
+                var workers = []
+                for (var i = 0; i < body.length; i++) {
+                    workers.push(new Worker(body[i].job_type, body[i].number, body[i].statuses))
+                }
+                resolve(workers)
+            }).catch((error) => {
+                if (error.status == 404) {
+                    return resolve([])
+                }
+                reject(error)
+            })
+        })
+    }
+
+    /**
+  * (promise) Get a Worker by Job type
+  * @param {string} jobType - a Job type
+  * @returns {Worker}
+  */
+
+    getWorker(jobType) {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/worker/' + jobType, true, false, that.autoRefreshToken).then((body) => {
+                resolve(new Worker(body.job_type, body.number, body.statuses))
+
             }).catch((error) => {
                 reject(error)
             })
