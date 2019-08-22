@@ -15,6 +15,7 @@ const application = {
     "email": "test@test.com",
     "first_name": "jean",
     "last_name": "test",
+    "default_job_callback_url": "http://test.com",
     "job_counts": {
         "predict-5d52858cb4608e10db98ea1f": 146,
         "predict-5d5285d5b4608e10db98ea20": 2,
@@ -140,19 +141,19 @@ function mockApplicationAPI() {
         .reply(400, null);
 
     nock(serverURL)
-        .post('/admin/application', { application_name: 'appName', application_type: 'admin', email: 'test@test.com', first_name: 'jean', 'last_name': 'test' })
+        .post('/admin/application', { application_name: 'appName', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com' })
         .reply(200, application);
 
     nock(serverURL)
-        .post('/admin/application', { application_name: 'appName2', application_type: 'admin', email: 'test@test.com', first_name: 'jean', 'last_name': 'test' })
+        .post('/admin/application', { application_name: 'appName2', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com' })
         .reply(401, application);
 
     nock(serverURL)
-        .post('/admin/application', { application_name: 'appName3', application_type: 'admin', email: 'test@test.com', first_name: 'jean', 'last_name': 'test' })
+        .post('/admin/application', { application_name: 'appName3', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com' })
         .reply(409, application);
 
     nock(serverURL)
-        .post('/admin/application', { application_name: 'appName4', application_type: 'admin', email: 'test@test.com', first_name: 'jean', 'last_name': 'test' })
+        .post('/admin/application', { application_name: 'appName4', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com' })
         .reply(400, application);
 
     nock(serverURL)
@@ -191,6 +192,9 @@ describe('LeIA Application API', () => {
                 result.email.should.be.eql(application.email)
                 result.firstname.should.be.eql(application.first_name)
                 result.lastname.should.be.eql(application.last_name)
+                result.defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
+                result.jobCounts.should.be.eql(application.job_counts)
+                result.jobCounts.should.be.a('object')
                 done()
             })
         });
@@ -233,6 +237,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].email.should.be.eql(application.email)
                     result.applications[0].firstname.should.be.eql(application.first_name)
                     result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
                     done()
@@ -257,6 +262,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].email.should.be.eql(application.email)
                     result.applications[0].firstname.should.be.eql(application.first_name)
                     result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
                     done()
@@ -280,6 +286,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].email.should.be.eql(application.email)
                     result.applications[0].firstname.should.be.eql(application.first_name)
                     result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
                     done()
@@ -303,6 +310,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].email.should.be.eql(application.email)
                     result.applications[0].firstname.should.be.eql(application.first_name)
                     result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
                     done()
@@ -327,6 +335,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].email.should.be.eql(application.email)
                     result.applications[0].firstname.should.be.eql(application.first_name)
                     result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
                     done()
@@ -351,6 +360,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].email.should.be.eql(application.email)
                     result.applications[0].firstname.should.be.eql(application.first_name)
                     result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
                     done()
@@ -376,6 +386,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].email.should.be.eql(application.email)
                     result.applications[0].firstname.should.be.eql(application.first_name)
                     result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
                     done()
@@ -443,6 +454,7 @@ describe('LeIA Application API', () => {
                     result.email.should.be.eql(application.email)
                     result.firstname.should.be.eql(application.first_name)
                     result.lastname.should.be.eql(application.last_name)
+                    result.defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.jobCounts.should.be.eql(application.job_counts)
                     result.jobCounts.should.be.a('object')
                     done()
@@ -486,6 +498,7 @@ describe('LeIA Application API', () => {
                     result.email.should.be.eql(application.email)
                     result.firstname.should.be.eql(application.first_name)
                     result.lastname.should.be.eql(application.last_name)
+                    result.defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.jobCounts.should.be.eql(application.job_counts)
                     result.jobCounts.should.be.a('object')
                     done()
@@ -542,7 +555,7 @@ describe('LeIA Application API', () => {
         it('should return an Application', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddApplication("test@test.com", "appName", "admin", "jean", "test").then((result) => {
+                leiaAPI.adminAddApplication("test@test.com", "appName", "admin", "jean", "test", "http://test.com").then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(application.id)
                     result.creationTime.should.be.eql(application.creation_time)
@@ -551,6 +564,7 @@ describe('LeIA Application API', () => {
                     result.email.should.be.eql(application.email)
                     result.firstname.should.be.eql(application.first_name)
                     result.lastname.should.be.eql(application.last_name)
+                    result.defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.jobCounts.should.be.eql(application.job_counts)
                     result.jobCounts.should.be.a('object')
                     done()
@@ -561,7 +575,7 @@ describe('LeIA Application API', () => {
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddApplication("test@test.com", "appName4", "admin", "jean", "test").then((_) => {
+                leiaAPI.adminAddApplication("test@test.com", "appName4", "admin", "jean", "test", "http://test.com").then((_) => {
                 }).catch((error) => {
                     error.status.should.be.eql(400)
                     done()
@@ -572,7 +586,7 @@ describe('LeIA Application API', () => {
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddApplication("test@test.com", "appName2", "admin", "jean", "test").then((_) => {
+                leiaAPI.adminAddApplication("test@test.com", "appName2", "admin", "jean", "test", "http://test.com").then((_) => {
                 }).catch((error) => {
                     error.status.should.be.eql(401)
                     done()
@@ -583,7 +597,7 @@ describe('LeIA Application API', () => {
         it('should return a 409 status when LeiaAPI returns a 409 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddApplication("test@test.com", "appName3", "admin", "jean", "test").then((_) => {
+                leiaAPI.adminAddApplication("test@test.com", "appName3", "admin", "jean", "test", "http://test.com").then((_) => {
                 }).catch((error) => {
                     error.status.should.be.eql(409)
                     done()
@@ -606,6 +620,7 @@ describe('LeIA Application API', () => {
                     result.email.should.be.eql(application.email)
                     result.firstname.should.be.eql(application.first_name)
                     result.lastname.should.be.eql(application.last_name)
+                    result.defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.jobCounts.should.be.eql(application.job_counts)
                     result.jobCounts.should.be.a('object')
                     done()
