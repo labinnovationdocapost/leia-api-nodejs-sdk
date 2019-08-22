@@ -7,9 +7,10 @@ module.exports = class Application {
       * @param {string} applicationName 
       * @param {string} firstname 
       * @param {string} lastname 
+      * @param {object} jobCounts
       * @param {string} apiKey 
       */
-    constructor(id, creationTime, applicationType, email, applicationName, firstname, lastname, apiKey) {
+    constructor(id, creationTime, applicationType, email, applicationName, firstname, lastname, jobCounts, apiKey) {
         this.id = id
         this.creationTime = creationTime
         this.applicationType = applicationType
@@ -17,6 +18,7 @@ module.exports = class Application {
         this.applicationName = applicationName
         this.firstname = firstname
         this.lastname = lastname
+        this.jobCounts = jobCounts
         this.apiKey = apiKey
     }
 }

@@ -39,7 +39,7 @@ module.exports = class LeiaAPI {
         return new Promise(function (resolve, reject) {
             leiaAPIRequest.login().then((body) => {
                 that.leiaAPIRequest = leiaAPIRequest
-                resolve(new Application(body.application.id, body.application.creation_time, body.application.application_type, body.application.email, body.application.application_name, body.application.first_name, body.application.last_name, body.application.api_key))
+                resolve(new Application(body.application.id, body.application.creation_time, body.application.application_type, body.application.email, body.application.application_name, body.application.first_name, body.application.last_name, body.job_counts, body.application.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -111,7 +111,7 @@ module.exports = class LeiaAPI {
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var applications = []
                 for (var i = 0; i < body.length; i++) {
-                    applications.push(new Application(body[i].id, body[i].creation_time, body[i].application_type, body[i].email, body[i].application_name, body[i].first_name, body[i].last_name, body[i].api_key))
+                    applications.push(new Application(body[i].id, body[i].creation_time, body[i].application_type, body[i].email, body[i].application_name, body[i].first_name, body[i].last_name, body[i].job_counts, body[i].api_key))
                 }
                 resolve({ contentRange, applications })
             }).catch((error) => {
@@ -184,7 +184,7 @@ module.exports = class LeiaAPI {
             }
 
             that.leiaAPIRequest.post(that.serverURL + '/admin/application', application, true, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.api_key))
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.job_counts, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -206,7 +206,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.post(that.serverURL + '/admin/application/' + applicationId + '/reset_api_key', {}, true, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.api_key))
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.job_counts, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -490,7 +490,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/admin/application/' + applicationId, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.api_key))
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.job_counts, body.api_key))
             }).catch((error) => {
                 reject(error)
             })

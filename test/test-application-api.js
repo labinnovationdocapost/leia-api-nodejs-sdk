@@ -14,7 +14,12 @@ const application = {
     "application_type": "admin",
     "email": "test@test.com",
     "first_name": "jean",
-    "last_name": "test"
+    "last_name": "test",
+    "job_counts": {
+        "predict-5d52858cb4608e10db98ea1f": 146,
+        "predict-5d5285d5b4608e10db98ea20": 2,
+        "predict-5d52864ab4608e10db98ea21": 1
+    }
 }
 
 function mockApplicationAPI() {
@@ -228,6 +233,8 @@ describe('LeIA Application API', () => {
                     result.applications[0].email.should.be.eql(application.email)
                     result.applications[0].firstname.should.be.eql(application.first_name)
                     result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].jobCounts.should.be.eql(application.job_counts)
+                    result.applications[0].jobCounts.should.be.a('object')
                     done()
                 })
             })
@@ -250,6 +257,8 @@ describe('LeIA Application API', () => {
                     result.applications[0].email.should.be.eql(application.email)
                     result.applications[0].firstname.should.be.eql(application.first_name)
                     result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].jobCounts.should.be.eql(application.job_counts)
+                    result.applications[0].jobCounts.should.be.a('object')
                     done()
                 })
             })
@@ -271,6 +280,8 @@ describe('LeIA Application API', () => {
                     result.applications[0].email.should.be.eql(application.email)
                     result.applications[0].firstname.should.be.eql(application.first_name)
                     result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].jobCounts.should.be.eql(application.job_counts)
+                    result.applications[0].jobCounts.should.be.a('object')
                     done()
                 })
             })
@@ -292,6 +303,8 @@ describe('LeIA Application API', () => {
                     result.applications[0].email.should.be.eql(application.email)
                     result.applications[0].firstname.should.be.eql(application.first_name)
                     result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].jobCounts.should.be.eql(application.job_counts)
+                    result.applications[0].jobCounts.should.be.a('object')
                     done()
                 })
             })
@@ -314,6 +327,8 @@ describe('LeIA Application API', () => {
                     result.applications[0].email.should.be.eql(application.email)
                     result.applications[0].firstname.should.be.eql(application.first_name)
                     result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].jobCounts.should.be.eql(application.job_counts)
+                    result.applications[0].jobCounts.should.be.a('object')
                     done()
                 })
             })
@@ -336,6 +351,8 @@ describe('LeIA Application API', () => {
                     result.applications[0].email.should.be.eql(application.email)
                     result.applications[0].firstname.should.be.eql(application.first_name)
                     result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].jobCounts.should.be.eql(application.job_counts)
+                    result.applications[0].jobCounts.should.be.a('object')
                     done()
                 })
             })
@@ -359,6 +376,8 @@ describe('LeIA Application API', () => {
                     result.applications[0].email.should.be.eql(application.email)
                     result.applications[0].firstname.should.be.eql(application.first_name)
                     result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].jobCounts.should.be.eql(application.job_counts)
+                    result.applications[0].jobCounts.should.be.a('object')
                     done()
                 })
             })
@@ -424,6 +443,8 @@ describe('LeIA Application API', () => {
                     result.email.should.be.eql(application.email)
                     result.firstname.should.be.eql(application.first_name)
                     result.lastname.should.be.eql(application.last_name)
+                    result.jobCounts.should.be.eql(application.job_counts)
+                    result.jobCounts.should.be.a('object')
                     done()
                 })
             })
@@ -465,6 +486,8 @@ describe('LeIA Application API', () => {
                     result.email.should.be.eql(application.email)
                     result.firstname.should.be.eql(application.first_name)
                     result.lastname.should.be.eql(application.last_name)
+                    result.jobCounts.should.be.eql(application.job_counts)
+                    result.jobCounts.should.be.a('object')
                     done()
                 })
             })
@@ -528,6 +551,8 @@ describe('LeIA Application API', () => {
                     result.email.should.be.eql(application.email)
                     result.firstname.should.be.eql(application.first_name)
                     result.lastname.should.be.eql(application.last_name)
+                    result.jobCounts.should.be.eql(application.job_counts)
+                    result.jobCounts.should.be.a('object')
                     done()
                 })
             })
@@ -581,6 +606,8 @@ describe('LeIA Application API', () => {
                     result.email.should.be.eql(application.email)
                     result.firstname.should.be.eql(application.first_name)
                     result.lastname.should.be.eql(application.last_name)
+                    result.jobCounts.should.be.eql(application.job_counts)
+                    result.jobCounts.should.be.a('object')
                     done()
                 })
             })
