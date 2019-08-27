@@ -2811,6 +2811,184 @@ and the documents processed will be those where originalId=documentIds[0] and th
     
 
     
+    <h4 class="name" id="adminCancelJob"><span class="type-signature"></span>adminCancelJob<span class="signature">(submitterId, jobId)</span><span class="type-signature"> &rarr; {<a href="Job.html">Job</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    (promise) Cancel a Job (admin)
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>submitterId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">a submitter id</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>jobId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">a Job id</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line1840">line 1840</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Job.html">Job</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="adminDeleteApplication"><span class="type-signature"></span>adminDeleteApplication<span class="signature">(applicationId)</span><span class="type-signature"></span></h4>
     
 
@@ -3097,184 +3275,6 @@ and the documents processed will be those where originalId=documentIds[0] and th
 
 
 
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="adminDeleteJob"><span class="type-signature"></span>adminDeleteJob<span class="signature">(submitterId, jobId)</span><span class="type-signature"> &rarr; {<a href="Job.html">Job</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    (promise) Delete a Job (admin)
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>submitterId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">a submitter id</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>jobId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">a Job id</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line1830">line 1830</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="Job.html">Job</a></span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -4886,7 +4886,7 @@ If a parameter is preceded by '-' it means descending order.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line1796">line 1796</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line1806">line 1806</a>
     </li></ul></dd>
     
 
@@ -4940,7 +4940,7 @@ If a parameter is preceded by '-' it means descending order.</td>
     
 
     
-    <h4 class="name" id="adminGetJobs"><span class="type-signature"></span>adminGetJobs<span class="signature">(submitterId, applicationId, jobType, modelId, documentId, executeAfterId, parentJobId, status, offset, limit)</span><span class="type-signature"> &rarr; {Array.&lt;object>}</span></h4>
+    <h4 class="name" id="adminGetJobs"><span class="type-signature"></span>adminGetJobs<span class="signature">(submitterId, applicationId, sort, jobType, modelId, documentId, executeAfterId, parentJobId, status, offset, limit)</span><span class="type-signature"> &rarr; {Array.&lt;object>}</span></h4>
     
 
     
@@ -5038,6 +5038,38 @@ If a parameter is preceded by '-' it means descending order.</td>
             
 
             <td class="description last">an Application id to filter</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sort</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;string></span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    null
+                
+                </td>
+            
+
+            <td class="description last">(optional) - a list of parameters 
+Can be'submitterId', 'applicationId', 'creationTime', 'startingTime', 'finishedTime', 'jobType', 'modelId',
+      'documentIds', 'status', 'parentJobId'. In ascending order by default.
+If a parameter is preceded by '-' it means descending order.</td>
         </tr>
 
     
@@ -5310,7 +5342,7 @@ If a parameter is preceded by '-' it means descending order.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line1690">line 1690</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line1694">line 1694</a>
     </li></ul></dd>
     
 
@@ -7531,6 +7563,161 @@ and the documents processed will be those where originalId=documentIds[0] and th
     
 
     
+    <h4 class="name" id="cancelJob"><span class="type-signature"></span>cancelJob<span class="signature">(jobId)</span><span class="type-signature"> &rarr; {<a href="Job.html">Job</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    (promise) Cancel a Job
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>jobId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">a Job id</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line2012">line 2012</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Job.html">Job</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="deleteAnnotation"><span class="type-signature"></span>deleteAnnotation<span class="signature">(annotationId)</span><span class="type-signature"></span></h4>
     
 
@@ -7794,161 +7981,6 @@ and the documents processed will be those where originalId=documentIds[0] and th
 
 
 
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="deleteJob"><span class="type-signature"></span>deleteJob<span class="signature">(jobId)</span><span class="type-signature"> &rarr; {<a href="Job.html">Job</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    (promise) Delete a Job
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>jobId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">a Job id</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line1992">line 1992</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="Job.html">Job</a></span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -9268,7 +9300,7 @@ If a parameter is preceded by '-' it means descending order.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line1959">line 1959</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line1979">line 1979</a>
     </li></ul></dd>
     
 
@@ -9322,7 +9354,7 @@ If a parameter is preceded by '-' it means descending order.</td>
     
 
     
-    <h4 class="name" id="getJobs"><span class="type-signature"></span>getJobs<span class="signature">(applicationId, jobType, modelId, documentId, executeAfterId, parentJobId, status, offset, limit)</span><span class="type-signature"> &rarr; {Array.&lt;object>}</span></h4>
+    <h4 class="name" id="getJobs"><span class="type-signature"></span>getJobs<span class="signature">(applicationId, sort, jobType, modelId, documentId, executeAfterId, parentJobId, status, offset, limit)</span><span class="type-signature"> &rarr; {Array.&lt;object>}</span></h4>
     
 
     
@@ -9391,6 +9423,38 @@ If a parameter is preceded by '-' it means descending order.</td>
             
 
             <td class="description last">an Application id to filter</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sort</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;string></span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    null
+                
+                </td>
+            
+
+            <td class="description last">(optional) - a list of parameters 
+Can be'submitterId', 'applicationId', 'creationTime', 'startingTime', 'finishedTime', 'jobType', 'modelId',
+       'documentIds', 'status', 'parentJobId'. In ascending order by default.
+If a parameter is preceded by '-' it means descending order.</td>
         </tr>
 
     
@@ -9663,7 +9727,7 @@ If a parameter is preceded by '-' it means descending order.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line1860">line 1860</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line1874">line 1874</a>
     </li></ul></dd>
     
 
@@ -10260,7 +10324,7 @@ If a parameter is preceded by '-' it means descending order.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line2043">line 2043</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line2063">line 2063</a>
     </li></ul></dd>
     
 
@@ -10366,7 +10430,7 @@ If a parameter is preceded by '-' it means descending order.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line2014">line 2014</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line2034">line 2034</a>
     </li></ul></dd>
     
 
@@ -11961,7 +12025,7 @@ and the documents processed will be those where originalId=documentIds[0] and th
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.2</a> on Thu Aug 22 2019 15:55:43 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.2</a> on Tue Aug 27 2019 14:17:56 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

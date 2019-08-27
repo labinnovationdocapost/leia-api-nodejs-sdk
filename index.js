@@ -1676,6 +1676,10 @@ module.exports = class LeiaAPI {
     * (promise) Get a list of jobs (admin)
     * @param {string} submitterId - a submitter id to filter
     * @param {string} applicationId - an Application id to filter
+    * @param {string[]} sort (optional) - a list of parameters 
+    * Can be'submitterId', 'applicationId', 'creationTime', 'startingTime', 'finishedTime', 'jobType', 'modelId',
+      'documentIds', 'status', 'parentJobId'. In ascending order by default.
+    * If a parameter is preceded by '-' it means descending order.
     * @param {string} jobType - a Job type (can be 'predict', 'pdf-images', 'image-text') to filter
     * @param {string} modelId - a Model id to filter
     * @param {string} documentId - a Document id to filter
@@ -1687,7 +1691,7 @@ module.exports = class LeiaAPI {
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, jobs: [Job]}]
     */
 
-    adminGetJobs(submitterId = null, applicationId = null, jobType = null, modelId = null, documentId = null, executeAfterId = null, parentJobId = null, status = null, offset = null, limit = null) {
+    adminGetJobs(submitterId = null, applicationId = null, sort = null, jobType = null, modelId = null, documentId = null, executeAfterId = null, parentJobId = null, status = null, offset = null, limit = null) {
         var offsetStr = ""
         var limitStr = ""
         var submitterIdStr = ""
@@ -1698,6 +1702,7 @@ module.exports = class LeiaAPI {
         var executeAfterIdStr = ""
         var parentJobIdStr = ""
         var statusStr = ""
+        var sortStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -1750,6 +1755,11 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
+        if (sort) {
+            sortStr = firstChar + "sort=" + pythonizeParams(sort)
+            firstChar = "&"
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -1757,7 +1767,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/job' + offsetStr + limitStr + submitterIdStr + applicationIdStr + jobTypeStr + modelIdStr + documentIdStr + executeAfterIdStr + parentJobIdStr + statusStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/job' + offsetStr + limitStr + submitterIdStr + applicationIdStr + jobTypeStr + modelIdStr + documentIdStr + executeAfterIdStr + parentJobIdStr + statusStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var jobs = []
@@ -1821,13 +1831,13 @@ module.exports = class LeiaAPI {
     }
 
     /**
-   * (promise) Delete a Job (admin)
+   * (promise) Cancel a Job (admin)
    * @param {string} submitterId - a submitter id
    * @param {string} jobId - a Job id
    * @returns {Job}
    */
 
-    adminDeleteJob(submitterId, jobId) {
+    adminCancelJob(submitterId, jobId) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -1846,6 +1856,10 @@ module.exports = class LeiaAPI {
     /**
      * (promise) Get a list of jobs
      * @param {string} applicationId - an Application id to filter
+     * @param {string[]} sort (optional) - a list of parameters 
+     * Can be'submitterId', 'applicationId', 'creationTime', 'startingTime', 'finishedTime', 'jobType', 'modelId',
+       'documentIds', 'status', 'parentJobId'. In ascending order by default.
+     * If a parameter is preceded by '-' it means descending order.
      * @param {string} jobType - a Job type (can be 'predict', 'pdf-images', 'image-text') to filter
      * @param {string} modelId - a Model id to filter
      * @param {string} documentId - a Document id to filter
@@ -1857,7 +1871,7 @@ module.exports = class LeiaAPI {
      * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, jobs: [Job]}]
      */
 
-    getJobs(applicationId = null, jobType = null, modelId = null, documentId = null, executeAfterId = null, parentJobId = null, status = null, offset = null, limit = null) {
+    getJobs(applicationId = null, sort = null, jobType = null, modelId = null, documentId = null, executeAfterId = null, parentJobId = null, status = null, offset = null, limit = null) {
         var offsetStr = ""
         var limitStr = ""
         var applicationIdStr = ""
@@ -1867,6 +1881,7 @@ module.exports = class LeiaAPI {
         var executeAfterIdStr = ""
         var parentJobIdStr = ""
         var statusStr = ""
+        var sortStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -1914,6 +1929,11 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
+        if (sort) {
+            sortStr = firstChar + "sort=" + pythonizeParams(sort)
+            firstChar = "&"
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -1921,7 +1941,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/job' + offsetStr + limitStr + applicationIdStr + jobTypeStr + modelIdStr + documentIdStr + executeAfterIdStr + parentJobIdStr + statusStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/job' + offsetStr + limitStr + applicationIdStr + jobTypeStr + modelIdStr + documentIdStr + executeAfterIdStr + parentJobIdStr + statusStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var jobs = []
@@ -1984,12 +2004,12 @@ module.exports = class LeiaAPI {
     }
 
     /**
-   * (promise) Delete a Job
+   * (promise) Cancel a Job
    * @param {string} jobId - a Job id
    * @returns {Job}
    */
 
-    deleteJob(jobId) {
+    cancelJob(jobId) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
