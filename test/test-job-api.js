@@ -42,7 +42,7 @@ function mockJobAPI() {
         .get('/login/mockApiKey')
         .reply(200, { token: 'faketoken', application: { id: 'id1', application_type: 'admin' } });
 
-        nock(serverURL)
+    nock(serverURL)
         .get('/admin/job')
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
@@ -54,7 +54,15 @@ function mockJobAPI() {
         .get('/admin/job?limit=20')
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
-        nock(serverURL)
+    nock(serverURL)
+        .get('/admin/job?sort=submitter_id')
+        .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/admin/job?sort=submitterId')
+        .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
         .get('/admin/job?submitter_id=submitterId1')
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
@@ -87,7 +95,15 @@ function mockJobAPI() {
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/admin/job?offset=20&limit=20&submitter_id=submitterId1&application_id=appId1&job_type=pdf-images&model_id=modelId1&document_id=documentId1&execute_after_id=jobId1&parent_job_id=jobId1&status=PROCESSED')
+        .get('/admin/job?created_after=2018-10-10T10:10:10')
+        .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/admin/job?created_before=2018-10-10T10:10:10')
+        .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/admin/job?offset=20&limit=20&sort=submitter_id&submitter_id=submitterId1&application_id=appId1&job_type=pdf-images&model_id=modelId1&document_id=documentId1&execute_after_id=jobId1&parent_job_id=jobId1&status=PROCESSED&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
     nock(serverURL)
@@ -151,6 +167,14 @@ function mockJobAPI() {
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
     nock(serverURL)
+        .get('/job?sort=submitter_id')
+        .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/job?submitter_id=submitterId1')
+        .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
         .get('/job?application_id=appId1')
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
@@ -179,7 +203,15 @@ function mockJobAPI() {
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/job?offset=20&limit=20&application_id=appId1&job_type=pdf-images&model_id=modelId1&document_id=documentId1&execute_after_id=jobId1&parent_job_id=jobId1&status=PROCESSED')
+        .get('/job?created_after=2018-10-10T10:10:10')
+        .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/job?created_before=2018-10-10T10:10:10')
+        .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/job?offset=20&limit=20&sort=submitter_id&application_id=appId1&job_type=pdf-images&model_id=modelId1&document_id=documentId1&execute_after_id=jobId1&parent_job_id=jobId1&status=PROCESSED&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
     nock(serverURL)
@@ -276,7 +308,7 @@ describe('LeIA Job API', () => {
         it('should return a list of jobs when offset is provided', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminGetJobs(null, null, null, null, null, null, null, null, null, 20, null).then((result) => {
+                leiaAPI.adminGetJobs(20).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -311,7 +343,42 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetJobs(null, null, null, null, null, null, null, null, null, null, 20).then((result) => {
+                leiaAPI.adminGetJobs(null, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.should.be.a('object');
+                    result.jobs.should.be.a('array');
+                    result.jobs[0].id.should.be.eql(transformPDFProcessedJob.id)
+                    result.jobs[0].creationTime.should.be.eql(transformPDFProcessedJob.creation_time)
+                    result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
+                    result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
+                    result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
+                    result.jobs[0].submitterId.should.be.eql(transformPDFProcessedJob.submitter_id)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].rotationAngle.should.be.eql(transformPDFProcessedJob.result[0].rotation_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
+                    result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
+                    result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
+                    result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
+                    done()
+                })
+            })
+        });
+
+        it('should return a list of jobs when sort is provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.adminGetJobs(null, null, ['submitter_id']).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -346,7 +413,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetJobs('submitterId1', null, null, null, null, null, null, null, null, null).then((result) => {
+                leiaAPI.adminGetJobs(null, null, null, 'submitterId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -381,7 +448,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetJobs(null, 'appId1', null, null, null, null, null, null, null, null).then((result) => {
+                leiaAPI.adminGetJobs(null, null, null, null, 'appId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -416,7 +483,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetJobs(null, null, null, 'pdf-images', null, null, null, null, null, null, null).then((result) => {
+                leiaAPI.adminGetJobs(null, null, null, null, null, 'pdf-images').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -451,7 +518,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
 
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminGetJobs(null, null, null, null, 'modelId1', null, null, null, null, null, null).then((result) => {
+                leiaAPI.adminGetJobs(null, null, null, null, null, null, 'modelId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -486,7 +553,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetJobs(null, null, null, null, null, 'documentId1', null, null, null, null, null).then((result) => {
+                leiaAPI.adminGetJobs(null, null, null, null, null, null, null, 'documentId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -521,7 +588,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetJobs(null, null, null, null, null, null, 'jobId1', null, null, null, null).then((result) => {
+                leiaAPI.adminGetJobs(null, null, null, null, null, null, null, null, 'jobId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -556,7 +623,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetJobs(null, null, null, null, null, null, null, 'jobId1', null, null, null).then((result) => {
+                leiaAPI.adminGetJobs(null, null, null, null, null, null, null, null, null, 'jobId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -591,7 +658,77 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetJobs(null, null, null, null, null, null, null, null, 'PROCESSED', null, null).then((result) => {
+                leiaAPI.adminGetJobs(null, null, null, null, null, null, null, null, null, null, 'PROCESSED').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.should.be.a('object');
+                    result.jobs.should.be.a('array');
+                    result.jobs[0].id.should.be.eql(transformPDFProcessedJob.id)
+                    result.jobs[0].creationTime.should.be.eql(transformPDFProcessedJob.creation_time)
+                    result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
+                    result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
+                    result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
+                    result.jobs[0].submitterId.should.be.eql(transformPDFProcessedJob.submitter_id)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].rotationAngle.should.be.eql(transformPDFProcessedJob.result[0].rotation_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
+                    result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
+                    result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
+                    result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
+                    done()
+                })
+            })
+        });
+
+        it('should return a list of jobs when createdAfter is provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.adminGetJobs(null, null, null, null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.should.be.a('object');
+                    result.jobs.should.be.a('array');
+                    result.jobs[0].id.should.be.eql(transformPDFProcessedJob.id)
+                    result.jobs[0].creationTime.should.be.eql(transformPDFProcessedJob.creation_time)
+                    result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
+                    result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
+                    result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
+                    result.jobs[0].submitterId.should.be.eql(transformPDFProcessedJob.submitter_id)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].rotationAngle.should.be.eql(transformPDFProcessedJob.result[0].rotation_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
+                    result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
+                    result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
+                    result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
+                    done()
+                })
+            })
+        });
+
+        it('should return a list of jobs when createdBefore is provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.adminGetJobs(null, null, null, null, null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -626,7 +763,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetJobs('submitterId1', 'appId1', null, 'pdf-images', 'modelId1', 'documentId1', 'jobId1', 'jobId1', 'PROCESSED', 20, 20).then((result) => {
+                leiaAPI.adminGetJobs(20, 20, ['submitter_id'], 'submitterId1', 'appId1', 'pdf-images', 'modelId1', 'documentId1', 'jobId1', 'jobId1', 'PROCESSED', '2018-10-10T10:10:10', '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -660,7 +797,7 @@ describe('LeIA Job API', () => {
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminGetJobs(null, null, null, null, null, null, null, null, null, null, 3).then(() => {
+                leiaAPI.adminGetJobs(null, 3).then(() => {
                 }).catch((error) => {
                     error.status.should.be.eql(401)
                     done()
@@ -671,7 +808,7 @@ describe('LeIA Job API', () => {
         it('should return 403 when LeiaAPI returns a 403 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminGetJobs(null, null, null, null, null, null, null, null, null, null, 4).then(() => {
+                leiaAPI.adminGetJobs(null, 4).then(() => {
                 }).catch((error) => {
                     error.status.should.be.eql(403)
                     done()
@@ -682,7 +819,7 @@ describe('LeIA Job API', () => {
         it('should return an empty list when LeiaAPI returns a 404 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminGetJobs(null, null, null, null, null, null, null, null, null, null, 5).then((result) => {
+                leiaAPI.adminGetJobs(null, 5).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(0)
                     result.contentRange.total.should.be.eql(0)
@@ -840,7 +977,7 @@ describe('LeIA Job API', () => {
         it('should return a list of jobs when offset is provided', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.getJobs(null, null, null, null, null, null, null, null, 20, null).then((result) => {
+                leiaAPI.getJobs(20).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -875,7 +1012,42 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getJobs(null, null, null, null, null, null, null,  null, null, 20).then((result) => {
+                leiaAPI.getJobs(null, 20).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.should.be.a('object');
+                    result.jobs.should.be.a('array');
+                    result.jobs[0].id.should.be.eql(transformPDFProcessedJob.id)
+                    result.jobs[0].creationTime.should.be.eql(transformPDFProcessedJob.creation_time)
+                    result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
+                    result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
+                    result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
+                    result.jobs[0].submitterId.should.be.eql(transformPDFProcessedJob.submitter_id)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].rotationAngle.should.be.eql(transformPDFProcessedJob.result[0].rotation_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
+                    result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
+                    result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
+                    result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
+                    done()
+                })
+            })
+        });
+
+        it('should return a list of jobs when sort is provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.getJobs(null, null, ['submitter_id']).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -910,7 +1082,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getJobs('appId1', null, null, null, null, null, null, null, null, null).then((result) => {
+                leiaAPI.getJobs(null, null, null, 'appId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -945,7 +1117,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getJobs(null, null, 'pdf-images', null, null, null, null, null, null, null).then((result) => {
+                leiaAPI.getJobs(null, null, null, null, 'pdf-images').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -980,7 +1152,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
 
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.getJobs(null, null, null, 'modelId1', null, null, null, null, null, null).then((result) => {
+                leiaAPI.getJobs(null, null, null, null, null, 'modelId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1015,7 +1187,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getJobs(null, null, null, null, 'documentId1', null, null, null, null, null).then((result) => {
+                leiaAPI.getJobs(null, null, null, null, null, null, 'documentId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1050,7 +1222,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getJobs(null, null, null, null, null, 'jobId1', null, null, null, null).then((result) => {
+                leiaAPI.getJobs(null, null, null, null, null, null, null, 'jobId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1085,7 +1257,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getJobs(null, null, null, null, null, null, 'jobId1', null, null, null).then((result) => {
+                leiaAPI.getJobs(null, null, null, null, null, null, null, null, 'jobId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1120,7 +1292,77 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getJobs(null, null, null, null, null, null, null, 'PROCESSED', null, null).then((result) => {
+                leiaAPI.getJobs(null, null, null, null, null, null, null, null, null, 'PROCESSED').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.should.be.a('object');
+                    result.jobs.should.be.a('array');
+                    result.jobs[0].id.should.be.eql(transformPDFProcessedJob.id)
+                    result.jobs[0].creationTime.should.be.eql(transformPDFProcessedJob.creation_time)
+                    result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
+                    result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
+                    result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
+                    result.jobs[0].submitterId.should.be.eql(transformPDFProcessedJob.submitter_id)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].rotationAngle.should.be.eql(transformPDFProcessedJob.result[0].rotation_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
+                    result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
+                    result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
+                    result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
+                    done()
+                })
+            })
+        });
+
+        it('should return a list of jobs when createdAfter is provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.getJobs(null, null, null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.should.be.a('object');
+                    result.jobs.should.be.a('array');
+                    result.jobs[0].id.should.be.eql(transformPDFProcessedJob.id)
+                    result.jobs[0].creationTime.should.be.eql(transformPDFProcessedJob.creation_time)
+                    result.jobs[0].applicationId.should.be.eql(transformPDFProcessedJob.application_id)
+                    result.jobs[0].documentIds.should.be.eql(transformPDFProcessedJob.document_ids)
+                    result.jobs[0].jobType.should.be.eql(transformPDFProcessedJob.job_type)
+                    result.jobs[0].submitterId.should.be.eql(transformPDFProcessedJob.submitter_id)
+                    result.jobs[0].resultType.should.be.eql(transformPDFProcessedJob.result_type)
+                    result.jobs[0].result.should.be.a('array');
+                    result.jobs[0].result.length.should.be.eql(1)
+                    result.jobs[0].result[0].id.should.be.eql(transformPDFProcessedJob.result[0].id)
+                    result.jobs[0].result[0].creationTime.should.be.eql(transformPDFProcessedJob.result[0].creation_time)
+                    result.jobs[0].result[0].filename.should.be.eql(transformPDFProcessedJob.result[0].filename)
+                    result.jobs[0].result[0].extension.should.be.eql(transformPDFProcessedJob.result[0].extension)
+                    result.jobs[0].result[0].rotationAngle.should.be.eql(transformPDFProcessedJob.result[0].rotation_angle)
+                    result.jobs[0].result[0].applicationId.should.be.eql(transformPDFProcessedJob.result[0].application_id)
+                    result.jobs[0].result[0].mimeType.should.be.eql(transformPDFProcessedJob.result[0].mime_type)
+                    result.jobs[0].result[0].tags.should.be.eql(transformPDFProcessedJob.result[0].tags)
+                    result.jobs[0].startingTime.should.be.eql(transformPDFProcessedJob.starting_time)
+                    result.jobs[0].status.should.be.eql(transformPDFProcessedJob.status)
+                    result.jobs[0].executeAfterId.should.be.eql(transformPDFProcessedJob.execute_after_id)
+                    done()
+                })
+            })
+        });
+
+        it('should return a list of jobs when createdBefore is provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.getJobs(null, null, null, null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1155,7 +1397,7 @@ describe('LeIA Job API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getJobs('appId1', null, 'pdf-images', 'modelId1', 'documentId1', 'jobId1', 'jobId1', 'PROCESSED', 20, 20).then((result) => {
+                leiaAPI.getJobs(20, 20, ['submitter_id'], 'appId1', 'pdf-images', 'modelId1', 'documentId1', 'jobId1', 'jobId1', 'PROCESSED', '2018-10-10T10:10:10', '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1189,7 +1431,7 @@ describe('LeIA Job API', () => {
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.getJobs(null, null, null, null, null, null, null, null, null, 3).then(() => {
+                leiaAPI.getJobs(null, 3).then(() => {
                 }).catch((error) => {
                     error.status.should.be.eql(401)
                     done()
@@ -1200,7 +1442,7 @@ describe('LeIA Job API', () => {
         it('should return 403 when LeiaAPI returns a 403 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.getJobs(null, null, null, null, null, null, null, null, null, 4).then(() => {
+                leiaAPI.getJobs(null, 4).then(() => {
                 }).catch((error) => {
                     error.status.should.be.eql(403)
                     done()
@@ -1211,7 +1453,7 @@ describe('LeIA Job API', () => {
         it('should return an empty list when LeiaAPI returns a 404 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.getJobs(null, null, null, null, null, null, null, null, null, 5).then((result) => {
+                leiaAPI.getJobs(null, 5).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(0)
                     result.contentRange.total.should.be.eql(0)

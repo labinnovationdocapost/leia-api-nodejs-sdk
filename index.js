@@ -68,20 +68,35 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Return a list of paginated Applications (admin)
-    * @param {string} email (optional) - an email address to filter applications
-    * @param {string} applicationName (optional) - an Application name to filter applications
+    * @param {integer} offset (optional) - list offset number for pagination
+    * @param {integer} limit (optional) - max per page
     * @param {string[]} sort (optional) - a list of parameters 
     * Can be 'applicationName', 'applicationType', 'creationTime', 'firstname', 'lastname', 'email'. In ascending order by default.
     * If a parameter is preceded by '-' it means descending order.
-    * @param {integer} offset (optional) - list offset number for pagination
-    * @param {integer} limit (optional) - max per page
+    * @param {string} email (optional) - an email address to filter applications
+    * @param {string} applicationName (optional) - an Application name to filter applications
+    * @param {string} firstName (optional) - filter by firstName
+    * @param {string} lastName (optional) - filter by lastName
+    * @param {string} applicationType (optional) - filter by applicationType
+    * @param {string} firstName (optional) - filter by firstName
+    * @param {string} firstName (optional) - filter by firstName
+    * @param {string} createdAfter (optional) - only return applications created after a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
+    * @param {string} createdBefore (optional) - only return applications created before a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, applications: [Application]}]
      */
 
-    adminGetApplications(email = null, applicationName = null, sort = null, offset = null, limit = null) {
+    adminGetApplications(offset = null, limit = null, sort = null, email = null, applicationName = null,
+        firstName = null, lastName = null, applicationType = null, createdAfter = null, createdBefore = null , ) {
         var offsetStr = ""
         var limitStr = ""
         var sortStr = ""
+        var emailStr = ""
+        var applicationNameStr = ""
+        var firstNameStr = ""
+        var lastNameStr = ""
+        var applicationTypeStr = ""
+        var createdAfterStr = ""
+        var createdBeforeStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -99,6 +114,41 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
+        if (email !== null) {
+            emailStr += firstChar + 'email=' + email
+            firstChar = "&"
+        }
+
+        if (applicationName !== null) {
+            applicationNameStr += firstChar + 'application_name=' + applicationName
+            firstChar = "&"
+        }
+
+        if (firstName !== null) {
+            firstNameStr += firstChar + 'first_name=' + firstName
+            firstChar = "&"
+        }
+
+        if (lastName !== null) {
+            lastNameStr += firstChar + 'last_name=' + lastName
+            firstChar = "&"
+        }
+
+        if (applicationType !== null) {
+            applicationTypeStr += firstChar + 'application_type=' + applicationType
+            firstChar = "&"
+        }
+
+        if (createdAfter !== null) {
+            createdAfterStr += firstChar + 'created_after=' + createdAfter
+            firstChar = "&"
+        }
+
+        if (createdBefore !== null) {
+            createdBeforeStr += firstChar + 'created_before=' + createdBefore
+            firstChar = "&"
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -106,7 +156,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/application' + offsetStr + limitStr + (email ? firstChar + 'email=' + email : '') + (applicationName ? firstChar + 'application_name=' + applicationName : '') + sortStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/application' + offsetStr + limitStr + sortStr + emailStr + applicationNameStr + firstNameStr + lastNameStr + applicationTypeStr + createdAfterStr + createdBeforeStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var applications = []
@@ -304,22 +354,35 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Return a list of paginated Models (admin)
-    * @param {string[]} tags (optional) - a list of tags to filter models
+    * @param {integer} offset (optional) - list offset number for pagination
+    * @param {integer} limit (optional) - max per page
     * @param {string[]} sort (optional) - a list of parameters 
     * Can be 'applicationId', 'creationTime', 'name', 'description', 'modelType'. In ascending order by default.
     * If a parameter is preceded by '-' it means descending order.
-    * @param {integer} offset (optional) - list offset number for pagination
-    * @param {integer} limit (optional) - max per page
     * @param {string} applicationId (optional) - an Application id to filter models
+    * @param {string[]} tags (optional) - a list of tags to filter models
+    * @param {string} modelType (optional) - filter by modelType
+    * @param {string} name (optional) - filter by name
+    * @param {string} description (optional) - filter by description
+    * @param {string} inputTypes (optional) - filter by inputTypes
+    * @param {string} createdAfter (optional) - only return models created after a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
+    * @param {string} createdBefore (optional) - only return models created before a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, models: [Model]}]
     */
 
-    adminGetModels(tags = null, sort = null, offset = null, limit = null, applicationId = null) {
+    adminGetModels(offset = null, limit = null, sort = null, applicationId = null, tags = null, modelType = null, name = null, 
+        description = null, inputTypes = null, createdAfter = null, createdBefore = null) {
         var offsetStr = ""
         var limitStr = ""
-        var tagsStr = ""
         var sortStr = ""
         var applicationIdStr = ""
+        var tagsStr = ""
+        var modelTypeStr = ""
+        var nameStr = ""
+        var descriptionStr = ""
+        var inputTypesStr = ""
+        var createdAfterStr = ""
+        var createdBeforeStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -332,8 +395,8 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        for (var i = 0; tags && i < tags.length; i++) {
-            tagsStr += firstChar + 'tags=' + tags[i]
+        if (sort) {
+            sortStr = firstChar + "sort=" + pythonizeParams(sort)
             firstChar = "&"
         }
 
@@ -342,8 +405,38 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (sort) {
-            sortStr = firstChar + "sort=" + pythonizeParams(sort)
+        for (var i = 0; tags && i < tags.length; i++) {
+            tagsStr += firstChar + 'tags=' + tags[i]
+            firstChar = "&"
+        }
+
+        if (modelType !== null) {
+            modelTypeStr += firstChar + 'model_type=' + modelType
+            firstChar = "&"
+        }
+
+        if (name !== null) {
+            nameStr += firstChar + 'name=' + name
+            firstChar = "&"
+        }
+
+        if (description !== null) {
+            descriptionStr += firstChar + 'description=' + description
+            firstChar = "&"
+        }
+
+        if (inputTypes !== null) {
+            inputTypesStr += firstChar + 'input_types=' + inputTypes
+            firstChar = "&"
+        }
+
+        if (createdAfter !== null) {
+            createdAfterStr += firstChar + 'created_after=' + createdAfter
+            firstChar = "&"
+        }
+
+        if (createdBefore !== null) {
+            createdBeforeStr += firstChar + 'created_before=' + createdBefore
             firstChar = "&"
         }
 
@@ -354,7 +447,8 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/model' + offsetStr + limitStr + tagsStr + applicationIdStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/model' + offsetStr + limitStr + sortStr + applicationIdStr + tagsStr + 
+               modelTypeStr + nameStr + descriptionStr + inputTypesStr + createdAfterStr + createdBeforeStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var models = []
@@ -373,21 +467,33 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Return a list of paginated Models owned by the API Key
-    * @param {string[]} tags (optional) - a list of tags to filter models
+    * @param {integer} offset (optional) - list offset number for pagination
+    * @param {integer} limit (optional) - max per page
     * @param {string[]} sort (optional) - a list of parameters 
     * Can be 'applicationId', 'creationTime', 'name', 'description', 'modelType'. In ascending order by default.
     * If a parameter is preceded by '-' it means descending order.
-    * @param {integer} offset (optional) - list offset number for pagination
-    * @param {integer} limit (optional) - max per page
-    * @param {string} applicationId (optional) - an Application id to filter models
+    * @param {string[]} tags (optional) - a list of tags to filter models
+    * @param {string} modelType (optional) - filter by modelType
+    * @param {string} name (optional) - filter by name
+    * @param {string} description (optional) - filter by description
+    * @param {string} inputTypes (optional) - filter by inputTypes
+    * @param {string} createdAfter (optional) - only return models created after a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
+    * @param {string} createdBefore (optional) - only return models created before a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, models: [Model]}]
     */
 
-    getModels(tags = null, sort = null, offset = null, limit = null) {
+    getModels(offset = null, limit = null, sort = null, tags = null, modelType = null, name = null, 
+        description = null, inputTypes = null, createdAfter = null, createdBefore = null) {
         var offsetStr = ""
         var limitStr = ""
-        var tagsStr = ""
         var sortStr = ""
+        var tagsStr = ""
+        var modelTypeStr = ""
+        var nameStr = ""
+        var descriptionStr = ""
+        var inputTypesStr = ""
+        var createdAfterStr = ""
+        var createdBeforeStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -400,13 +506,43 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
+        if (sort) {
+            sortStr = firstChar + "sort=" + pythonizeParams(sort)
+            firstChar = "&"
+        }
+
         for (var i = 0; tags && i < tags.length; i++) {
             tagsStr += firstChar + 'tags=' + tags[i]
             firstChar = "&"
         }
 
-        if (sort) {
-            sortStr = firstChar + "sort=" + pythonizeParams(sort)
+        if (modelType !== null) {
+            modelTypeStr += firstChar + 'model_type=' + modelType
+            firstChar = "&"
+        }
+
+        if (name !== null) {
+            nameStr += firstChar + 'name=' + name
+            firstChar = "&"
+        }
+
+        if (description !== null) {
+            descriptionStr += firstChar + 'description=' + description
+            firstChar = "&"
+        }
+
+        if (inputTypes !== null) {
+            inputTypesStr += firstChar + 'input_types=' + inputTypes
+            firstChar = "&"
+        }
+
+        if (createdAfter !== null) {
+            createdAfterStr += firstChar + 'created_after=' + createdAfter
+            firstChar = "&"
+        }
+
+        if (createdBefore !== null) {
+            createdBeforeStr += firstChar + 'created_before=' + createdBefore
             firstChar = "&"
         }
 
@@ -417,7 +553,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/model' + offsetStr + limitStr + tagsStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/model' + offsetStr + limitStr + sortStr + tagsStr + modelTypeStr + nameStr + descriptionStr + inputTypesStr + createdAfterStr + createdBeforeStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var models = []
@@ -985,24 +1121,37 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Return a list of paginated Documents (admin)
-    * @param {string[]} tags (optional) - an email address to filter documents
-    * @param {string} tagResult (optional) - tag the fetched documents
+    * @param {integer} offset (optional) - list offset number for pagination
+    * @param {integer} limit (optional) - max per page
     * @param {string[]} sort (optional) - a list of parameters 
     * Can be 'applicationId', 'filename', 'extension', 'mimeType', 'originalId', 'page', 'creationTime'. In ascending order by default.
     * If a parameter is preceded by '-' it means descending order.
-    * @param {integer} offset (optional) - list offset number for pagination
-    * @param {integer} limit (optional) - max per page
     * @param {string} applicationId (optional) - an Application id to filter documents
+    * @param {string} tagResult (optional) - tag the fetched documents
+    * @param {string[]} tags (optional) - an email address to filter documents
+    * @param {string} filename (optional) - filter by filename
+    * @param {string} extension (optional) - filter by extension
+    * @param {string} mimeType (optional) - filter by MIME type
+    * @param {string} originalId (optional) - filter by originalId
+    * @param {string} createdAfter (optional) - only return documents created after a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
+    * @param {string} createdBefore (optional) - only return documents created before a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
     */
 
-    adminGetDocuments(tags = null, tagResult = null, sort = null, offset = null, limit = null, applicationId = null) {
+    adminGetDocuments(offset = null, limit = null, sort = null, applicationId = null, tagResult = null, tags = null, filename = null, extension = null,
+        mimeType = null, originalId = null, createdAfter = null, createdBefore = null) {
         var offsetStr = ""
         var limitStr = ""
-        var tagsStr = ""
-        var tagResultStr = ""
-        var applicationIdStr = ""
         var sortStr = ""
+        var applicationIdStr = ""
+        var tagResultStr = ""
+        var tagsStr = ""
+        var filenameStr = ""
+        var extensionStr = ""
+        var mimeTypeStr = ""
+        var originalIdStr = ""
+        var createdAfterStr = ""
+        var createdBeforeStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -1015,13 +1164,8 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        for (var i = 0; tags && i < tags.length; i++) {
-            tagsStr += firstChar + 'tags=' + tags[i]
-            firstChar = "&"
-        }
-
-        if (tagResult !== null) {
-            tagResultStr = firstChar + "tag_result=" + tagResult
+        if (sort) {
+            sortStr = firstChar + "sort=" + pythonizeParams(sort)
             firstChar = "&"
         }
 
@@ -1030,8 +1174,43 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (sort) {
-            sortStr = firstChar + "sort=" + pythonizeParams(sort)
+        if (tagResult !== null) {
+            tagResultStr = firstChar + "tag_result=" + tagResult
+            firstChar = "&"
+        }
+
+        for (var i = 0; tags && i < tags.length; i++) {
+            tagsStr += firstChar + 'tags=' + tags[i]
+            firstChar = "&"
+        }
+
+        if (filename !== null) {
+            filenameStr += firstChar + 'filename=' + filename
+            firstChar = "&"
+        }
+
+        if (extension !== null) {
+            extensionStr += firstChar + 'extension=' + extension
+            firstChar = "&"
+        }
+
+        if (mimeType !== null) {
+            mimeTypeStr += firstChar + 'mime_type=' + mimeType
+            firstChar = "&"
+        }
+
+        if (originalId !== null) {
+            originalIdStr += firstChar + 'original_id=' + originalId
+            firstChar = "&"
+        }
+
+        if (createdAfter !== null) {
+            createdAfterStr += firstChar + 'created_after=' + createdAfter
+            firstChar = "&"
+        }
+
+        if (createdBefore !== null) {
+            createdBeforeStr += firstChar + 'created_before=' + createdBefore
             firstChar = "&"
         }
 
@@ -1042,7 +1221,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/document' + offsetStr + limitStr + tagsStr + tagResultStr + applicationIdStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/document' + offsetStr + limitStr + sortStr + applicationIdStr + tagResultStr + tagsStr + filenameStr + extensionStr + mimeTypeStr + originalIdStr + createdAfterStr + createdBeforeStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
@@ -1063,22 +1242,36 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Return a list of paginated Documents
-    * @param {string[]} tags (optional) - an email address to filter documents
-    * @param {string} tagResult (optional) - tag the fetched documents
+    * @param {integer} offset (optional) - list offset number for pagination
+    * @param {integer} limit (optional) - max per page
     * @param {string[]} sort (optional) - a list of parameters 
     * Can be 'applicationId', 'filename', 'extension', 'mimeType', 'originalId', 'page', 'creationTime'. In ascending order by default.
     * If a parameter is preceded by '-' it means descending order.
-    * @param {integer} offset (optional) - list offset number for pagination
-    * @param {integer} limit (optional) - max per page
+    * @param {string} tagResult (optional) - tag the fetched documents
+    * @param {string[]} tags (optional) - an email address to filter documents
+    * @param {string} filename (optional) - filter by filename
+    * @param {string} extension (optional) - filter by extension
+    * @param {string} mimeType (optional) - filter by MIME type
+    * @param {string} originalId (optional) - filter by originalId
+    * @param {string} createdAfter (optional) - only return documents created after a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
+    * @param {string} createdBefore (optional) - only return documents created before a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, documents: [Document]}]
     */
 
-    getDocuments(tags = null, tagResult = null, sort = null, offset = null, limit = null) {
+    getDocuments(offset = null, limit = null, sort = null, tagResult = null, tags = null, filename = null, extension = null,
+        mimeType = null, originalId = null, createdAfter = null, createdBefore = null) {
+
         var offsetStr = ""
         var limitStr = ""
-        var tagsStr = ""
-        var tagResultStr = ""
         var sortStr = ""
+        var tagResultStr = ""
+        var tagsStr = ""
+        var filenameStr = ""
+        var extensionStr = ""
+        var mimeTypeStr = ""
+        var originalIdStr = ""
+        var createdAfterStr = ""
+        var createdBeforeStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -1088,6 +1281,11 @@ module.exports = class LeiaAPI {
 
         if (limit !== null) {
             limitStr += firstChar + 'limit=' + limit
+            firstChar = "&"
+        }
+
+        if (sort) {
+            sortStr = firstChar + "sort=" + pythonizeParams(sort)
             firstChar = "&"
         }
 
@@ -1101,10 +1299,37 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (sort) {
-            sortStr = firstChar + "sort=" + pythonizeParams(sort)
+        if (filename !== null) {
+            filenameStr += firstChar + 'filename=' + filename
             firstChar = "&"
         }
+
+        if (extension !== null) {
+            extensionStr += firstChar + 'extension=' + extension
+            firstChar = "&"
+        }
+
+        if (mimeType !== null) {
+            mimeTypeStr += firstChar + 'mime_type=' + mimeType
+            firstChar = "&"
+        }
+
+        if (originalId !== null) {
+            originalIdStr += firstChar + 'original_id=' + originalId
+            firstChar = "&"
+        }
+
+        if (createdAfter !== null) {
+            createdAfterStr += firstChar + 'created_after=' + createdAfter
+            firstChar = "&"
+        }
+
+        if (createdBefore !== null) {
+            createdBeforeStr += firstChar + 'created_before=' + createdBefore
+            firstChar = "&"
+        }
+
+        
 
         var that = this
         return new Promise(function (resolve, reject) {
@@ -1113,7 +1338,9 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/document' + offsetStr + limitStr + tagsStr + tagResultStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
+
+            that.leiaAPIRequest.get(that.serverURL + '/document' + offsetStr + limitStr + sortStr + tagResultStr + tagsStr +  
+             filenameStr + extensionStr + mimeTypeStr + originalIdStr + createdAfterStr + createdBeforeStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
@@ -1463,22 +1690,26 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Return a list of paginated Annotations
+    * @param {integer} offset (optional) - list offset number for pagination
+    * @param {integer} limit (optional) - max per page
     * @param {string[]} tags (optional) - an email address to filter documents
     * @param {string} annotationType (optional) - a type of annotation (can be BOX, TYPING or TEXT so far)
     * @param {string} name (optional) - an Annotation name
-    * @param {string} documentId (optional) - a Document id to filter annotations
-    * @param {integer} offset (optional) - list offset number for pagination
-    * @param {integer} limit (optional) - max per page
+    * @param {string} documentId (optional) - a Document id to filte    
+    * @param {string} createdAfter (optional) - only return annotations created after a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
+    * @param {string} createdBefore (optional) - only return annotations created before a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)r annotations
     * @returns {Annotation} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, annotations: [Annotation]}]
     */
 
-    getAnnotations(tags = null, annotationType = null, name = null, documentId = null, offset = null, limit = null) {
+    getAnnotations(offset = null, limit = null, tags = null, annotationType = null, name = null, documentId = null, createdAfter = null, createdBefore = null) {
         var offsetStr = ""
         var limitStr = ""
         var tagsStr = ""
-        var documentIdStr = ""
         var annotationTypeStr = ""
         var nameStr = ""
+        var documentIdStr = ""
+        var createdAfterStr = ""
+        var createdBeforeStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -1496,11 +1727,6 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (documentId !== null) {
-            documentIdStr = firstChar + "document_id=" + documentId
-            firstChar = "&"
-        }
-
         if (annotationType !== null) {
             annotationTypeStr = firstChar + "annotation_type=" + annotationType
             firstChar = "&"
@@ -1511,6 +1737,21 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
+        if (documentId !== null) {
+            documentIdStr = firstChar + "document_id=" + documentId
+            firstChar = "&"
+        }
+
+        if (createdAfter !== null) {
+            createdAfterStr += firstChar + 'created_after=' + createdAfter
+            firstChar = "&"
+        }
+
+        if (createdBefore !== null) {
+            createdBeforeStr += firstChar + 'created_before=' + createdBefore
+            firstChar = "&"
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -1518,7 +1759,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/annotation' + offsetStr + limitStr + tagsStr + documentIdStr + annotationTypeStr + nameStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/annotation' + offsetStr + limitStr + tagsStr + annotationTypeStr + nameStr + documentIdStr + createdAfterStr + createdBeforeStr , true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var annotations = []
@@ -1697,26 +1938,32 @@ module.exports = class LeiaAPI {
 
     /**
     * (promise) Get a list of jobs (admin)
-    * @param {string} submitterId - a submitter id to filter
-    * @param {string} applicationId - an Application id to filter
+    * @param {integer} offset - an offset for pagination
+    * @param {integer} limit - a limit for pagination
     * @param {string[]} sort (optional) - a list of parameters 
     * Can be'submitterId', 'applicationId', 'creationTime', 'startingTime', 'finishedTime', 'jobType', 'modelId',
       'documentIds', 'status', 'parentJobId'. In ascending order by default.
     * If a parameter is preceded by '-' it means descending order.
+    * @param {string} submitterId - a submitter id to filter
+    * @param {string} applicationId - an Application id to filter
+
     * @param {string} jobType - a Job type (can be 'predict', 'pdf-images', 'image-text') to filter
     * @param {string} modelId - a Model id to filter
     * @param {string} documentId - a Document id to filter
     * @param {string} executeAfterId - a pre-Job id to filter
     * @param {string} parentJobId - a parent Job id to filter
     * @param {string} status - a status (can be WAITING, READY, STARTING, PROCESSED, PROCESSING, CANCELED, FAILED)
-    * @param {integer} offset - an offset for pagination
-    * @param {integer} limit - a limit for pagination
+    * @param {string} createdAfter (optional) - only return jobs created after a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
+    * @param {string} createdBefore (optional) - only return jobs created before a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)r annotations
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, jobs: [Job]}]
     */
 
-    adminGetJobs(submitterId = null, applicationId = null, sort = null, jobType = null, modelId = null, documentId = null, executeAfterId = null, parentJobId = null, status = null, offset = null, limit = null) {
+    adminGetJobs(offset = null, limit = null, sort = null, submitterId = null, applicationId = null,
+         jobType = null, modelId = null, documentId = null, executeAfterId = null, parentJobId = null, 
+         status = null, createdAfter = null, createdBefore = null) {
         var offsetStr = ""
         var limitStr = ""
+        var sortStr = ""
         var submitterIdStr = ""
         var applicationIdStr = ""
         var jobTypeStr = ""
@@ -1725,7 +1972,8 @@ module.exports = class LeiaAPI {
         var executeAfterIdStr = ""
         var parentJobIdStr = ""
         var statusStr = ""
-        var sortStr = ""
+        var createdAfterStr = ""
+        var createdBeforeStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -1735,6 +1983,11 @@ module.exports = class LeiaAPI {
 
         if (limit !== null) {
             limitStr += firstChar + 'limit=' + limit
+            firstChar = "&"
+        }
+
+        if (sort) {
+            sortStr = firstChar + "sort=" + pythonizeParams(sort)
             firstChar = "&"
         }
 
@@ -1778,8 +2031,13 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (sort) {
-            sortStr = firstChar + "sort=" + pythonizeParams(sort)
+        if (createdAfter !== null) {
+            createdAfterStr += firstChar + 'created_after=' + createdAfter
+            firstChar = "&"
+        }
+
+        if (createdBefore !== null) {
+            createdBeforeStr += firstChar + 'created_before=' + createdBefore
             firstChar = "&"
         }
 
@@ -1790,7 +2048,8 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/job' + offsetStr + limitStr + submitterIdStr + applicationIdStr + jobTypeStr + modelIdStr + documentIdStr + executeAfterIdStr + parentJobIdStr + statusStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/job' + offsetStr + limitStr + sortStr + submitterIdStr + applicationIdStr 
+            + jobTypeStr + modelIdStr + documentIdStr + executeAfterIdStr + parentJobIdStr + statusStr + createdAfterStr + createdBeforeStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var jobs = []
@@ -1878,25 +2137,30 @@ module.exports = class LeiaAPI {
 
     /**
      * (promise) Get a list of jobs
-     * @param {string} applicationId - an Application id to filter
+     * @param {integer} offset - an offset for pagination
+     * @param {integer} limit - a limit for pagination
      * @param {string[]} sort (optional) - a list of parameters 
      * Can be'submitterId', 'applicationId', 'creationTime', 'startingTime', 'finishedTime', 'jobType', 'modelId',
        'documentIds', 'status', 'parentJobId'. In ascending order by default.
      * If a parameter is preceded by '-' it means descending order.
+     * @param {string} applicationId - an Application id to filter
      * @param {string} jobType - a Job type (can be 'predict', 'pdf-images', 'image-text') to filter
      * @param {string} modelId - a Model id to filter
      * @param {string} documentId - a Document id to filter
      * @param {string} executeAfterId - a pre-Job id to filter
      * @param {string} parentJobId - a parent Job id to filter
      * @param {string} status - a status (can be WAITING, READY, STARTING, PROCESSED, PROCESSING, CANCELED, FAILED)
-     * @param {integer} offset - an offset for pagination
-     * @param {integer} limit - a limit for pagination
+     * @param {string} createdAfter (optional) - only return jobs created after a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
+     * @param {string} createdBefore (optional) - only return jobs created before a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)r annotations
      * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, jobs: [Job]}]
      */
 
-    getJobs(applicationId = null, sort = null, jobType = null, modelId = null, documentId = null, executeAfterId = null, parentJobId = null, status = null, offset = null, limit = null) {
+    getJobs(offset = null, limit = null, sort = null, applicationId = null,  jobType = null,
+         modelId = null, documentId = null, executeAfterId = null, parentJobId = null, 
+         status = null, createdAfter = null, createdBefore = null) {
         var offsetStr = ""
         var limitStr = ""
+        var sortStr = ""
         var applicationIdStr = ""
         var jobTypeStr = ""
         var modelIdStr = ""
@@ -1904,7 +2168,8 @@ module.exports = class LeiaAPI {
         var executeAfterIdStr = ""
         var parentJobIdStr = ""
         var statusStr = ""
-        var sortStr = ""
+        var createdAfterStr = ""
+        var createdBeforeStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -1914,6 +2179,11 @@ module.exports = class LeiaAPI {
 
         if (limit !== null) {
             limitStr += firstChar + 'limit=' + limit
+            firstChar = "&"
+        }
+
+        if (sort) {
+            sortStr = firstChar + "sort=" + pythonizeParams(sort)
             firstChar = "&"
         }
 
@@ -1952,8 +2222,13 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (sort) {
-            sortStr = firstChar + "sort=" + pythonizeParams(sort)
+        if (createdAfter !== null) {
+            createdAfterStr += firstChar + 'created_after=' + createdAfter
+            firstChar = "&"
+        }
+
+        if (createdBefore !== null) {
+            createdBeforeStr += firstChar + 'created_before=' + createdBefore
             firstChar = "&"
         }
 
@@ -1964,7 +2239,8 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/job' + offsetStr + limitStr + applicationIdStr + jobTypeStr + modelIdStr + documentIdStr + executeAfterIdStr + parentJobIdStr + statusStr + sortStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/job' + offsetStr + limitStr + sortStr + applicationIdStr + jobTypeStr + modelIdStr
+             + documentIdStr + executeAfterIdStr + parentJobIdStr + statusStr + createdAfterStr + createdBeforeStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var jobs = []
