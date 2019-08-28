@@ -120,7 +120,7 @@ function mockDocumentAPI() {
 
     nock(serverURL)
         .get('/admin/' + application.id + '/document/id1?file_contents=true')
-        .reply(200, document);
+        .reply(200, Buffer.from([0xff, 0x11]));
 
     nock(serverURL)
         .get('/admin/' + application.id + '/document/id2?file_contents=true')
@@ -1082,7 +1082,7 @@ describe('LeIA Document API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
                 leiaAPI.getDocumentContent('id1').then((result) => {
-                    (typeof result === 'object').should.be.true
+                    Buffer.isBuffer(result).should.be.true
                     done()
                 })
             })

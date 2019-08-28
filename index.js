@@ -458,6 +458,29 @@ module.exports = class LeiaAPI {
     }
 
     /**
+  * (promise) Get the content of a Model (admin)
+  * @param {string} applicationId - an Application id
+  * @param {string} modelId - a Model id
+  * @returns {Buffer}
+  */
+
+    adminGetModelContent(applicationId, modelId) {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.getFile(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '?file_contents=true', false, that.autoRefreshToken).then((body) => {
+                resolve(body)
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+    /**
     * (promise) Return a Model
     * @param {string} modelId - a Model id
     * @returns {Model}
