@@ -86,7 +86,7 @@ module.exports = class LeiaAPI {
      */
 
     adminGetApplications(offset = null, limit = null, sort = null, email = null, applicationName = null,
-        firstName = null, lastName = null, applicationType = null, createdAfter = null, createdBefore = null , ) {
+        firstName = null, lastName = null, applicationType = null, createdAfter = null, createdBefore = null) {
         var offsetStr = ""
         var limitStr = ""
         var sortStr = ""
