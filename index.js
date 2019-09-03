@@ -12,7 +12,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
  * @class
  */
 
-module.exports = class LeiaAPI {
+ class LeiaAPI {
 
     /**
      * @param {string} serverURL  - a LeIA API server URL
@@ -364,7 +364,7 @@ module.exports = class LeiaAPI {
     * @param {string} modelType (optional) - filter by modelType
     * @param {string} name (optional) - filter by name
     * @param {string} description (optional) - filter by description
-    * @param {string} inputTypes (optional) - filter by inputTypes
+    * @param {string[]} inputTypes (optional) - a list of inputTypes to filter models
     * @param {string} createdAfter (optional) - only return models created after a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @param {string} createdBefore (optional) - only return models created before a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, models: [Model]}]
@@ -425,8 +425,8 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (inputTypes !== null) {
-            inputTypesStr += firstChar + 'input_types=' + inputTypes
+        for (var i = 0; inputTypes && i < inputTypes.length; i++) {
+            inputTypesStr += firstChar + 'input_types=' + inputTypes[i]
             firstChar = "&"
         }
 
@@ -476,7 +476,7 @@ module.exports = class LeiaAPI {
     * @param {string} modelType (optional) - filter by modelType
     * @param {string} name (optional) - filter by name
     * @param {string} description (optional) - filter by description
-    * @param {string} inputTypes (optional) - filter by inputTypes
+    * @param {string[]} inputTypes (optional) - a list of inputTypes to filter models
     * @param {string} createdAfter (optional) - only return models created after a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @param {string} createdBefore (optional) - only return models created before a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, models: [Model]}]
@@ -531,8 +531,8 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (inputTypes !== null) {
-            inputTypesStr += firstChar + 'input_types=' + inputTypes
+        for (var i = 0; inputTypes && i < inputTypes.length; i++) {
+            inputTypesStr += firstChar + 'input_types=' + inputTypes[i]
             firstChar = "&"
         }
 
