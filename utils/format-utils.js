@@ -1,7 +1,12 @@
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
 module.exports.pythonizeParams = (params) => {
     if (!params) return
     var paramString = params.join(',')
-    return paramString.replace( /([A-Z]{1})/, function(v) { return '_' + v.toLowerCase(); })
+    return paramString.replaceAll( /([A-Z]{1})/, function(v) { return '_' + v.toLowerCase(); })
 }
 
 module.exports.extractContentRangeInfo = (contentRange) => {
