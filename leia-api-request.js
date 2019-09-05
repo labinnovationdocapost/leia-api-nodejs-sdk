@@ -121,11 +121,7 @@ module.exports = class LeiaAPIRequest {
                 if (response.statusCode != 200 && response.statusCode != 201 && response.statusCode != 204) {
                     if (response.statusCode === 401 && refreshToken) {
                         return that.handle401(fnc, args, true).then((body) => {
-                            if (contentRange) {
-                                return resolve({body, contentRange: response['headers']['content-range']})
-                            } else {
-                                return resolve(body)
-                            }
+                            return resolve(body)
                         }).catch((error) => {
                             return reject(error)
                         })

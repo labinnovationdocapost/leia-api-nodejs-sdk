@@ -78,8 +78,6 @@ module.exports = class LeiaAPI {
     * @param {string} firstName (optional) - filter by firstName
     * @param {string} lastName (optional) - filter by lastName
     * @param {string} applicationType (optional) - filter by applicationType
-    * @param {string} firstName (optional) - filter by firstName
-    * @param {string} firstName (optional) - filter by firstName
     * @param {string} createdAfter (optional) - only return applications created after a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @param {string} createdBefore (optional) - only return applications created before a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, applications: [Application]}]
