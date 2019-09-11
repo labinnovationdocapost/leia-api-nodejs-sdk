@@ -179,15 +179,22 @@ module.exports = class LeiaAPI {
     * @param {string} description (optional) - a Model description
     * @param {integer} ttl (optional) - a ttl value in seconds
     * @param {string[]} tags (optional) - a list of tags
+    * @param {boolean} allowAllApplications (optional) - if true, all applications are allowed to access the model
+    * @param {string[]} allowedApplicationIds (optional) - a list of application ids allowed to access the model
     * @returns {Model}
     */
 
-    adminAddModel(applicationId, name, fileBuffer, description = null, ttl = null, tags = null) {
+    adminAddModel(applicationId, name, fileBuffer, description = null, ttl = null, tags = null, allowAllApplications = null, allowedApplicationIds = null) {
         var that = this
         var tagsStr = ""
+        var allowedApplicationIdsStr = ""
         var firstChar = "&"
         for (var i = 0; tags && i < tags.length; i++) {
             tagsStr += firstChar + 'tags=' + tags[i]
+        }
+
+        for (var i = 0; allowedApplicationIds && i < allowedApplicationIds.length; i++) {
+            allowedApplicationIdsStr += firstChar + 'allowed_application_ids=' + allowedApplicationIds[i]
         }
 
         var that = this
@@ -197,8 +204,11 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/model?name=' + name + (description ? '&description=' + description : '') + (ttl !== null ? '&ttl=' + ttl : '') + tagsStr, fileBuffer, true, that.autoRefreshToken).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
+            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/model?name=' + name + (description ? '&description=' + description : '') 
+            + (ttl !== null ? '&ttl=' + ttl : '') 
+            + tagsStr + (allowAllApplications !== null ? '&allow_all_applications=' + allowAllApplications : '') 
+            + allowedApplicationIdsStr, fileBuffer, true, that.autoRefreshToken).then((body) => {
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -295,10 +305,12 @@ module.exports = class LeiaAPI {
      * @param {string} name - a Model name
      * @param {string} description - a Model description
      * @param {integer} ttl - a TTL value in seconds
+     * @param {boolean} allowAllApplications (optional) - if true, all applications are allowed to access the model
+     * @param {string[]} allowedApplicationIds (optional) - a list of application ids allowed to access the model
      * @returns {Model}
      */
 
-    adminUpdateModel(applicationId, modelId, name = null, description = null, ttl = null) {
+    adminUpdateModel(applicationId, modelId, name = null, description = null, ttl = null, allowAllApplications = null, allowedApplicationIds = null) {
         var query = ""
         var firstChar = "?"
         if (name !== null) {
@@ -314,6 +326,14 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
+        if (allowAllApplications !== null) {
+            query += firstChar + 'allow_all_applications=' + allowAllApplications
+        }
+
+        for (var i = 0; allowedApplicationIds && i < allowedApplicationIds.length; i++) {
+            query += firstChar + 'allowed_application_ids=' + allowedApplicationIds[i]
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -321,8 +341,8 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + query, {}, true, that.autoRefreshToken).then((model) => {
-                resolve(model)
+            that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + query, {}, true, that.autoRefreshToken).then((body) => {
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -451,7 +471,7 @@ module.exports = class LeiaAPI {
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var models = []
                 for (var i = 0; i < body.length; i++) {
-                    models.push(new Model(body[i].id, body[i].creation_time, body[i].description, body[i].ttl, body[i].input_types, body[i].name, body[i].tags, body[i].model_type, body[i].application_id))
+                    models.push(new Model(body[i].id, body[i].creation_time, body[i].description, body[i].ttl, body[i].input_types, body[i].name, body[i].tags, body[i].model_type, body[i].allow_all_applications, body[i].allowed_application_ids, body[i].application_id))
                 }
                 resolve({ contentRange, models })
             }).catch((error) => {
@@ -556,7 +576,7 @@ module.exports = class LeiaAPI {
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var models = []
                 for (var i = 0; i < body.length; i++) {
-                    models.push(new Model(body[i].id, body[i].creation_time, body[i].description, body[i].ttl, body[i].input_types, body[i].name, body[i].tags, body[i].model_type, body[i].application_id))
+                    models.push(new Model(body[i].id, body[i].creation_time, body[i].description, body[i].ttl, body[i].input_types, body[i].name, body[i].tags, body[i].model_type, body[i].allow_all_applications, body[i].allowed_application_ids, body[i].application_id))
                 }
                 resolve({ contentRange, models })
             }).catch((error) => {
@@ -584,7 +604,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/model/' + modelId, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -629,7 +649,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/model/' + modelId, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -1040,7 +1060,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/tag/' + tag, {}, true, that.autoRefreshToken).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -1063,7 +1083,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.post(that.serverURL + '/model/' + modelId + '/tag/' + tag, {}, true, that.autoRefreshToken).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -1087,7 +1107,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/tag/' + tag, true, that.autoRefreshToken).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id))
             }).catch((error) => {
                 reject(error)
             })
@@ -1110,7 +1130,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.del(that.serverURL + '/model/' + modelId + '/tag/' + tag, true, that.autoRefreshToken).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.application_id))
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id))
             }).catch((error) => {
                 reject(error)
             })
