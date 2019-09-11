@@ -330,8 +330,14 @@ module.exports = class LeiaAPI {
             query += firstChar + 'allow_all_applications=' + allowAllApplications
         }
 
-        for (var i = 0; allowedApplicationIds && i < allowedApplicationIds.length; i++) {
-            query += firstChar + 'allowed_application_ids=' + allowedApplicationIds[i]
+        if (allowedApplicationIds) {
+            if (allowedApplicationIds.length === 0) {
+                query += firstChar + 'allowed_application_ids='
+            } else {
+                for (var i = 0; i < allowedApplicationIds.length; i++) {
+                    query += firstChar + 'allowed_application_ids=' + allowedApplicationIds[i]
+                }
+            }
         }
 
         var that = this
