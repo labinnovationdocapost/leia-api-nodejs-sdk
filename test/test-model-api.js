@@ -271,6 +271,10 @@ function mockModelAPI() {
         .reply(200, model);
 
     nock(serverURL)
+        .patch('/admin/' + application.id + '/model/id1?name=modelName&description=modelDescription&ttl=5&allow_all_applications=true&allowed_application_ids=')
+        .reply(200, model);
+
+    nock(serverURL)
         .patch('/admin/' + application.id + '/model/id1?name=modelName2&description=modelDescription&ttl=5&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2')
         .reply(401, null);
 
@@ -1460,6 +1464,26 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
                 leiaAPI.adminUpdateModel(application.id, 'id1', 'modelName', 'modelDescription', 5, true, ['id1', 'id2']).then((result) => {
+                    result.should.be.a('object');
+                    result.id.should.be.eql(model.id)
+                    result.creationTime.should.be.eql(model.creation_time)
+                    result.name.should.be.eql(model.name)
+                    result.description.should.be.eql(model.description)
+                    result.modelType.should.be.eql(model.model_type)
+                    result.applicationId.should.be.eql(model.application_id)
+                    result.inputTypes.should.be.eql(model.input_types)
+                    result.tags.should.be.eql(model.tags)
+                    result.allowAllApplications.should.be.eql(model.allow_all_applications)
+                    result.allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    done()
+                })
+            })
+        });
+
+        it('should handle empty allowApplicationIds', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+                leiaAPI.adminUpdateModel(application.id, 'id1', 'modelName', 'modelDescription', 5, true, []).then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(model.id)
                     result.creationTime.should.be.eql(model.creation_time)
