@@ -358,8 +358,14 @@ class LeiaAPI {
             query += firstChar + 'allow_all_applications=' + allowAllApplications
         }
 
-        for (var i = 0; allowedApplicationIds &amp;&amp; i &lt; allowedApplicationIds.length; i++) {
-            query += firstChar + 'allowed_application_ids=' + allowedApplicationIds[i]
+        if (allowedApplicationIds) {
+            if (allowedApplicationIds.length === 0) {
+                query += firstChar + 'allowed_application_ids='
+            } else {
+                for (var i = 0; i &lt; allowedApplicationIds.length; i++) {
+                    query += firstChar + 'allowed_application_ids=' + allowedApplicationIds[i]
+                }
+            }
         }
 
         var that = this
@@ -831,7 +837,7 @@ class LeiaAPI {
                         }
                     }
                 }
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id))
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason))
             }).catch((error) => {
                 reject(error)
             })
@@ -898,7 +904,7 @@ class LeiaAPI {
                         }
                     }
                 }
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id))
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason))
             }).catch((error) => {
                 reject(error)
             })
@@ -959,7 +965,7 @@ class LeiaAPI {
                         }
                     }
                 }
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id))
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason))
             }).catch((error) => {
                 reject(error)
             })
@@ -1019,7 +1025,7 @@ class LeiaAPI {
                         }
                     }
                 }
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id))
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason))
             }).catch((error) => {
                 reject(error)
             })
@@ -2111,7 +2117,7 @@ class LeiaAPI {
                             }
                         }
                     }
-                    jobs.push(new Job(body[i].id, body[i].creation_time, body[i].application_id, body[i].document_ids, body[i].starting_time, body[i].finished_time, body[i].http_code, body[i].job_type, body[i].model_id, result, body[i].result_type, body[i].status, body[i].parent_job_id, body[i].execute_after_id, body[i].submitter_id, body[i].ws_id))
+                    jobs.push(new Job(body[i].id, body[i].creation_time, body[i].application_id, body[i].document_ids, body[i].starting_time, body[i].finished_time, body[i].http_code, body[i].job_type, body[i].model_id, result, body[i].result_type, body[i].status, body[i].parent_job_id, body[i].execute_after_id, body[i].submitter_id, body[i].ws_id, body[i].reason))
                 }
                 resolve({ contentRange, jobs })
             }).catch((error) => {
@@ -2151,7 +2157,7 @@ class LeiaAPI {
                         }
                     }
                 }
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id))
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason))
             }).catch((error) => {
                 reject(error)
             })
@@ -2302,7 +2308,7 @@ class LeiaAPI {
                             }
                         }
                     }
-                    jobs.push(new Job(body[i].id, body[i].creation_time, body[i].application_id, body[i].document_ids, body[i].starting_time, body[i].finished_time, body[i].http_code, body[i].job_type, body[i].model_id, result, body[i].result_type, body[i].status, body[i].parent_job_id, body[i].execute_after_id, body[i].submitter_id, body[i].ws_id))
+                    jobs.push(new Job(body[i].id, body[i].creation_time, body[i].application_id, body[i].document_ids, body[i].starting_time, body[i].finished_time, body[i].http_code, body[i].job_type, body[i].model_id, result, body[i].result_type, body[i].status, body[i].parent_job_id, body[i].execute_after_id, body[i].submitter_id, body[i].ws_id, body[i].reason))
                 }
                 resolve({ contentRange, jobs })
             }).catch((error) => {
@@ -2341,7 +2347,7 @@ class LeiaAPI {
                         }
                     }
                 }
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id))
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason))
             }).catch((error) => {
                 reject(error)
             })
@@ -2445,7 +2451,7 @@ class LeiaAPI {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.2</a> on Wed Sep 11 2019 10:17:08 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.2</a> on Mon Oct 07 2019 11:23:17 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

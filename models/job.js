@@ -16,8 +16,9 @@ module.exports = class Job {
      * @param {string} executeAfterId
      * @param {string} submitterId 
      * @param {string} wsId
+     * @param {string} reason
      */
-   constructor(id, creationTime, applicationId, documentIds, startingTime, finishedTime, httpCode, jobType, modelId, result, resultType, status, parentJobId, executeAfterId, submitterId, wsId) {
+   constructor(id, creationTime, applicationId, documentIds, startingTime, finishedTime, httpCode, jobType, modelId, result, resultType, status, parentJobId, executeAfterId, submitterId, wsId, reason) {
        this.id = id
        this.creationTime = creationTime
        this.applicationId = applicationId
@@ -34,5 +35,6 @@ module.exports = class Job {
        this.executeAfterId = executeAfterId
        this.submitterId = submitterId
        this.wsId = wsId
+       this.reason = reason
    }
 }
