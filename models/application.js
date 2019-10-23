@@ -9,9 +9,10 @@ module.exports = class Application {
       * @param {string} lastname 
       * @param {string} defaultJobCallbackUrl
       * @param {object} jobCounts
+      * @param {boolean} dedicatedWorkers
       * @param {string} apiKey 
       */
-    constructor(id, creationTime, applicationType, email, applicationName, firstname, lastname, defaultJobCallbackUrl, jobCounts, apiKey) {
+    constructor(id, creationTime, applicationType, email, applicationName, firstname, lastname, defaultJobCallbackUrl, jobCounts, dedicatedWorkers, apiKey) {
         this.id = id
         this.creationTime = creationTime
         this.applicationType = applicationType
@@ -21,6 +22,7 @@ module.exports = class Application {
         this.lastname = lastname
         this.defaultJobCallbackUrl = defaultJobCallbackUrl
         this.jobCounts = jobCounts
+        this.dedicatedWorkers = dedicatedWorkers
         this.apiKey = apiKey
     }
 }

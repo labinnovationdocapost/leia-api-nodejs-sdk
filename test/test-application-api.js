@@ -20,7 +20,8 @@ const application = {
         "predict-5d52858cb4608e10db98ea1f": 146,
         "predict-5d5285d5b4608e10db98ea20": 2,
         "predict-5d52864ab4608e10db98ea21": 1
-    }
+    },
+    "dedicated_workers": true
 }
 
 function mockApplicationAPI() {
@@ -30,7 +31,7 @@ function mockApplicationAPI() {
 
     nock(serverURL)
         .get('/login/mockApiKeyDev')
-        .reply(200, { token: 'faketoken', application: { id: 'id1', application_type: 'developer' } });
+        .reply(200, { token: 'faketoken', application: { id: 'id1', application_type: 'developer', dedicated_workers: true } });
 
     nock(serverURL)
         .get('/login/badApiKey')
@@ -195,6 +196,7 @@ describe('LeIA Application API', () => {
                 result.defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                 result.jobCounts.should.be.eql(application.job_counts)
                 result.jobCounts.should.be.a('object')
+                result.dedicatedWorkers.should.be.eql(application.dedicated_workers)
                 done()
             })
         });
@@ -240,6 +242,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
+                    result.applications[0].dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -265,6 +268,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
+                    result.applications[0].dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -289,6 +293,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
+                    result.applications[0].dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -313,6 +318,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
+                    result.applications[0].dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -338,6 +344,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
+                    result.applications[0].dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -363,6 +370,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
+                    result.applications[0].dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -388,6 +396,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
+                    result.applications[0].dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -413,6 +422,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
+                    result.applications[0].dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -438,6 +448,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
+                    result.applications[0].dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -463,6 +474,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
+                    result.applications[0].dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -488,6 +500,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
+                    result.applications[0].dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -513,6 +526,7 @@ describe('LeIA Application API', () => {
                     result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.applications[0].jobCounts.should.be.eql(application.job_counts)
                     result.applications[0].jobCounts.should.be.a('object')
+                    result.applications[0].dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -581,6 +595,7 @@ describe('LeIA Application API', () => {
                     result.defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.jobCounts.should.be.eql(application.job_counts)
                     result.jobCounts.should.be.a('object')
+                    result.dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -625,6 +640,7 @@ describe('LeIA Application API', () => {
                     result.defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.jobCounts.should.be.eql(application.job_counts)
                     result.jobCounts.should.be.a('object')
+                    result.dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -691,6 +707,7 @@ describe('LeIA Application API', () => {
                     result.defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.jobCounts.should.be.eql(application.job_counts)
                     result.jobCounts.should.be.a('object')
+                    result.dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
@@ -747,6 +764,7 @@ describe('LeIA Application API', () => {
                     result.defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
                     result.jobCounts.should.be.eql(application.job_counts)
                     result.jobCounts.should.be.a('object')
+                    result.dedicatedWorkers.should.be.eql(application.dedicated_workers)
                     done()
                 })
             })
