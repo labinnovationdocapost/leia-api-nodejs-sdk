@@ -925,7 +925,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr + callbackUrlStr, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr + callbackUrlStr, {}, true, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -985,7 +985,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr + callbackUrlStr, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr + callbackUrlStr, {}, true, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {

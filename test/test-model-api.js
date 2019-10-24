@@ -319,79 +319,79 @@ function mockModelAPI() {
         .reply(404, null);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/model/modelId1/apply/documentId1')
+        .post('/admin/' + application.id + '/model/modelId1/apply/documentId1')
         .reply(200, applyModelToDocumentProcessingJob);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/model/modelId1/apply/documentId1?execute_after_id=jobId1')
+        .post('/admin/' + application.id + '/model/modelId1/apply/documentId1?execute_after_id=jobId1')
         .reply(200, applyModelToDocumentProcessingJob);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/model/modelId1/apply/documentId1?callback_url=https://test.com')
+        .post('/admin/' + application.id + '/model/modelId1/apply/documentId1?callback_url=https://test.com')
         .reply(200, applyModelToDocumentProcessingJob);
 
     nock(serverURL)
-        .get('/model/modelId1/apply/documentId1')
+        .post('/model/modelId1/apply/documentId1')
         .reply(200, applyModelToDocumentProcessingJob);
 
     nock(serverURL)
-        .get('/model/modelId1/apply/documentId1?execute_after_id=jobId1')
+        .post('/model/modelId1/apply/documentId1?execute_after_id=jobId1')
         .reply(200, applyModelToDocumentProcessingJob);
 
     nock(serverURL)
-        .get('/model/modelId1/apply/documentId1?callback_url=https://test.com')
+        .post('/model/modelId1/apply/documentId1?callback_url=https://test.com')
         .reply(200, applyModelToDocumentProcessingJob);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/model/modelId1/apply/documentId2')
+        .post('/admin/' + application.id + '/model/modelId1/apply/documentId2')
         .reply(400, null);
 
     nock(serverURL)
-        .get('/model/modelId1/apply/documentId2')
+        .post('/model/modelId1/apply/documentId2')
         .reply(400, null);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/model/modelId1/apply/documentId3')
+        .post('/admin/' + application.id + '/model/modelId1/apply/documentId3')
         .reply(401, null);
 
     nock(serverURL)
-        .get('/model/modelId1/apply/documentId3')
+        .post('/model/modelId1/apply/documentId3')
         .reply(401, null);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/model/modelId1/apply/documentId4')
+        .post('/admin/' + application.id + '/model/modelId1/apply/documentId4')
         .reply(403, null);
 
     nock(serverURL)
-        .get('/model/modelId1/apply/documentId4')
+        .post('/model/modelId1/apply/documentId4')
         .reply(403, null);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/model/modelId1/apply/documentId5')
+        .post('/admin/' + application.id + '/model/modelId1/apply/documentId5')
         .reply(404, null);
 
     nock(serverURL)
-        .get('/model/modelId1/apply/documentId5')
+        .post('/model/modelId1/apply/documentId5')
         .reply(404, null);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/model/modelId1/apply/documentId1?tag=tag1')
+        .post('/admin/' + application.id + '/model/modelId1/apply/documentId1?tag=tag1')
         .reply(200, applyModelToDocumentProcessingJob);
 
     nock(serverURL)
-        .get('/model/modelId1/apply/documentId1?tag=tag1')
+        .post('/model/modelId1/apply/documentId1?tag=tag1')
         .reply(200, applyModelToDocumentProcessingJob);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/model/modelId1/apply/documentId1?tag=tag1&execute_after_id=jobId1&callback_url=https://test.com')
+        .post('/admin/' + application.id + '/model/modelId1/apply/documentId1?tag=tag1&execute_after_id=jobId1&callback_url=https://test.com')
         .reply(200, applyModelToDocumentProcessingJob);
 
     nock(serverURL)
-        .get('/model/modelId1/apply/documentId1?tag=tag1&execute_after_id=jobId1&callback_url=https://test.com')
+        .post('/model/modelId1/apply/documentId1?tag=tag1&execute_after_id=jobId1&callback_url=https://test.com')
         .reply(200, applyModelToDocumentProcessingJob);
 
     nock(serverURL)
-        .get('/model/modelId1/apply/documentId1?tag=tag1&execute_after_id=jobId1')
+        .post('/model/modelId1/apply/documentId1?tag=tag1&execute_after_id=jobId1')
         .reply(200, applyModelToDocumentProcessingJob);
 
     nock(serverURL)
