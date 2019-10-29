@@ -142,19 +142,19 @@ function mockApplicationAPI() {
         .reply(400, null);
 
     nock(serverURL)
-        .post('/admin/application', { application_name: 'appName', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com' })
+        .post('/admin/application', { application_name: 'appName', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com', dedicated_workers: 'true' })
         .reply(200, application);
 
     nock(serverURL)
-        .post('/admin/application', { application_name: 'appName2', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com' })
+        .post('/admin/application', { application_name: 'appName2', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com', dedicated_workers: 'true' })
         .reply(401, application);
 
     nock(serverURL)
-        .post('/admin/application', { application_name: 'appName3', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com' })
+        .post('/admin/application', { application_name: 'appName3', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com', dedicated_workers: 'true' })
         .reply(409, application);
 
     nock(serverURL)
-        .post('/admin/application', { application_name: 'appName4', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com' })
+        .post('/admin/application', { application_name: 'appName4', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com', dedicated_workers: 'true' })
         .reply(400, application);
 
     nock(serverURL)
@@ -695,7 +695,7 @@ describe('LeIA Application API', () => {
         it('should return an Application', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddApplication("test@test.com", "appName", "admin", "jean", "test", "http://test.com").then((result) => {
+                leiaAPI.adminAddApplication("test@test.com", "appName", "admin", "jean", "test", "http://test.com", true).then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(application.id)
                     result.creationTime.should.be.eql(application.creation_time)
@@ -716,7 +716,7 @@ describe('LeIA Application API', () => {
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddApplication("test@test.com", "appName4", "admin", "jean", "test", "http://test.com").then((_) => {
+                leiaAPI.adminAddApplication("test@test.com", "appName4", "admin", "jean", "test", "http://test.com", true).then((_) => {
                 }).catch((error) => {
                     error.status.should.be.eql(400)
                     done()
@@ -727,7 +727,7 @@ describe('LeIA Application API', () => {
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddApplication("test@test.com", "appName2", "admin", "jean", "test", "http://test.com").then((_) => {
+                leiaAPI.adminAddApplication("test@test.com", "appName2", "admin", "jean", "test", "http://test.com", true).then((_) => {
                 }).catch((error) => {
                     error.status.should.be.eql(401)
                     done()
@@ -738,7 +738,7 @@ describe('LeIA Application API', () => {
         it('should return a 409 status when LeiaAPI returns a 409 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddApplication("test@test.com", "appName3", "admin", "jean", "test", "http://test.com").then((_) => {
+                leiaAPI.adminAddApplication("test@test.com", "appName3", "admin", "jean", "test", "http://test.com", true).then((_) => {
                 }).catch((error) => {
                     error.status.should.be.eql(409)
                     done()

@@ -222,11 +222,12 @@ module.exports = class LeiaAPI {
     * @param {string} applicationType - an Application type. Can be 'admin' or 'developer'
     * @param {string} firstname - an Application owner's firstname
     * @param {string} lastname - an Application owner's lastname
-    * @param {string} defaultJobCallbackUrl - a default job callback url
+    * @param {string} defaultJobCallbackUrl (optional) - a default job callback url
+    * @param {boolean} dedicatedWorkers (optional) - determine whether or not an Application has dedicated workers
     * @returns {Application}
     */
 
-    adminAddApplication(email, applicationName, applicationType, firstname, lastname, defaultJobCallbackUrl = null) {
+    adminAddApplication(email, applicationName, applicationType, firstname, lastname, defaultJobCallbackUrl = null, dedicatedWorkers = false) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -244,6 +245,9 @@ module.exports = class LeiaAPI {
 
             if (defaultJobCallbackUrl !== null) {
                 application['default_job_callback_url'] = defaultJobCallbackUrl
+            }
+            if (dedicatedWorkers !== null) {
+                application['dedicated_workers'] = dedicatedWorkers.toString()
             }
 
             that.leiaAPIRequest.post(that.serverURL + '/admin/application', application, true, that.autoRefreshToken).then((body) => {
