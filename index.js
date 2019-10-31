@@ -39,7 +39,7 @@ module.exports = class LeiaAPI {
         return new Promise(function (resolve, reject) {
             leiaAPIRequest.login().then((body) => {
                 that.leiaAPIRequest = leiaAPIRequest
-                resolve(new Application(body.application.id, body.application.creation_time, body.application.application_type, body.application.email, body.application.application_name, body.application.first_name, body.application.last_name, body.application.default_job_callback_url, body.application.job_counts, body.application.dedicated_workers, body.application.api_key))
+                resolve(new Application(body.application.id, body.application.creation_time, body.application.application_type, body.application.email, body.application.application_name, body.application.first_name, body.application.last_name, body.application.default_job_callback_url, body.application.job_counts, body.application.dedicated_workers, body.application.dedicated_workers_ttl, body.application.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -159,7 +159,7 @@ module.exports = class LeiaAPI {
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var applications = []
                 for (var i = 0; i < body.length; i++) {
-                    applications.push(new Application(body[i].id, body[i].creation_time, body[i].application_type, body[i].email, body[i].application_name, body[i].first_name, body[i].last_name, body[i].default_job_callback_url, body[i].job_counts, body[i].dedicated_workers, body[i].api_key))
+                    applications.push(new Application(body[i].id, body[i].creation_time, body[i].application_type, body[i].email, body[i].application_name, body[i].first_name, body[i].last_name, body[i].default_job_callback_url, body[i].job_counts, body[i].dedicated_workers, body[i].dedicated_workers_ttl, body[i].api_key))
                 }
                 resolve({ contentRange, applications })
             }).catch((error) => {
@@ -224,10 +224,11 @@ module.exports = class LeiaAPI {
     * @param {string} lastname - an Application owner's lastname
     * @param {string} defaultJobCallbackUrl (optional) - a default job callback url
     * @param {boolean} dedicatedWorkers (optional) - determine whether or not an Application has dedicated workers
+    * @param {integer} dedicatedWorkersTtl (optional) - TTL for an Application
     * @returns {Application}
     */
 
-    adminAddApplication(email, applicationName, applicationType, firstname, lastname, defaultJobCallbackUrl = null, dedicatedWorkers = false) {
+    adminAddApplication(email, applicationName, applicationType, firstname, lastname, defaultJobCallbackUrl = null, dedicatedWorkers = null, dedicatedWorkersTtl = null) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -246,12 +247,15 @@ module.exports = class LeiaAPI {
             if (defaultJobCallbackUrl !== null) {
                 application['default_job_callback_url'] = defaultJobCallbackUrl
             }
-            if (dedicatedWorkers !== null) {
+            if (dedicatedWorkers) {
                 application['dedicated_workers'] = dedicatedWorkers.toString()
+            }
+            if (dedicatedWorkersTtl !== null) {
+                application['dedicated_workers_ttl'] = dedicatedWorkersTtl
             }
 
             that.leiaAPIRequest.post(that.serverURL + '/admin/application', application, true, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.api_key))
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -273,7 +277,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.post(that.serverURL + '/admin/application/' + applicationId + '/reset_api_key', {}, true, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.api_key))
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -682,7 +686,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/admin/application/' + applicationId, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.api_key))
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -695,15 +699,21 @@ module.exports = class LeiaAPI {
     * @param {string} fileName - a document file name
     * @param {Buffer} fileBuffer - a document file buffer
     * @param {string[]} tags (optional) - a list of tags
-    * @returns {Model}
+    * @param {integer} ttl (optional) - a TTL in seconds
+    * @returns {Document}
     */
 
-    adminAddDocument(applicationId, fileName, fileBuffer, tags = null) {
+    adminAddDocument(applicationId, fileName, fileBuffer, tags = null, ttl = null) {
         var tagsStr = ""
+        var ttlStr = ""
         var firstChar = "&"
 
         for (var i = 0; tags && i < tags.length; i++) {
             tagsStr += firstChar + 'tags=' + tags[i]
+        }
+
+        if (ttl !== null) {
+            ttlStr += firstChar + 'ttl=' + ttl
         }
 
         var that = this
@@ -713,8 +723,8 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/document?filename=' + fileName + tagsStr, fileBuffer, true, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
+            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/document?filename=' + fileName + tagsStr + ttlStr, fileBuffer, true, that.autoRefreshToken).then((body) => {
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
             })
@@ -726,15 +736,21 @@ module.exports = class LeiaAPI {
     * @param {string} fileName - a document file name
     * @param {Buffer} fileBuffer - a document file buffer
     * @param {string[]} tags (optional) - a list of tags
-    * @returns {Model}
+    * @param {integer} ttl (optional) - a TTL in seconds
+    * @returns {Document}
     */
 
-    addDocument(fileName, fileBuffer, tags = null) {
+    addDocument(fileName, fileBuffer, tags = null, ttl = null) {
+        var ttlStr = ""
         var tagsStr = ""
         var firstChar = "&"
 
         for (var i = 0; tags && i < tags.length; i++) {
             tagsStr += firstChar + 'tags=' + tags[i]
+        }
+
+        if (ttl !== null) {
+            ttlStr += firstChar + 'ttl=' + ttl
         }
 
         var that = this
@@ -744,8 +760,8 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/document?filename=' + fileName + tagsStr, fileBuffer, true, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
+            that.leiaAPIRequest.streamPost(that.serverURL + '/document?filename=' + fileName + tagsStr + ttlStr, fileBuffer, true, that.autoRefreshToken).then((body) => {
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
             })
@@ -805,11 +821,11 @@ module.exports = class LeiaAPI {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
-                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.rotation_angle, body.result.tags, body.result.size)
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.rotation_angle, body.result.tags, body.result.size, body.expiration_time)
                     } else if (body.result_type === 'list[document]') {
                         result = []
                         for (var i = 0; i < body.result.length; i++) {
-                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].rotation_angle, body.result[i].tags, body.result[i].size))
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].rotation_angle, body.result[i].tags, body.result[i].size, body.result[i].expiration_time))
                         }
                     }
                 }
@@ -872,11 +888,11 @@ module.exports = class LeiaAPI {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
-                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.rotation_angle, body.result.tags, body.result.size)
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.rotation_angle, body.result.tags, body.result.size, body.result.expiration_time)
                     } else if (body.result_type === 'list[document]') {
                         result = []
                         for (var i = 0; i < body.result.length; i++) {
-                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].rotation_angle, body.result[i].tags, body.result[i].size))
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].rotation_angle, body.result[i].tags, body.result[i].size, body.result[i].expiration_time))
                         }
                     }
                 }
@@ -933,11 +949,11 @@ module.exports = class LeiaAPI {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
-                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.rotation_angle, body.result.tags, body.result.size)
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.rotation_angle, body.result.tags, body.result.size, body.result.expiration_time)
                     } else if (body.result_type === 'list[document]') {
                         result = []
                         for (var i = 0; i < body.result.length; i++) {
-                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].rotation_angle, body.result[i].tags, body.result[i].size))
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].rotation_angle, body.result[i].tags, body.result[i].size, body.result[i].expiration_time))
                         }
                     }
                 }
@@ -993,11 +1009,11 @@ module.exports = class LeiaAPI {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
-                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.rotation_angle, body.result.tags, body.result.size)
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.rotation_angle, body.result.tags, body.result.size, body.result.expiration_time)
                     } else if (body.result_type === 'list[document]') {
                         result = []
                         for (var i = 0; i < body.result.length; i++) {
-                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].rotation_angle, body.result[i].tags, body.result[i].size))
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].rotation_angle, body.result[i].tags, body.result[i].size, body.result[i].expiration_time))
                         }
                     }
                 }
@@ -1255,7 +1271,7 @@ module.exports = class LeiaAPI {
                 var documents = []
                 for (var i = 0; i < body.length; i++) {
                     documents.push(new Document(body[i].id, body[i].creation_time, body[i].application_id, body[i].filename, body[i].extension, body[i].original_id, body[i].mime_type, body[i].rotation_angle,
-                        body[i].tags, body[i].size))
+                        body[i].tags, body[i].size, body[i].expiration_time))
                 }
                 resolve({ contentRange, documents })
             }).catch((error) => {
@@ -1374,7 +1390,7 @@ module.exports = class LeiaAPI {
                 var documents = []
                 for (var i = 0; i < body.length; i++) {
                     documents.push(new Document(body[i].id, body[i].creation_time, body[i].application_id, body[i].filename, body[i].extension, body[i].original_id, body[i].mime_type, body[i].rotation_angle,
-                        body[i].tags, body[i].size))
+                        body[i].tags, body[i].size, body[i].expiration_time))
                 }
                 resolve({ contentRange, documents })
             }).catch((error) => {
@@ -1403,7 +1419,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/document/' + documentId, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
             })
@@ -1425,7 +1441,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/document/' + documentId, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
             })
@@ -1559,7 +1575,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/tag/' + tag, {}, true, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
             })
@@ -1583,7 +1599,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/tag/' + tag, true, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
             })
@@ -1606,7 +1622,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.post(that.serverURL + '/document/' + documentId + '/tag/' + tag, {}, true, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
 
@@ -1630,7 +1646,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.del(that.serverURL + '/document/' + documentId + '/tag/' + tag, true, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
             })
@@ -1669,7 +1685,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + filenameStr + rotationAngleStr, {}, true, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
             })
@@ -1707,7 +1723,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.patch(that.serverURL + '/document/' + documentId + filenameStr + rotationAngleStr, {}, true, that.autoRefreshToken).then((body) => {
-                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size))
+                resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
                 resolve(document)
             }).catch((error) => {
                 reject(error)
@@ -2085,11 +2101,11 @@ module.exports = class LeiaAPI {
                     var result = body[i].result
                     if (result !== null) {
                         if (body[i].result_type === 'document') {
-                            result = new Document(body[i].result.id, body[i].result.creation_time, body[i].result.application_id, body[i].result.filename, body[i].result.extension, body[i].original_id, body[i].result.mime_type, body[i].result.rotation_angle, body[i].result.tags, body[i].result.size)
+                            result = new Document(body[i].result.id, body[i].result.creation_time, body[i].result.application_id, body[i].result.filename, body[i].result.extension, body[i].original_id, body[i].result.mime_type, body[i].result.rotation_angle, body[i].result.tags, body[i].result.size, body[i].expiration_time)
                         } else if (body[i].result_type === 'list[document]') {
                             result = []
                             for (var j = 0; j < body[i].result.length; j++) {
-                                result.push(new Document(body[i].result[j].id, body[i].result[j].creation_time, body[i].result[j].application_id, body[i].result[j].filename, body[i].result[j].extension, body[i].result[j].original_id, body[i].result[j].mime_type, body[i].result[j].rotation_angle, body[i].result[j].tags, body[i].result[j].size))
+                                result.push(new Document(body[i].result[j].id, body[i].result[j].creation_time, body[i].result[j].application_id, body[i].result[j].filename, body[i].result[j].extension, body[i].result[j].original_id, body[i].result[j].mime_type, body[i].result[j].rotation_angle, body[i].result[j].tags, body[i].result[j].size, body[i].result[j].expiration_time))
                             }
                         }
                     }
@@ -2125,11 +2141,11 @@ module.exports = class LeiaAPI {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
-                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.rotation_angle, body.result.tags, body.result.size)
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.rotation_angle, body.result.tags, body.result.size, body.result.expiration_time)
                     } else if (body.result_type === 'list[document]') {
                         result = []
                         for (var i = 0; i < body.result.length; i++) {
-                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].rotation_angle, body.result[i].tags, body.result[i].size))
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].rotation_angle, body.result[i].tags, body.result[i].size, body.result[i].expiration_time))
                         }
                     }
                 }
@@ -2276,11 +2292,11 @@ module.exports = class LeiaAPI {
                     var result = body[i].result
                     if (result !== null) {
                         if (body[i].result_type === 'document') {
-                            result = new Document(body[i].result.id, body[i].result.creation_time, body[i].result.application_id, body[i].result.filename, body[i].result.extension, body[i].original_id, body[i].result.mime_type, body[i].result.rotation_angle, body[i].result.tags, body[i].result.size)
+                            result = new Document(body[i].result.id, body[i].result.creation_time, body[i].result.application_id, body[i].result.filename, body[i].result.extension, body[i].original_id, body[i].result.mime_type, body[i].result.rotation_angle, body[i].result.tags, body[i].result.size, body[i].result.expiration_time)
                         } else if (body[i].result_type === 'list[document]') {
                             result = []
                             for (var j = 0; j < body[i].result.length; j++) {
-                                result.push(new Document(body[i].result[j].id, body[i].result[j].creation_time, body[i].result[j].application_id, body[i].result[j].filename, body[i].result[j].extension, body[i].result[j].original_id, body[i].result[j].mime_type, body[i].result[j].rotation_angle, body[i].result[j].tags, body[i].result[j].size))
+                                result.push(new Document(body[i].result[j].id, body[i].result[j].creation_time, body[i].result[j].application_id, body[i].result[j].filename, body[i].result[j].extension, body[i].result[j].original_id, body[i].result[j].mime_type, body[i].result[j].rotation_angle, body[i].result[j].tags, body[i].result[j].size, body[i].result[j].expiration_time))
                             }
                         }
                     }
@@ -2315,11 +2331,11 @@ module.exports = class LeiaAPI {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
-                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.rotation_angle, body.result.tags, body.result.size)
+                        result = new Document(body.result.id, body.result.creation_time, body.result.application_id, body.result.filename, body.result.extension, body.result.original_id, body.result.mime_type, body.result.rotation_angle, body.result.tags, body.result.size, body.result.expiration_time)
                     } else if (body.result_type === 'list[document]') {
                         result = []
                         for (var i = 0; i < body.result.length; i++) {
-                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].rotation_angle, body.result[i].tags, body.result[i].size))
+                            result.push(new Document(body.result[i].id, body.result[i].creation_time, body.result[i].application_id, body.result[i].filename, body.result[i].extension, body.result[i].original_id, body.result[i].mime_type, body.result[i].rotation_angle, body.result[i].tags, body.result[i].size, body.result[i].expiration_time))
                         }
                     }
                 }

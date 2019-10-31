@@ -27,7 +27,8 @@ const document = {
     "extension": '.jpg',
     "mime_type": 'jpg',
     "rotation_angle": 0,
-    "size": 1000
+    "size": 1000,
+    "expiration_time": '2018-11-07T16:02:29.761Z'
 }
 
 const transformPDFProcessingJob = {
@@ -367,34 +368,34 @@ function mockDocumentAPI() {
         .reply(404, null);
 
     nock(serverURL)
-        .post('/admin/' + application.id + '/document?filename=test.jpg&tags=tag1')
+        .post('/admin/' + application.id + '/document?filename=test.jpg&tags=tag1&ttl=70')
         .reply(200, document);
     nock(serverURL)
-        .post('/document?filename=test.jpg&tags=tag1')
+        .post('/document?filename=test.jpg&tags=tag1&ttl=70')
         .reply(200, document);
 
     nock(serverURL)
-        .post('/admin/' + application.id + '/document?filename=test.jpg&tags=tag0')
+        .post('/admin/' + application.id + '/document?filename=test.jpg&tags=tag0&ttl=70')
         .reply(400, null);
 
     nock(serverURL)
-        .post('/document?filename=test.jpg&tags=tag0')
+        .post('/document?filename=test.jpg&tags=tag0&ttl=70')
         .reply(400, null);
 
     nock(serverURL)
-        .post('/admin/' + application.id + '/document?filename=test.jpg&tags=tag2')
+        .post('/admin/' + application.id + '/document?filename=test.jpg&tags=tag2&ttl=70')
         .reply(401, null);
 
     nock(serverURL)
-        .post('/document?filename=test.jpg&tags=tag2')
+        .post('/document?filename=test.jpg&tags=tag2&ttl=70')
         .reply(401, null);
 
     nock(serverURL)
-        .post('/admin/' + application.id + '/document?filename=test.jpg&tags=tag3')
+        .post('/admin/' + application.id + '/document?filename=test.jpg&tags=tag3&ttl=70')
         .reply(403, null);
 
     nock(serverURL)
-        .post('/document?filename=test.jpg&tags=tag3')
+        .post('/document?filename=test.jpg&tags=tag3&ttl=70')
         .reply(403, null);
 
     nock(serverURL)
@@ -540,6 +541,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -564,6 +566,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -589,6 +592,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -614,6 +618,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -639,6 +644,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -664,6 +670,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -689,6 +696,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -714,6 +722,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -739,6 +748,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -764,6 +774,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -789,6 +800,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -814,6 +826,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -839,6 +852,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -865,6 +879,7 @@ describe('LeIA Document API', () => {
                         result.documents[0].mimeType.should.be.eql(document.mime_type)
                         result.documents[0].tags.should.be.eql(document.tags)
                         result.documents[0].size.should.be.eql(document.size)
+                        result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                         done()
                     })
             })
@@ -916,6 +931,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -941,6 +957,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -966,6 +983,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -991,6 +1009,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -1016,6 +1035,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -1041,6 +1061,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -1066,6 +1087,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -1091,6 +1113,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -1116,6 +1139,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -1141,6 +1165,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -1166,6 +1191,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -1191,6 +1217,7 @@ describe('LeIA Document API', () => {
                     result.documents[0].mimeType.should.be.eql(document.mime_type)
                     result.documents[0].tags.should.be.eql(document.tags)
                     result.documents[0].size.should.be.eql(document.size)
+                    result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -1217,6 +1244,7 @@ describe('LeIA Document API', () => {
                         result.documents[0].mimeType.should.be.eql(document.mime_type)
                         result.documents[0].tags.should.be.eql(document.tags)
                         result.documents[0].size.should.be.eql(document.size)
+                        result.documents[0].expirationTime.should.be.eql(document.expiration_time)
                         done()
                     })
             })
@@ -1262,6 +1290,7 @@ describe('LeIA Document API', () => {
                     result.mimeType.should.be.eql(document.mime_type)
                     result.tags.should.be.eql(document.tags)
                     result.size.should.be.eql(document.size)
+                    result.expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -1317,6 +1346,7 @@ describe('LeIA Document API', () => {
                     result.mimeType.should.be.eql(document.mime_type)
                     result.tags.should.be.eql(document.tags)
                     result.size.should.be.eql(document.size)
+                    result.expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -1450,7 +1480,7 @@ describe('LeIA Document API', () => {
         it('should return a Document', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddDocument(application.id, 'test.jpg', Buffer.from([0xff, 0x11]), ['tag1']).then((result) => {
+                leiaAPI.adminAddDocument(application.id, 'test.jpg', Buffer.from([0xff, 0x11]), ['tag1'], 70).then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(document.id)
                     result.creationTime.should.be.eql(document.creation_time)
@@ -1462,6 +1492,7 @@ describe('LeIA Document API', () => {
                     result.mimeType.should.be.eql(document.mime_type)
                     result.tags.should.be.eql(document.tags)
                     result.size.should.be.eql(document.size)
+                    result.expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -1470,7 +1501,7 @@ describe('LeIA Document API', () => {
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddDocument(application.id, 'test.jpg', Buffer.from([0xff, 0x11]), ['tag0']).then((_) => {
+                leiaAPI.adminAddDocument(application.id, 'test.jpg', Buffer.from([0xff, 0x11]), ['tag0'], 70).then((_) => {
                 }).catch((error) => {
                     error.status.should.be.eql(400)
                     done()
@@ -1481,7 +1512,7 @@ describe('LeIA Document API', () => {
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddDocument(application.id, 'test.jpg', Buffer.from([0xff, 0x11]), ['tag2']).then((_) => {
+                leiaAPI.adminAddDocument(application.id, 'test.jpg', Buffer.from([0xff, 0x11]), ['tag2'], 70).then((_) => {
                 }).catch((error) => {
                     error.status.should.be.eql(401)
                     done()
@@ -1495,7 +1526,7 @@ describe('LeIA Document API', () => {
         it('should return a Document', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.addDocument('test.jpg', Buffer.from([0xff, 0x11]), ['tag1']).then((result) => {
+                leiaAPI.addDocument('test.jpg', Buffer.from([0xff, 0x11]), ['tag1'], 70).then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(document.id)
                     result.creationTime.should.be.eql(document.creation_time)
@@ -1507,6 +1538,7 @@ describe('LeIA Document API', () => {
                     result.mimeType.should.be.eql(document.mime_type)
                     result.tags.should.be.eql(document.tags)
                     result.size.should.be.eql(document.size)
+                    result.expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -1515,7 +1547,7 @@ describe('LeIA Document API', () => {
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.addDocument('test.jpg', Buffer.from([0xff, 0x11]), ['tag0']).then((_) => {
+                leiaAPI.addDocument('test.jpg', Buffer.from([0xff, 0x11]), ['tag0'], 70).then((_) => {
                 }).catch((error) => {
                     error.status.should.be.eql(400)
                     done()
@@ -1526,7 +1558,7 @@ describe('LeIA Document API', () => {
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.addDocument('test.jpg', Buffer.from([0xff, 0x11]), ['tag2']).then((_) => {
+                leiaAPI.addDocument('test.jpg', Buffer.from([0xff, 0x11]), ['tag2'], 70).then((_) => {
                 }).catch((error) => {
                     error.status.should.be.eql(401)
                     done()
@@ -1921,6 +1953,7 @@ describe('LeIA Document API', () => {
                     result.mimeType.should.be.eql(document.mime_type)
                     result.tags.should.be.eql(document.tags)
                     result.size.should.be.eql(document.size)
+                    result.expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -1976,6 +2009,7 @@ describe('LeIA Document API', () => {
                     result.mimeType.should.be.eql(document.mime_type)
                     result.tags.should.be.eql(document.tags)
                     result.size.should.be.eql(document.size)
+                    result.expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -2031,6 +2065,7 @@ describe('LeIA Document API', () => {
                     result.mimeType.should.be.eql(document.mime_type)
                     result.tags.should.be.eql(document.tags)
                     result.size.should.be.eql(document.size)
+                    result.expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -2086,6 +2121,7 @@ describe('LeIA Document API', () => {
                     result.mimeType.should.be.eql(document.mime_type)
                     result.tags.should.be.eql(document.tags)
                     result.size.should.be.eql(document.size)
+                    result.expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -2141,6 +2177,7 @@ describe('LeIA Document API', () => {
                     result.mimeType.should.be.eql(document.mime_type)
                     result.tags.should.be.eql(document.tags)
                     result.size.should.be.eql(document.size)
+                    result.expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -2161,6 +2198,7 @@ describe('LeIA Document API', () => {
                     result.mimeType.should.be.eql(document.mime_type)
                     result.tags.should.be.eql(document.tags)
                     result.size.should.be.eql(document.size)
+                    result.expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -2181,6 +2219,7 @@ describe('LeIA Document API', () => {
                     result.mimeType.should.be.eql(document.mime_type)
                     result.tags.should.be.eql(document.tags)
                     result.size.should.be.eql(document.size)
+                    result.expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -2236,6 +2275,7 @@ describe('LeIA Document API', () => {
                     result.mimeType.should.be.eql(document.mime_type)
                     result.tags.should.be.eql(document.tags)
                     result.size.should.be.eql(document.size)
+                    result.expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -2256,6 +2296,7 @@ describe('LeIA Document API', () => {
                     result.mimeType.should.be.eql(document.mime_type)
                     result.tags.should.be.eql(document.tags)
                     result.size.should.be.eql(document.size)
+                    result.expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })
@@ -2276,6 +2317,7 @@ describe('LeIA Document API', () => {
                     result.mimeType.should.be.eql(document.mime_type)
                     result.tags.should.be.eql(document.tags)
                     result.size.should.be.eql(document.size)
+                    result.expirationTime.should.be.eql(document.expiration_time)
                     done()
                 })
             })

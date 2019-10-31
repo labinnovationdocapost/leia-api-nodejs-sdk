@@ -11,9 +11,10 @@ module.exports = class Document {
      * @param {integer} rotationAngle 
      * @param {string[]} tags 
      * @param {integer} size
+     * @param {string} expirationTime
      */
 
-    constructor(id, creationTime, applicationId, filename, extension, originalId, mimeType, rotationAngle, tags, size) {
+    constructor(id, creationTime, applicationId, filename, extension, originalId, mimeType, rotationAngle, tags, size, expirationTime) {
         this.id = id
         this.creationTime = creationTime
         this.applicationId = applicationId
@@ -24,5 +25,6 @@ module.exports = class Document {
         this.rotationAngle = rotationAngle
         this.tags = tags
         this.size = size
+        this.expirationTime = expirationTime
     }
 }
