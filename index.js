@@ -1802,7 +1802,7 @@ module.exports = class LeiaAPI {
         }
 
         if (annotationId !== null) {
-            annotationIdStr = firstChar + "annotationId=" + annotationId
+            annotationIdStr = firstChar + "annotation_id=" + annotationId
             firstChar = "&"
         }
 

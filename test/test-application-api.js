@@ -334,11 +334,38 @@ describe('LeIA Application API', () => {
             })
         });
 
+        it('should return a list of applications when application_id is provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.adminGetApplications(null, null, null, 'id1').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.applications.should.be.a('array');
+                    result.applications.length.should.be.eql(1)
+                    result.applications[0].id.should.be.eql(application.id)
+                    result.applications[0].creationTime.should.be.eql(application.creation_time)
+                    result.applications[0].applicationName.should.be.eql(application.application_name)
+                    result.applications[0].applicationType.should.be.eql(application.application_type)
+                    result.applications[0].email.should.be.eql(application.email)
+                    result.applications[0].firstname.should.be.eql(application.first_name)
+                    result.applications[0].lastname.should.be.eql(application.last_name)
+                    result.applications[0].defaultJobCallbackUrl.should.be.eql(application.default_job_callback_url)
+                    result.applications[0].jobCounts.should.be.eql(application.job_counts)
+                    result.applications[0].jobCounts.should.be.a('object')
+                    result.applications[0].dedicatedWorkers.should.be.eql(application.dedicated_workers)
+                    result.applications[0].dedicatedWorkersTtl.should.be.eql(application.dedicated_workers_ttl)
+                    done()
+                })
+            })
+        });
+
         it('should return a list of applications when email is provided', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetApplications(null, null, null, 'test@test.com').then((result) => {
+                leiaAPI.adminGetApplications(null, null, null, null, 'test@test.com').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -365,7 +392,7 @@ describe('LeIA Application API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetApplications(null, null, null, null, 'appName').then((result) => {
+                leiaAPI.adminGetApplications(null, null, null, null, null, 'appName').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -392,7 +419,7 @@ describe('LeIA Application API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetApplications(null, null, null, null, null, 'Jean').then((result) => {
+                leiaAPI.adminGetApplications(null, null, null, null, null, null, 'Jean').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -419,7 +446,7 @@ describe('LeIA Application API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetApplications(null, null, null, null, null, null, 'test').then((result) => {
+                leiaAPI.adminGetApplications(null, null, null, null, null, null, null, 'test').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -446,7 +473,7 @@ describe('LeIA Application API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetApplications(null, null, null, null, null, null, null, 'admin').then((result) => {
+                leiaAPI.adminGetApplications(null, null, null, null, null, null, null, null, 'admin').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -473,7 +500,7 @@ describe('LeIA Application API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetApplications(null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
+                leiaAPI.adminGetApplications(null, null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -500,7 +527,7 @@ describe('LeIA Application API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetApplications(null, null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
+                leiaAPI.adminGetApplications(null, null, null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -526,7 +553,7 @@ describe('LeIA Application API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetApplications(20, 20, ['applicationName', '-email'], 'test@test.com', 'appName', 'Jean', 'test', 'admin', '2018-10-10T10:10:10', '2018-10-10T10:10:10').then((result) => {
+                leiaAPI.adminGetApplications(20, 20, ['applicationName', '-email'], 'id1', 'test@test.com', 'appName', 'Jean', 'test', 'admin', '2018-10-10T10:10:10', '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)

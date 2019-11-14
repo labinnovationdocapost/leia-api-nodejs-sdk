@@ -44,7 +44,7 @@ function mockAnnotationAPI() {
         .reply(200, [annotation], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/annotation?annotationId=id1')
+        .get('/annotation?annotation_id=id1')
         .reply(200, [annotation], { 'content-range': '0-1/1' });
 
     nock(serverURL)

@@ -700,11 +700,36 @@ describe('LeIA Model API', () => {
             })
         });
 
+        it('should return a list of models when modelId is provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.adminGetModels(null, null, null, null, 'id1').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
+                    result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    done()
+                })
+            })
+        });
+
         it('should return a list of models when tags is provided', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetModels(null, null, null, null, ['tag1', 'tag2']).then((result) => {
+                leiaAPI.adminGetModels(null, null, null, null, null, ['tag1', 'tag2']).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -729,7 +754,7 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetModels(null, null, null, null, null, 'classification').then((result) => {
+                leiaAPI.adminGetModels(null, null, null, null, null, null, 'classification').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -754,7 +779,7 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetModels(null, null, null, null, null, null, 'modelName').then((result) => {
+                leiaAPI.adminGetModels(null, null, null, null, null, null, null, 'modelName').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -779,7 +804,7 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetModels(null, null, null, null, null, null, null, 'description').then((result) => {
+                leiaAPI.adminGetModels(null, null, null, null, null, null, null, null, 'description').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -804,7 +829,7 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetModels(null, null, null, null, null, null, null, null, ['image']).then((result) => {
+                leiaAPI.adminGetModels(null, null, null, null, null, null, null, null, null, ['image']).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -829,7 +854,7 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetModels(null, null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
+                leiaAPI.adminGetModels(null, null, null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -854,7 +879,7 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetModels(null, null, null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
+                leiaAPI.adminGetModels(null, null, null, null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -880,7 +905,7 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetModels(20, 20, ['name', '-description'], 'appId1', ['tag1', 'tag2'], 'classification', 'modelName', 'description', ['image'], '2018-10-10T10:10:10', '2018-10-10T10:10:10').then((result) => {
+                leiaAPI.adminGetModels(20, 20, ['name', '-description'], 'appId1', 'id1', ['tag1', 'tag2'], 'classification', 'modelName', 'description', ['image'], '2018-10-10T10:10:10', '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1039,12 +1064,37 @@ describe('LeIA Model API', () => {
             })
         });
 
+        it('should return a list of models when modelId is provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.getModels(null, null, null, 'id1').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
+                    result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    done()
+                })
+            })
+        });
+
 
         it('should return a list of models when tags is provided', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getModels(null, null, null, ['tag1', 'tag2']).then((result) => {
+                leiaAPI.getModels(null, null, null, null, ['tag1', 'tag2']).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1069,7 +1119,7 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getModels(null, null, null, null, 'classification').then((result) => {
+                leiaAPI.getModels(null, null, null, null, null, 'classification').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1094,7 +1144,7 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getModels(null, null, null, null, null, 'modelName').then((result) => {
+                leiaAPI.getModels(null, null, null, null, null, null, 'modelName').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1119,7 +1169,7 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getModels(null, null, null, null, null, null, 'description').then((result) => {
+                leiaAPI.getModels(null, null, null, null, null, null, null, 'description').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1144,7 +1194,7 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getModels(null, null, null, null, null, null, null, ['image']).then((result) => {
+                leiaAPI.getModels(null, null, null, null, null, null, null, null, ['image']).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1169,7 +1219,7 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getModels(null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
+                leiaAPI.getModels(null, null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1194,7 +1244,7 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getModels(null, null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
+                leiaAPI.getModels(null, null, null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1220,7 +1270,7 @@ describe('LeIA Model API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getModels(20, 20, ['name', '-description'], ['tag1', 'tag2'], 'classification', 'modelName', 'description', ['image'], '2018-10-10T10:10:10', '2018-10-10T10:10:10').then((result) => {
+                leiaAPI.getModels(20, 20, ['name', '-description'], 'id1', ['tag1', 'tag2'], 'classification', 'modelName', 'description', ['image'], '2018-10-10T10:10:10', '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
