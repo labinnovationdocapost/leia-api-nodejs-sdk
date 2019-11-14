@@ -59,6 +59,10 @@ function mockApplicationAPI() {
         .reply(200, [application], { 'content-range': '0-1/1' });
 
     nock(serverURL)
+        .get('/admin/application?application_id=id1')
+        .reply(200, [application], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
         .get('/admin/application?email=test@test.com')
         .reply(200, [application], { 'content-range': '0-1/1' });
 
@@ -87,7 +91,7 @@ function mockApplicationAPI() {
         .reply(200, [application], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/admin/application?offset=20&limit=20&sort=application_name,-email&email=test@test.com&application_name=appName&first_name=Jean&last_name=test&application_type=admin&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
+        .get('/admin/application?offset=20&limit=20&sort=application_name,-email&application_id=id1&email=test@test.com&application_name=appName&first_name=Jean&last_name=test&application_type=admin&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
         .reply(200, [application], { 'content-range': '0-1/1' });
 
     nock(serverURL)

@@ -44,6 +44,10 @@ function mockAnnotationAPI() {
         .reply(200, [annotation], { 'content-range': '0-1/1' });
 
     nock(serverURL)
+        .get('/annotation?annotationId=id1')
+        .reply(200, [annotation], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
         .get('/annotation?tags=tag1&tags=tag2')
         .reply(200, [annotation], { 'content-range': '0-1/1' });
 
@@ -68,7 +72,7 @@ function mockAnnotationAPI() {
         .reply(200, [annotation], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/annotation?offset=20&limit=20&tags=tag1&tags=tag2&annotation_type=BOX&name=test&document_id=documentId1&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
+        .get('/annotation?offset=20&limit=20&annotation_id=id1&tags=tag1&tags=tag2&annotation_type=BOX&name=test&document_id=documentId1&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
         .reply(200, [annotation], { 'content-range': '0-1/1' });
 
     nock(serverURL)
@@ -277,11 +281,34 @@ describe('LeIA Annotation API', () => {
             })
         });
 
+        it('should return a list of documents when annotationId is provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.getAnnotations(null, null, 'id1').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.annotations.should.be.a('array');
+                    result.annotations.length.should.be.eql(1)
+                    result.annotations[0].id.should.be.eql(annotation.id)
+                    result.annotations[0].creationTime.should.be.eql(annotation.creation_time)
+                    result.annotations[0].annotationType.should.be.eql(annotation.annotation_type)
+                    result.annotations[0].applicationId.should.be.eql(annotation.application_id)
+                    result.annotations[0].documentId.should.be.eql(annotation.document_id)
+                    result.annotations[0].name.should.be.eql(annotation.name)
+                    result.annotations[0].prediction.should.be.eql(annotation.prediction)
+                    result.annotations[0].tags.should.be.eql(annotation.tags)
+                    done()
+                })
+            })
+        });
+
         it('should return a list of documents when tags is provided', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getAnnotations(null, null, ['tag1', 'tag2']).then((result) => {
+                leiaAPI.getAnnotations(null, null, null, ['tag1', 'tag2']).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -304,7 +331,7 @@ describe('LeIA Annotation API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getAnnotations(null, null, null, 'BOX').then((result) => {
+                leiaAPI.getAnnotations(null, null, null, null, 'BOX').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -327,7 +354,7 @@ describe('LeIA Annotation API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getAnnotations(null, null, null, null, 'test').then((result) => {
+                leiaAPI.getAnnotations(null, null, null, null, null, 'test').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -350,7 +377,7 @@ describe('LeIA Annotation API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getAnnotations(null, null, null, null, null, 'documentId1').then((result) => {
+                leiaAPI.getAnnotations(null, null, null, null, null, null, 'documentId1').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -373,7 +400,7 @@ describe('LeIA Annotation API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getAnnotations(null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
+                leiaAPI.getAnnotations(null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -396,7 +423,7 @@ describe('LeIA Annotation API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getAnnotations(null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
+                leiaAPI.getAnnotations(null, null, null, null, null, null, null, null, '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -419,7 +446,7 @@ describe('LeIA Annotation API', () => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getAnnotations(20, 20, ['tag1', 'tag2'], 'BOX', 'test', 'documentId1', '2018-10-10T10:10:10', '2018-10-10T10:10:10').then((result) => {
+                leiaAPI.getAnnotations(20, 20, 'id1', ['tag1', 'tag2'], 'BOX', 'test', 'documentId1', '2018-10-10T10:10:10', '2018-10-10T10:10:10').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)

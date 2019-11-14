@@ -107,6 +107,10 @@ function mockModelAPI() {
         .reply(200, [model], { 'content-range': '0-1/1' });
 
     nock(serverURL)
+        .get('/admin/model?model_id=id1')
+        .reply(200, [model], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
         .get('/admin/model?tags=tag1&tags=tag2')
         .reply(200, [model], { 'content-range': '0-1/1' });
 
@@ -135,7 +139,7 @@ function mockModelAPI() {
         .reply(200, [model], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/admin/model?offset=20&limit=20&sort=name,-description&application_id=appId1&tags=tag1&tags=tag2&model_type=classification&name=modelName&description=description&input_types=image&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
+        .get('/admin/model?offset=20&limit=20&sort=name,-description&application_id=appId1&model_id=id1&tags=tag1&tags=tag2&model_type=classification&name=modelName&description=description&input_types=image&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
         .reply(200, [model], { 'content-range': '0-1/1' });
 
     nock(serverURL)
@@ -187,6 +191,10 @@ function mockModelAPI() {
         .reply(200, [model], { 'content-range': '0-1/1' });
 
     nock(serverURL)
+        .get('/model?model_id=id1')
+        .reply(200, [model], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
         .get('/model?tags=tag1&tags=tag2')
         .reply(200, [model], { 'content-range': '0-1/1' });
 
@@ -215,7 +223,7 @@ function mockModelAPI() {
         .reply(200, [model], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/model?offset=20&limit=20&sort=name,-description&tags=tag1&tags=tag2&model_type=classification&name=modelName&description=description&input_types=image&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
+        .get('/model?offset=20&limit=20&sort=name,-description&model_id=id1&tags=tag1&tags=tag2&model_type=classification&name=modelName&description=description&input_types=image&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
         .reply(200, [model], { 'content-range': '0-1/1' });
 
     nock(serverURL)

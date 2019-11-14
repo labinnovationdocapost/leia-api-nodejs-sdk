@@ -80,6 +80,10 @@ function mockDocumentAPI() {
         .reply(200, [document], { 'content-range': '0-1/1' });
 
     nock(serverURL)
+        .get('/admin/document?document_id=id1')
+        .reply(200, [document], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
         .get('/admin/document?tags=tag1&tags=tag2')
         .reply(200, [document], { 'content-range': '0-1/1' });
 
@@ -108,7 +112,7 @@ function mockDocumentAPI() {
         .reply(200, [document], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/admin/document?offset=20&limit=20&sort=filename,-extension&application_id=appId1&tag_result=tag3&tags=tag1&tags=tag2&filename=test&extension=jpg&mime_type=image/jpeg&original_id=id1&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
+        .get('/admin/document?offset=20&limit=20&sort=filename,-extension&application_id=appId1&tag_result=tag3&document_id=id1&tags=tag1&tags=tag2&filename=test&extension=jpg&mime_type=image/jpeg&original_id=id1&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
         .reply(200, [document], { 'content-range': '0-1/1' });
 
     nock(serverURL)
@@ -219,6 +223,10 @@ function mockDocumentAPI() {
         .get('/document?tag_result=tag3')
         .reply(200, [document], { 'content-range': '0-1/1' });
 
+        nock(serverURL)
+        .get('/document?document_id=id1')
+        .reply(200, [document], { 'content-range': '0-1/1' });
+
     nock(serverURL)
         .get('/document?tags=tag1&tags=tag2')
         .reply(200, [document], { 'content-range': '0-1/1' });
@@ -248,7 +256,7 @@ function mockDocumentAPI() {
         .reply(200, [document], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/document?offset=20&limit=20&sort=filename,-extension&tag_result=tag3&tags=tag1&tags=tag2&filename=test&extension=jpg&mime_type=image/jpeg&original_id=id1&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
+        .get('/document?offset=20&limit=20&sort=filename,-extension&tag_result=tag3&document_id=id1&tags=tag1&tags=tag2&filename=test&extension=jpg&mime_type=image/jpeg&original_id=id1&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
         .reply(200, [document], { 'content-range': '0-1/1' });
 
     nock(serverURL)

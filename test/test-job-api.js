@@ -63,6 +63,10 @@ function mockJobAPI() {
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
     nock(serverURL)
+        .get('/admin/job?job_id=id1')
+        .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
         .get('/admin/job?submitter_id=submitterId1')
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
@@ -103,7 +107,7 @@ function mockJobAPI() {
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/admin/job?offset=20&limit=20&sort=submitter_id&submitter_id=submitterId1&application_id=appId1&job_type=pdf-images&model_id=modelId1&document_id=documentId1&execute_after_id=jobId1&parent_job_id=jobId1&status=PROCESSED&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
+        .get('/admin/job?offset=20&limit=20&sort=submitter_id&job_id=id1&submitter_id=submitterId1&application_id=appId1&job_type=pdf-images&model_id=modelId1&document_id=documentId1&execute_after_id=jobId1&parent_job_id=jobId1&status=PROCESSED&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
     nock(serverURL)
@@ -171,6 +175,11 @@ function mockJobAPI() {
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
     nock(serverURL)
+        .get('/job?job_id=id1')
+        .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
+
+
+    nock(serverURL)
         .get('/job?submitter_id=submitterId1')
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
@@ -211,7 +220,7 @@ function mockJobAPI() {
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/job?offset=20&limit=20&sort=submitter_id&application_id=appId1&job_type=pdf-images&model_id=modelId1&document_id=documentId1&execute_after_id=jobId1&parent_job_id=jobId1&status=PROCESSED&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
+        .get('/job?offset=20&limit=20&sort=submitter_id&job_id=id1&application_id=appId1&job_type=pdf-images&model_id=modelId1&document_id=documentId1&execute_after_id=jobId1&parent_job_id=jobId1&status=PROCESSED&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
         .reply(200, [transformPDFProcessedJob], { 'content-range': '0-1/1' });
 
     nock(serverURL)
