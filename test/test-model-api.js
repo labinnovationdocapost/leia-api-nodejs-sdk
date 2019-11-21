@@ -311,19 +311,19 @@ function mockModelAPI() {
         .reply(404, null);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/model/id1?file_contents=true')
+        .get('/admin/' + application.id + '/model/id1/file_contents')
         .reply(200, Buffer.from([0xff, 0x11]))
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/model/id2?file_contents=true')
+        .get('/admin/' + application.id + '/model/id2/file_contents')
         .reply(401, null);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/model/id3?file_contents=true')
+        .get('/admin/' + application.id + '/model/id3/file_contents')
         .reply(403, null);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/model/id4?file_contents=true')
+        .get('/admin/' + application.id + '/model/id4/file_contents')
         .reply(404, null);
 
     nock(serverURL)

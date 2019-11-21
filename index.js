@@ -661,7 +661,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.getFile(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '?file_contents=true', false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.getFile(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/file_contents', false, that.autoRefreshToken).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 reject(error)
@@ -1492,7 +1492,7 @@ module.exports = class LeiaAPI {
     adminGetDocumentContent(applicationId, documentId, maxSize = null) {
         var maxSizeStr = ""
         if (maxSize) {
-            maxSizeStr = "&max_size=" + maxSize
+            maxSizeStr = "?max_size=" + maxSize
         }
         var that = this
         return new Promise(function (resolve, reject) {
@@ -1501,7 +1501,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.getFile(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '?file_contents=true' + maxSizeStr, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.getFile(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/file_contents' + maxSizeStr, false, that.autoRefreshToken).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 reject(error)
@@ -1519,7 +1519,7 @@ module.exports = class LeiaAPI {
     getDocumentContent(documentId, maxSize = null) {
         var maxSizeStr = ""
         if (maxSize) {
-            maxSizeStr = "&max_size=" + maxSize
+            maxSizeStr = "?max_size=" + maxSize
         }
         var that = this
         return new Promise(function (resolve, reject) {
@@ -1528,7 +1528,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.getFile(that.serverURL + '/document/' + documentId + '?file_contents=true' + maxSizeStr, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.getFile(that.serverURL + '/document/' + documentId + '/file_contents' + maxSizeStr, false, that.autoRefreshToken).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 reject(error)

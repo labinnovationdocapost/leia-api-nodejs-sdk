@@ -148,19 +148,19 @@ function mockDocumentAPI() {
         .reply(404, null);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/document/id1?file_contents=true')
+        .get('/admin/' + application.id + '/document/id1/file_contents')
         .reply(200, Buffer.from([0xff, 0x11]));
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/document/id2?file_contents=true')
+        .get('/admin/' + application.id + '/document/id2/file_contents')
         .reply(401, null);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/document/id3?file_contents=true')
+        .get('/admin/' + application.id + '/document/id3/file_contents')
         .reply(403, null);
 
     nock(serverURL)
-        .get('/admin/' + application.id + '/document/id4?file_contents=true')
+        .get('/admin/' + application.id + '/document/id4/file_contents')
         .reply(404, null);
 
     nock(serverURL)
@@ -292,19 +292,19 @@ function mockDocumentAPI() {
         .reply(404, null);
 
     nock(serverURL)
-        .get('/document/id1?file_contents=true')
+        .get('/document/id1/file_contents')
         .reply(200, document);
 
     nock(serverURL)
-        .get('/document/id2?file_contents=true')
+        .get('/document/id2/file_contents')
         .reply(401, null);
 
     nock(serverURL)
-        .get('/document/id3?file_contents=true')
+        .get('/document/id3/file_contents')
         .reply(403, null);
 
     nock(serverURL)
-        .get('/document/id4?file_contents=true')
+        .get('/document/id4/file_contents')
         .reply(404, null);
 
     nock(serverURL)
