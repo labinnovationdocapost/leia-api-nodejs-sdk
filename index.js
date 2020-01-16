@@ -934,10 +934,11 @@ module.exports = class LeiaAPI {
     * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
     * @param {string} executeAfterId (optional) - should be executed after a certain Job
     * @param {string} callbackUrl (optional) - callback url for when a job is finished
+    * @param {object} modelParams (optional) - Additional model params (json)
     * @returns {Job} a job with the processing info
     */
 
-    adminApplyModelToDocuments(applicationId, modelId, documentIds, tag = null, executeAfterId = null, callbackUrl = null) {
+    adminApplyModelToDocuments(applicationId, modelId, documentIds, tag = null, executeAfterId = null, callbackUrl = null, modelParams = null) {
         var documentIdsString = documentIds.join(',')
         var tagStr = ""
         var executeAfterIdStr = ""
@@ -966,7 +967,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr + callbackUrlStr, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr + callbackUrlStr, modelParams ? modelParams : {}, true, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -994,10 +995,11 @@ module.exports = class LeiaAPI {
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
      * @param {string} executeAfterId (optional) - should be executed after a certain Job
      * @param {string} callbackUrl (optional) - callback url for when a job is finished
+     * @param {object} modelParams (optional) - Additional model params (json)
      * @returns {Job} a job with the processing info
      */
 
-    applyModelToDocuments(modelId, documentIds, tag = null, executeAfterId = null, callbackUrl = null) {
+    applyModelToDocuments(modelId, documentIds, tag = null, executeAfterId = null, callbackUrl = null, modelParams = null) {
         var documentIdsString = documentIds.join(',')
         var tagStr = ""
         var executeAfterIdStr = ""
@@ -1026,7 +1028,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr + callbackUrlStr, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr + callbackUrlStr, modelParams ? modelParams : {}, true, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
