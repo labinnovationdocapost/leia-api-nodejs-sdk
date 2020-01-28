@@ -17,8 +17,9 @@ module.exports = class Job {
      * @param {string} submitterId 
      * @param {string} wsId
      * @param {string} reason
+     * @param {string} pageRange
      */
-   constructor(id, creationTime, applicationId, documentIds, startingTime, finishedTime, httpCode, jobType, modelId, result, resultType, status, parentJobId, executeAfterId, submitterId, wsId, reason) {
+   constructor(id, creationTime, applicationId, documentIds, startingTime, finishedTime, httpCode, jobType, modelId, result, resultType, status, parentJobId, executeAfterId, submitterId, wsId, reason, pageRange) {
        this.id = id
        this.creationTime = creationTime
        this.applicationId = applicationId
@@ -36,5 +37,6 @@ module.exports = class Job {
        this.submitterId = submitterId
        this.wsId = wsId
        this.reason = reason
+       this.pageRange = pageRange
    }
 }

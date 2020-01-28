@@ -790,7 +790,7 @@ module.exports = class LeiaAPI {
     }
 
     /**
-       * (promise) Transform a list of PDF into images or text (admin)
+       * (promise) Transform a list of Documents into images or text (admin)
        * @param {string} applicationId - an Application id
        * @param {string[]} documentIds - a list of Document ids
        * @param {string} outputType - an output type. 
@@ -803,7 +803,7 @@ module.exports = class LeiaAPI {
        * @returns {Job} a job with the processing info
        */
 
-    adminTransformPDF(applicationId, documentIds, outputType, inputTag = null, outputTag = null, executeAfterId = null, callbackUrl = null) {
+    adminTransformDocuments(applicationId, documentIds, outputType, inputTag = null, outputTag = null, executeAfterId = null, callbackUrl = null) {
         var documentIdsString = documentIds.join(',')
         var inputTagStr = ""
         var outputTagStr = ""
@@ -850,7 +850,7 @@ module.exports = class LeiaAPI {
                         }
                     }
                 }
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason))
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason, body.page_range))
             }).catch((error) => {
                 reject(error)
             })
@@ -858,7 +858,7 @@ module.exports = class LeiaAPI {
     }
 
     /**
-     * (promise) Transform a list of PDF into images or text
+     * (promise) Transform a list of Documents into images or text
      * @param {string[]} documentIds - a list of Document ids
      * @param {string} outputType - an output type. 
      * @param {string} inputTag (optional) - The tag of the documents to process. 
@@ -870,7 +870,7 @@ module.exports = class LeiaAPI {
      * @returns {Job} a job with the processing info
      */
 
-    transformPDF(documentIds, outputType, inputTag = null, outputTag = null, executeAfterId = null, callbackUrl = null) {
+    transformDocuments(documentIds, outputType, inputTag = null, outputTag = null, executeAfterId = null, callbackUrl = null) {
         var documentIdsString = documentIds.join(',')
         var inputTagStr = ""
         var outputTagStr = ""
@@ -917,7 +917,7 @@ module.exports = class LeiaAPI {
                         }
                     }
                 }
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason))
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason, body.page_range))
             }).catch((error) => {
                 reject(error)
             })
@@ -932,21 +932,28 @@ module.exports = class LeiaAPI {
     * @param {string} tag (optional) - The tag of the documents to process.
     * If tag is present, documentIds should contain a single value, 
     * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
+    * @param {string} pageRange (optional) - Page range to process (ex: :5 = pages 1-5)
     * @param {string} executeAfterId (optional) - should be executed after a certain Job
     * @param {string} callbackUrl (optional) - callback url for when a job is finished
     * @param {object} modelParams (optional) - Additional model params (json)
     * @returns {Job} a job with the processing info
     */
 
-    adminApplyModelToDocuments(applicationId, modelId, documentIds, tag = null, executeAfterId = null, callbackUrl = null, modelParams = null) {
+    adminApplyModelToDocuments(applicationId, modelId, documentIds, tag = null, pageRange = null, executeAfterId = null, callbackUrl = null, modelParams = null) {
         var documentIdsString = documentIds.join(',')
         var tagStr = ""
+        var pageRangeStr = ""
         var executeAfterIdStr = ""
         var callbackUrlStr = ""
         var firstChar = "?"
 
         if (tag !== null) {
             tagStr = firstChar + 'tag=' + tag
+            firstChar = "&"
+        }
+
+        if (pageRange !== null) {
+            pageRangeStr = firstChar + 'page_range=' + pageRange
             firstChar = "&"
         }
 
@@ -967,7 +974,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr + callbackUrlStr, modelParams ? modelParams : {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + pageRangeStr + executeAfterIdStr + callbackUrlStr, modelParams ? modelParams : {}, true, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -979,7 +986,7 @@ module.exports = class LeiaAPI {
                         }
                     }
                 }
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason))
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason, body.page_range))
             }).catch((error) => {
                 reject(error)
             })
@@ -993,21 +1000,28 @@ module.exports = class LeiaAPI {
      * @param {string} tag (optional) - The tag of the documents to process.
      * If tag is present, documentIds should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
+     * @param {string} pageRange (optional) - Page range to process (ex: :5 = pages 1-5)
      * @param {string} executeAfterId (optional) - should be executed after a certain Job
      * @param {string} callbackUrl (optional) - callback url for when a job is finished
      * @param {object} modelParams (optional) - Additional model params (json)
      * @returns {Job} a job with the processing info
      */
 
-    applyModelToDocuments(modelId, documentIds, tag = null, executeAfterId = null, callbackUrl = null, modelParams = null) {
+    applyModelToDocuments(modelId, documentIds, tag = null, pageRange = null, executeAfterId = null, callbackUrl = null, modelParams = null) {
         var documentIdsString = documentIds.join(',')
         var tagStr = ""
+        var pageRangeStr = ""
         var executeAfterIdStr = ""
         var callbackUrlStr = ""
         var firstChar = "?"
 
         if (tag !== null) {
             tagStr = firstChar + 'tag=' + tag
+            firstChar = "&"
+        }
+
+        if (pageRange !== null) {
+            pageRangeStr = firstChar + 'page_range=' + pageRange
             firstChar = "&"
         }
 
@@ -1028,7 +1042,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + executeAfterIdStr + callbackUrlStr, modelParams ? modelParams : {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + pageRangeStr + executeAfterIdStr + callbackUrlStr, modelParams ? modelParams : {}, true, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -1040,7 +1054,7 @@ module.exports = class LeiaAPI {
                         }
                     }
                 }
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason))
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason, body.page_range))
             }).catch((error) => {
                 reject(error)
             })
@@ -2157,7 +2171,7 @@ module.exports = class LeiaAPI {
                             }
                         }
                     }
-                    jobs.push(new Job(body[i].id, body[i].creation_time, body[i].application_id, body[i].document_ids, body[i].starting_time, body[i].finished_time, body[i].http_code, body[i].job_type, body[i].model_id, result, body[i].result_type, body[i].status, body[i].parent_job_id, body[i].execute_after_id, body[i].submitter_id, body[i].ws_id, body[i].reason))
+                    jobs.push(new Job(body[i].id, body[i].creation_time, body[i].application_id, body[i].document_ids, body[i].starting_time, body[i].finished_time, body[i].http_code, body[i].job_type, body[i].model_id, result, body[i].result_type, body[i].status, body[i].parent_job_id, body[i].execute_after_id, body[i].submitter_id, body[i].ws_id, body[i].reason, body[i].page_range))
                 }
                 resolve({ contentRange, jobs })
             }).catch((error) => {
@@ -2197,7 +2211,7 @@ module.exports = class LeiaAPI {
                         }
                     }
                 }
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason))
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason, body.page_range))
             }).catch((error) => {
                 reject(error)
             })
@@ -2355,7 +2369,7 @@ module.exports = class LeiaAPI {
                             }
                         }
                     }
-                    jobs.push(new Job(body[i].id, body[i].creation_time, body[i].application_id, body[i].document_ids, body[i].starting_time, body[i].finished_time, body[i].http_code, body[i].job_type, body[i].model_id, result, body[i].result_type, body[i].status, body[i].parent_job_id, body[i].execute_after_id, body[i].submitter_id, body[i].ws_id, body[i].reason))
+                    jobs.push(new Job(body[i].id, body[i].creation_time, body[i].application_id, body[i].document_ids, body[i].starting_time, body[i].finished_time, body[i].http_code, body[i].job_type, body[i].model_id, result, body[i].result_type, body[i].status, body[i].parent_job_id, body[i].execute_after_id, body[i].submitter_id, body[i].ws_id, body[i].reason, body[i].page_range))
                 }
                 resolve({ contentRange, jobs })
             }).catch((error) => {
@@ -2394,7 +2408,7 @@ module.exports = class LeiaAPI {
                         }
                     }
                 }
-                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason))
+                resolve(new Job(body.id, body.creation_time, body.application_id, body.document_ids, body.starting_time, body.finished_time, body.http_code, body.job_type, body.model_id, result, body.result_type, body.status, body.parent_job_id, body.execute_after_id, body.submitter_id, body.ws_id, body.reason, body.page_range))
             }).catch((error) => {
                 reject(error)
             })
