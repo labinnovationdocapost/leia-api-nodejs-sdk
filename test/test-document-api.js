@@ -1650,7 +1650,7 @@ describe('LeIA Document API', () => {
         it('should return a job when providing an inputTag', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminTransformDocuments(application.id, ['id1'], 'image', 'tag1').then((result) => {
+                leiaAPI.adminTransformDocuments(application.id, ['id1'], 'image', null, 'tag1').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(transformDocumentsProcessingJob.id)
                     result.creationTime.should.be.eql(transformDocumentsProcessingJob.creation_time)
@@ -1669,7 +1669,7 @@ describe('LeIA Document API', () => {
         it('should return a job when providing an outputTag', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminTransformDocuments(application.id, ['id1'], 'image', null, 'tag1').then((result) => {
+                leiaAPI.adminTransformDocuments(application.id, ['id1'], 'image', null, null, 'tag1').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(transformDocumentsProcessingJob.id)
                     result.creationTime.should.be.eql(transformDocumentsProcessingJob.creation_time)
@@ -1688,7 +1688,7 @@ describe('LeIA Document API', () => {
         it('should return a job when providing an executeAfterId', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminTransformDocuments(application.id, ['id1'], 'image', null, null, 'jobId1').then((result) => {
+                leiaAPI.adminTransformDocuments(application.id, ['id1'], 'image', null, null, null, 'jobId1').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(transformDocumentsProcessingJob.id)
                     result.creationTime.should.be.eql(transformDocumentsProcessingJob.creation_time)
@@ -1707,7 +1707,7 @@ describe('LeIA Document API', () => {
         it('should return a job when providing a callback url', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminTransformDocuments(application.id, ['id1'], 'image', null, null, null, 'https://test.com').then((result) => {
+                leiaAPI.adminTransformDocuments(application.id, ['id1'], 'image', null, null, null, null, 'https://test.com').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(transformDocumentsProcessingJob.id)
                     result.creationTime.should.be.eql(transformDocumentsProcessingJob.creation_time)
@@ -1726,7 +1726,7 @@ describe('LeIA Document API', () => {
         it('should return a job when providing all parameters', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminTransformDocuments(application.id, ['id1'], 'image', 'tag1', 'tag1', 'jobId1', 'https://test.com').then((result) => {
+                leiaAPI.adminTransformDocuments(application.id, ['id1'], 'image', null, 'tag1', 'tag1', 'jobId1', 'https://test.com').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(transformDocumentsProcessingJob.id)
                     result.creationTime.should.be.eql(transformDocumentsProcessingJob.creation_time)
@@ -1745,7 +1745,7 @@ describe('LeIA Document API', () => {
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminTransformDocuments(application.id, ['id2'], 'image', null, 'tag2').then((result) => {
+                leiaAPI.adminTransformDocuments(application.id, ['id2'], 'image', null, null, 'tag2').then((result) => {
                 }).catch((error) => {
                     error.status.should.be.eql(401)
                     done()
@@ -1756,7 +1756,7 @@ describe('LeIA Document API', () => {
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminTransformDocuments(application.id, ['id3'], 'image', null, 'tag3').then((result) => {
+                leiaAPI.adminTransformDocuments(application.id, ['id3'], 'image', null, null, 'tag3').then((result) => {
                 }).catch((error) => {
                     error.status.should.be.eql(403)
                     done()
@@ -1767,7 +1767,7 @@ describe('LeIA Document API', () => {
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminTransformDocuments(application.id, ['id4'], 'image', null, 'tag4').then((result) => {
+                leiaAPI.adminTransformDocuments(application.id, ['id4'], 'image', null, null, 'tag4').then((result) => {
                 }).catch((error) => {
                     error.status.should.be.eql(404)
                     done()
@@ -1800,7 +1800,7 @@ describe('LeIA Document API', () => {
         it('should return a list of documents when providing an inputTag', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.transformDocuments(['id1'], 'image', 'tag1').then((result) => {
+                leiaAPI.transformDocuments(['id1'], 'image', null, 'tag1').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(transformDocumentsProcessingJob.id)
                     result.creationTime.should.be.eql(transformDocumentsProcessingJob.creation_time)
@@ -1819,7 +1819,7 @@ describe('LeIA Document API', () => {
         it('should return a list of documents when providing an outputTag', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.transformDocuments(['id1'], 'image', null, 'tag1').then((result) => {
+                leiaAPI.transformDocuments(['id1'], 'image', null, null, 'tag1').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(transformDocumentsProcessingJob.id)
                     result.creationTime.should.be.eql(transformDocumentsProcessingJob.creation_time)
@@ -1838,7 +1838,7 @@ describe('LeIA Document API', () => {
         it('should return a list of documents when providing an executeAfterId', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.transformDocuments(['id1'], 'image', null, null, 'jobId1').then((result) => {
+                leiaAPI.transformDocuments(['id1'], 'image', null, null, null, 'jobId1').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(transformDocumentsProcessingJob.id)
                     result.creationTime.should.be.eql(transformDocumentsProcessingJob.creation_time)
@@ -1857,7 +1857,7 @@ describe('LeIA Document API', () => {
         it('should return a job when providing all parameters', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.transformDocuments(['id1'], 'image', 'tag1', 'tag1', 'jobId1', 'https://test.com').then((result) => {
+                leiaAPI.transformDocuments(['id1'], 'image', null, 'tag1', 'tag1', 'jobId1', 'https://test.com').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(transformDocumentsProcessingJob.id)
                     result.creationTime.should.be.eql(transformDocumentsProcessingJob.creation_time)
@@ -1876,7 +1876,7 @@ describe('LeIA Document API', () => {
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.transformDocuments(['id2'], 'image', null, 'tag2').then((result) => {
+                leiaAPI.transformDocuments(['id2'], 'image', null, null, 'tag2').then((result) => {
                 }).catch((error) => {
                     error.status.should.be.eql(401)
                     done()
@@ -1887,7 +1887,7 @@ describe('LeIA Document API', () => {
         it('should return a 403 status when LeiaAPI returns a 403 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.transformDocuments(['id3'], 'image', null, 'tag3').then((result) => {
+                leiaAPI.transformDocuments(['id3'], 'image', null, null, 'tag3').then((result) => {
                 }).catch((error) => {
                     error.status.should.be.eql(403)
                     done()
@@ -1898,7 +1898,7 @@ describe('LeIA Document API', () => {
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.transformDocuments(['id4'], 'image', null, 'tag4').then((result) => {
+                leiaAPI.transformDocuments(['id4'], 'image', null, null, 'tag4').then((result) => {
                 }).catch((error) => {
                     error.status.should.be.eql(404)
                     done()

@@ -794,6 +794,7 @@ module.exports = class LeiaAPI {
        * @param {string} applicationId - an Application id
        * @param {string[]} documentIds - a list of Document ids
        * @param {string} outputType - an output type. 
+       * @param {string} pageRange (optional) - Page range to process (ex: :5 = pages 1-5)
        * @param {string} inputTag (optional) - The tag of the documents to process. 
        * If inputTag is present, document_ids should contain a single value, 
        * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
@@ -803,13 +804,19 @@ module.exports = class LeiaAPI {
        * @returns {Job} a job with the processing info
        */
 
-    adminTransformDocuments(applicationId, documentIds, outputType, inputTag = null, outputTag = null, executeAfterId = null, callbackUrl = null) {
+    adminTransformDocuments(applicationId, documentIds, outputType, pageRange = null, inputTag = null, outputTag = null, executeAfterId = null, callbackUrl = null) {
         var documentIdsString = documentIds.join(',')
+        var pageRangeStr = ""
         var inputTagStr = ""
         var outputTagStr = ""
         var executeAfterIdStr = ""
         var callbackUrlStr = ""
         var firstChar = "?"
+
+        if (pageRange !== null) {
+            pageRangeStr = firstChar + 'page_range=' + pageRange
+            firstChar = "&"
+        }
 
         if (inputTag !== null) {
             inputTagStr = firstChar + 'input_tag=' + inputTag
@@ -838,7 +845,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr + executeAfterIdStr + callbackUrlStr, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentIdsString + '/transform/' + outputType + pageRangeStr + inputTagStr + outputTagStr + executeAfterIdStr + callbackUrlStr, {}, true, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -861,6 +868,7 @@ module.exports = class LeiaAPI {
      * (promise) Transform a list of Documents into images or text
      * @param {string[]} documentIds - a list of Document ids
      * @param {string} outputType - an output type. 
+     * @param {string} pageRange (optional) - Page range to process (ex: :5 = pages 1-5)
      * @param {string} inputTag (optional) - The tag of the documents to process. 
      * If inputTag is present, document_ids should contain a single value, 
      * and the documents processed will be those where originalId=documentIds[0] and that contain the specified tag
@@ -870,13 +878,19 @@ module.exports = class LeiaAPI {
      * @returns {Job} a job with the processing info
      */
 
-    transformDocuments(documentIds, outputType, inputTag = null, outputTag = null, executeAfterId = null, callbackUrl = null) {
+    transformDocuments(documentIds, outputType, pageRange = null, inputTag = null, outputTag = null, executeAfterId = null, callbackUrl = null) {
         var documentIdsString = documentIds.join(',')
+        var pageRangeStr = ""
         var inputTagStr = ""
         var outputTagStr = ""
         var executeAfterIdStr = ""
         var callbackUrlStr = ""
         var firstChar = "?"
+
+        if (pageRange !== null) {
+            pageRangeStr = firstChar + 'page_range=' + pageRange
+            firstChar = "&"
+        }
 
         if (inputTag !== null) {
             inputTagStr = firstChar + 'input_tag=' + inputTag
@@ -905,7 +919,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentIdsString + '/transform/' + outputType + inputTagStr + outputTagStr + executeAfterIdStr + callbackUrlStr, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentIdsString + '/transform/' + outputType + pageRangeStr + inputTagStr + outputTagStr + executeAfterIdStr + callbackUrlStr, {}, true, that.autoRefreshToken).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
