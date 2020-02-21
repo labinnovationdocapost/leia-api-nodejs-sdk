@@ -31,7 +31,8 @@ const model = {
     "name": 'modelName',
     "tags": ['tag1', 'tag2'],
     "model_type": 'classification',
-    "application_id": 'appid1'
+    "application_id": 'appid1',
+    "short_name": 'sname'
 }
 
 const applyModelToDocumentProcessingJob = {
@@ -111,7 +112,11 @@ function mockModelAPI() {
         .reply(200, [model], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/admin/model?offset=20&limit=20&sort=name,-description&application_id=appId1&model_id=id1&tags=tag1&tags=tag2&model_type=classification&name=modelName&description=description&input_types=image&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
+        .get('/admin/model?short_name=sname')
+        .reply(200, [model], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/admin/model?offset=20&limit=20&sort=name,-description&application_id=appId1&model_id=id1&tags=tag1&tags=tag2&model_type=classification&name=modelName&description=description&input_types=image&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10&short_name=sname')
         .reply(200, [model], { 'content-range': '0-1/1' });
 
     nock(serverURL)
@@ -195,7 +200,11 @@ function mockModelAPI() {
         .reply(200, [model], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/model?offset=20&limit=20&sort=name,-description&model_id=id1&tags=tag1&tags=tag2&model_type=classification&name=modelName&description=description&input_types=image&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10')
+        .get('/model?short_name=sname')
+        .reply(200, [model], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/model?offset=20&limit=20&sort=name,-description&model_id=id1&tags=tag1&tags=tag2&model_type=classification&name=modelName&description=description&input_types=image&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10&short_name=sname')
         .reply(200, [model], { 'content-range': '0-1/1' });
 
     nock(serverURL)
@@ -247,23 +256,23 @@ function mockModelAPI() {
         .reply(400, null);
 
     nock(serverURL)
-        .patch('/admin/' + application.id + '/model/id1?name=modelName&description=modelDescription&ttl=5&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2')
+        .patch('/admin/' + application.id + '/model/id1?name=modelName&description=modelDescription&ttl=5&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2&short_name=sname')
         .reply(200, model);
 
     nock(serverURL)
-        .patch('/admin/' + application.id + '/model/id1?name=modelName&description=modelDescription&ttl=5&allow_all_applications=true&allowed_application_ids=')
+        .patch('/admin/' + application.id + '/model/id1?name=modelName&description=modelDescription&ttl=5&allow_all_applications=true&allowed_application_ids=&short_name=sname')
         .reply(200, model);
 
     nock(serverURL)
-        .patch('/admin/' + application.id + '/model/id1?name=modelName2&description=modelDescription&ttl=5&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2')
+        .patch('/admin/' + application.id + '/model/id1?name=modelName2&description=modelDescription&ttl=5&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2&short_name=sname')
         .reply(401, null);
 
     nock(serverURL)
-        .patch('/admin/' + application.id + '/model/id1?name=modelName3&description=modelDescription&ttl=5&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2')
+        .patch('/admin/' + application.id + '/model/id1?name=modelName3&description=modelDescription&ttl=5&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2&short_name=sname')
         .reply(404, null);
 
     nock(serverURL)
-        .patch('/admin/' + application.id + '/model/id1?name=modelName4&description=modelDescription&ttl=5&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2')
+        .patch('/admin/' + application.id + '/model/id1?name=modelName4&description=modelDescription&ttl=5&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2&short_name=sname')
         .reply(400, null);
 
     nock(serverURL)
@@ -322,7 +331,7 @@ function mockModelAPI() {
         .post('/model/modelId1/apply/documentId1?execute_after_id=jobId1')
         .reply(200, applyModelToDocumentProcessingJob);
 
-        nock(serverURL)
+    nock(serverURL)
         .post('/model/modelId1/apply/documentId1?page_range=:5&execute_after_id=jobId1')
         .reply(200, applyModelToDocumentProcessingJob);
 
@@ -475,6 +484,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -500,6 +510,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -525,6 +536,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -550,6 +562,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -575,6 +588,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -600,6 +614,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -625,6 +640,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -650,6 +666,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -675,6 +692,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -700,6 +718,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -725,6 +744,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -750,6 +770,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -775,17 +796,17 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
         });
 
-
-        it('should return a list of models when all parameters are provided', (done) => {
+        it('should return a list of models when shoetName is provided', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetModels(20, 20, ['name', '-description'], 'appId1', 'id1', ['tag1', 'tag2'], 'classification', 'modelName', 'description', ['image'], '2018-10-10T10:10:10', '2018-10-10T10:10:10').then((result) => {
+                leiaAPI.adminGetModels(null, null, null, null, null, null, null, null, null, null, null, null, 'sname').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -801,6 +822,33 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
+                    done()
+                })
+            })
+        });
+
+        it('should return a list of models when all parameters are provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.adminGetModels(20, 20, ['name', '-description'], 'appId1', 'id1', ['tag1', 'tag2'], 'classification', 'modelName', 'description', ['image'], '2018-10-10T10:10:10', '2018-10-10T10:10:10', 'sname').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
+                    result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -864,6 +912,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -889,6 +938,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -914,6 +964,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -939,6 +990,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -964,6 +1016,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -990,6 +1043,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -1015,6 +1069,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -1040,6 +1095,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -1065,6 +1121,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -1090,6 +1147,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -1115,6 +1173,7 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -1140,17 +1199,17 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
         });
 
-
-        it('should return a list of models when all parameters are provided', (done) => {
+        it('should return a list of models when shortName is provided', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getModels(20, 20, ['name', '-description'], 'id1', ['tag1', 'tag2'], 'classification', 'modelName', 'description', ['image'], '2018-10-10T10:10:10', '2018-10-10T10:10:10').then((result) => {
+                leiaAPI.getModels(null, null, null, null, null, null, null, null, null, null, null, 'sname').then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1166,6 +1225,34 @@ describe('LeIA Model API', () => {
                     result.models[0].tags.should.be.eql(model.tags)
                     result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
+                    done()
+                })
+            })
+        });
+
+
+        it('should return a list of models when all parameters are provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.getModels(20, 20, ['name', '-description'], 'id1', ['tag1', 'tag2'], 'classification', 'modelName', 'description', ['image'], '2018-10-10T10:10:10', '2018-10-10T10:10:10', 'sname').then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
+                    result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -1224,6 +1311,7 @@ describe('LeIA Model API', () => {
                     result.tags.should.be.eql(model.tags)
                     result.allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -1313,6 +1401,7 @@ describe('LeIA Model API', () => {
                     result.tags.should.be.eql(model.tags)
                     result.allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -1357,6 +1446,7 @@ describe('LeIA Model API', () => {
                     result.tags.should.be.eql(model.tags)
                     result.allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -1401,7 +1491,7 @@ describe('LeIA Model API', () => {
         it('should return a model', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminUpdateModel(application.id, 'id1', 'modelName', 'modelDescription', 5, true, ['id1', 'id2']).then((result) => {
+                leiaAPI.adminUpdateModel(application.id, 'id1', 'modelName', 'modelDescription', 5, true, ['id1', 'id2'], 'sname').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(model.id)
                     result.creationTime.should.be.eql(model.creation_time)
@@ -1413,6 +1503,7 @@ describe('LeIA Model API', () => {
                     result.tags.should.be.eql(model.tags)
                     result.allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -1421,7 +1512,7 @@ describe('LeIA Model API', () => {
         it('should handle empty allowApplicationIds', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminUpdateModel(application.id, 'id1', 'modelName', 'modelDescription', 5, true, []).then((result) => {
+                leiaAPI.adminUpdateModel(application.id, 'id1', 'modelName', 'modelDescription', 5, true, [], 'sname').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(model.id)
                     result.creationTime.should.be.eql(model.creation_time)
@@ -1433,6 +1524,7 @@ describe('LeIA Model API', () => {
                     result.tags.should.be.eql(model.tags)
                     result.allowAllApplications.should.be.eql(model.allow_all_applications)
                     result.allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -1441,7 +1533,7 @@ describe('LeIA Model API', () => {
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminUpdateModel(application.id, 'id1', 'modelName4', 'modelDescription', 5, true, ['id1', 'id2']).then((result) => {
+                leiaAPI.adminUpdateModel(application.id, 'id1', 'modelName4', 'modelDescription', 5, true, ['id1', 'id2'], 'sname').then((result) => {
                 }).catch((error) => {
                     error.status.should.be.eql(400)
                     done()
@@ -1452,7 +1544,7 @@ describe('LeIA Model API', () => {
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminUpdateModel(application.id, 'id1', 'modelName2', 'modelDescription', 5, true, ['id1', 'id2']).then((result) => {
+                leiaAPI.adminUpdateModel(application.id, 'id1', 'modelName2', 'modelDescription', 5, true, ['id1', 'id2'], 'sname').then((result) => {
                 }).catch((error) => {
                     error.status.should.be.eql(401)
                     done()
@@ -1463,7 +1555,7 @@ describe('LeIA Model API', () => {
         it('should return a 404 status when LeiaAPI returns a 404 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminUpdateModel(application.id, 'id1', 'modelName3', 'modelDescription', 5, true, ['id1', 'id2']).then((result) => {
+                leiaAPI.adminUpdateModel(application.id, 'id1', 'modelName3', 'modelDescription', 5, true, ['id1', 'id2'], 'sname').then((result) => {
                 }).catch((error) => {
                     error.status.should.be.eql(404)
                     done()
@@ -1856,6 +1948,9 @@ describe('LeIA Model API', () => {
                     result.applicationId.should.be.eql(model.application_id)
                     result.inputTypes.should.be.eql(model.input_types)
                     result.tags.should.be.eql(model.tags)
+                    result.allowAllApplications.should.be.eql(model.allow_all_applications)
+                    result.allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -1909,6 +2004,9 @@ describe('LeIA Model API', () => {
                     result.applicationId.should.be.eql(model.application_id)
                     result.inputTypes.should.be.eql(model.input_types)
                     result.tags.should.be.eql(model.tags)
+                    result.allowAllApplications.should.be.eql(model.allow_all_applications)
+                    result.allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -1962,6 +2060,9 @@ describe('LeIA Model API', () => {
                     result.applicationId.should.be.eql(model.application_id)
                     result.inputTypes.should.be.eql(model.input_types)
                     result.tags.should.be.eql(model.tags)
+                    result.allowAllApplications.should.be.eql(model.allow_all_applications)
+                    result.allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.shortName.should.be.eql(model.short_name)
                     done()
                 })
             })
@@ -2015,6 +2116,9 @@ describe('LeIA Model API', () => {
                     result.applicationId.should.be.eql(model.application_id)
                     result.inputTypes.should.be.eql(model.input_types)
                     result.tags.should.be.eql(model.tags)
+                    result.allowAllApplications.should.be.eql(model.allow_all_applications)
+                    result.allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.shortName.should.be.eql(model.short_name)
                     done()
                 })
             })

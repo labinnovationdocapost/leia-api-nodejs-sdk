@@ -12,8 +12,9 @@ module.exports = class Model {
      * @param {boolean} allowAllApplications
      * @param {string[]} allowedApplicationIds
      * @param {string} applicationId 
+     * @param {string} shortName
      */
-    constructor(id, creationTime, description, ttl, inputTypes, name, tags, modelType, allowAllApplications, allowedApplicationIds, applicationId) {
+    constructor(id, creationTime, description, ttl, inputTypes, name, tags, modelType, allowAllApplications, allowedApplicationIds, applicationId, shortName) {
         this.id = id
         this.creationTime = creationTime
         this.description = description
@@ -25,5 +26,6 @@ module.exports = class Model {
         this.allowAllApplications = allowAllApplications
         this.allowedApplicationIds = allowedApplicationIds
         this.applicationId = applicationId
+        this.shortName = shortName
     }
 }

@@ -147,19 +147,19 @@ function mockApplicationAPI() {
         .reply(400, null);
 
     nock(serverURL)
-        .post('/admin/application', { application_name: 'appName', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com', dedicated_workers: 'true', dedicated_workers_ttl: 70 })
+        .post('/admin/application', { application_name: 'appName', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com', dedicated_workers: true, dedicated_workers_ttl: 70 })
         .reply(200, application);
 
     nock(serverURL)
-        .post('/admin/application', { application_name: 'appName2', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com', dedicated_workers: 'true', dedicated_workers_ttl: 70 })
+        .post('/admin/application', { application_name: 'appName2', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com', dedicated_workers: true, dedicated_workers_ttl: 70 })
         .reply(401, application);
 
     nock(serverURL)
-        .post('/admin/application', { application_name: 'appName3', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com', dedicated_workers: 'true', dedicated_workers_ttl: 70 })
+        .post('/admin/application', { application_name: 'appName3', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com', dedicated_workers: true, dedicated_workers_ttl: 70 })
         .reply(409, application);
 
     nock(serverURL)
-        .post('/admin/application', { application_name: 'appName4', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com', dedicated_workers: 'true', dedicated_workers_ttl: 70 })
+        .post('/admin/application', { application_name: 'appName4', application_type: 'admin', email: 'test@test.com', first_name: 'jean', last_name: 'test', default_job_callback_url: 'http://test.com', dedicated_workers: true, dedicated_workers_ttl: 70 })
         .reply(400, application);
 
     nock(serverURL)
