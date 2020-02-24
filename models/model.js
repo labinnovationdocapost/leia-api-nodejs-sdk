@@ -13,8 +13,10 @@ module.exports = class Model {
      * @param {string[]} allowedApplicationIds
      * @param {string} applicationId 
      * @param {string} shortName
+     * @param {string} documentation
+     * @param {object} outputFormat
      */
-    constructor(id, creationTime, description, ttl, inputTypes, name, tags, modelType, allowAllApplications, allowedApplicationIds, applicationId, shortName) {
+    constructor(id, creationTime, description, ttl, inputTypes, name, tags, modelType, allowAllApplications, allowedApplicationIds, applicationId, shortName, documentation, outputFormat) {
         this.id = id
         this.creationTime = creationTime
         this.description = description
@@ -27,5 +29,7 @@ module.exports = class Model {
         this.allowedApplicationIds = allowedApplicationIds
         this.applicationId = applicationId
         this.shortName = shortName
+        this.documentation = documentation
+        this.outputFormat = outputFormat
     }
 }
