@@ -346,7 +346,7 @@ module.exports = class LeiaAPI {
             query += firstChar + 'allow_all_applications=' + allowAllApplications
         }
 
-        if (allowedApplicationIds) {
+        if (allowedApplicationIds !== null) {
             if (allowedApplicationIds.length === 0) {
                 query += firstChar + 'allowed_application_ids='
             } else {
@@ -357,7 +357,7 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
-        if (shortName) {
+        if (shortName !== null) {
             query += firstChar + "short_name=" + shortName
         }
 
