@@ -118,7 +118,11 @@ function mockModelAPI() {
         .reply(200, [model], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/admin/model?offset=20&limit=20&sort=name,-description&application_id=appId1&model_id=id1&tags=tag1&tags=tag2&model_type=classification&name=modelName&description=description&input_types=image&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10&short_name=sname')
+        .get('/admin/model?only_mine=true')
+        .reply(200, [model], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/admin/model?offset=20&limit=20&sort=name,-description&application_id=appId1&model_id=id1&tags=tag1&tags=tag2&model_type=classification&name=modelName&description=description&input_types=image&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10&short_name=sname&only_mine=true')
         .reply(200, [model], { 'content-range': '0-1/1' });
 
     nock(serverURL)
@@ -206,7 +210,11 @@ function mockModelAPI() {
         .reply(200, [model], { 'content-range': '0-1/1' });
 
     nock(serverURL)
-        .get('/model?offset=20&limit=20&sort=name,-description&model_id=id1&tags=tag1&tags=tag2&model_type=classification&name=modelName&description=description&input_types=image&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10&short_name=sname')
+        .get('/model?only_mine=true')
+        .reply(200, [model], { 'content-range': '0-1/1' });
+
+    nock(serverURL)
+        .get('/model?offset=20&limit=20&sort=name,-description&model_id=id1&tags=tag1&tags=tag2&model_type=classification&name=modelName&description=description&input_types=image&created_after=2018-10-10T10:10:10&created_before=2018-10-10T10:10:10&short_name=sname&only_mine=true')
         .reply(200, [model], { 'content-range': '0-1/1' });
 
     nock(serverURL)
@@ -830,7 +838,7 @@ describe('LeIA Model API', () => {
             })
         });
 
-        it('should return a list of models when shoetName is provided', (done) => {
+        it('should return a list of models when shortName is provided', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
@@ -858,11 +866,39 @@ describe('LeIA Model API', () => {
             })
         });
 
+        it('should return a list of models when onlyMine is provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.adminGetModels(null, null, null, null, null, null, null, null, null, null, null, null, null, true).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
+                    result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
+                    result.models[0].documentation.should.be.eql(model.documentation)
+                    result.models[0].outputFormat.should.be.eql(model.output_format)
+                    done()
+                })
+            })
+        });
+
         it('should return a list of models when all parameters are provided', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.adminGetModels(20, 20, ['name', '-description'], 'appId1', 'id1', ['tag1', 'tag2'], 'classification', 'modelName', 'description', ['image'], '2018-10-10T10:10:10', '2018-10-10T10:10:10', 'sname').then((result) => {
+                leiaAPI.adminGetModels(20, 20, ['name', '-description'], 'appId1', 'id1', ['tag1', 'tag2'], 'classification', 'modelName', 'description', ['image'], '2018-10-10T10:10:10', '2018-10-10T10:10:10', 'sname', true).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)
@@ -1289,12 +1325,39 @@ describe('LeIA Model API', () => {
             })
         });
 
+        it('should return a list of models when onlyMine is provided', (done) => {
+            var leiaAPI = new LeiaAPI(serverURL)
+            leiaAPI.login('mockApiKey').then((_) => {
+
+                leiaAPI.getModels(null, null, null, null, null, null, null, null, null, null, null, null, true).then((result) => {
+                    result.contentRange.offset.should.be.eql(0)
+                    result.contentRange.limit.should.be.eql(1)
+                    result.contentRange.total.should.be.eql(1)
+                    result.models.should.be.a('array');
+                    result.models.length.should.be.eql(1)
+                    result.models[0].id.should.be.eql(model.id)
+                    result.models[0].creationTime.should.be.eql(model.creation_time)
+                    result.models[0].name.should.be.eql(model.name)
+                    result.models[0].description.should.be.eql(model.description)
+                    result.models[0].modelType.should.be.eql(model.model_type)
+                    result.models[0].applicationId.should.be.eql(model.application_id)
+                    result.models[0].inputTypes.should.be.eql(model.input_types)
+                    result.models[0].tags.should.be.eql(model.tags)
+                    result.models[0].allowAllApplications.should.be.eql(model.allow_all_applications)
+                    result.models[0].allowedApplicationIds.should.be.eql(model.allowed_application_ids)
+                    result.models[0].shortName.should.be.eql(model.short_name)
+                    result.models[0].documentation.should.be.eql(model.documentation)
+                    result.models[0].outputFormat.should.be.eql(model.output_format)
+                    done()
+                })
+            })
+        });
 
         it('should return a list of models when all parameters are provided', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
 
-                leiaAPI.getModels(20, 20, ['name', '-description'], 'id1', ['tag1', 'tag2'], 'classification', 'modelName', 'description', ['image'], '2018-10-10T10:10:10', '2018-10-10T10:10:10', 'sname').then((result) => {
+                leiaAPI.getModels(20, 20, ['name', '-description'], 'id1', ['tag1', 'tag2'], 'classification', 'modelName', 'description', ['image'], '2018-10-10T10:10:10', '2018-10-10T10:10:10', 'sname', true).then((result) => {
                     result.contentRange.offset.should.be.eql(0)
                     result.contentRange.limit.should.be.eql(1)
                     result.contentRange.total.should.be.eql(1)

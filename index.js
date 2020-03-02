@@ -414,11 +414,12 @@ module.exports = class LeiaAPI {
     * @param {string} createdAfter (optional) - only return models created after a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @param {string} createdBefore (optional) - only return models created before a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @param {string} shortName (optional) - filter by shortName
+    * @param {boolean} onlyMine (optional) - If true, only show application models 
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, models: [Model]}]
     */
 
     adminGetModels(offset = null, limit = null, sort = null, applicationId = null, modelId = null, tags = null, modelType = null, name = null, 
-        description = null, inputTypes = null, createdAfter = null, createdBefore = null, shortName = null) {
+        description = null, inputTypes = null, createdAfter = null, createdBefore = null, shortName = null, onlyMine = null) {
         var offsetStr = ""
         var limitStr = ""
         var sortStr = ""
@@ -432,6 +433,7 @@ module.exports = class LeiaAPI {
         var createdAfterStr = ""
         var createdBeforeStr = ""
         var shortNameStr = ""
+        var onlyMineStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -499,6 +501,11 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
+        if (onlyMine !== null) {
+            onlyMineStr += firstChar + 'only_mine=' + onlyMine.toString()
+            firstChar = "&"
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -507,7 +514,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/admin/model' + offsetStr + limitStr + sortStr + applicationIdStr + modelIdStr + tagsStr + 
-               modelTypeStr + nameStr + descriptionStr + inputTypesStr + createdAfterStr + createdBeforeStr + shortNameStr, true, true, that.autoRefreshToken).then((result) => {
+               modelTypeStr + nameStr + descriptionStr + inputTypesStr + createdAfterStr + createdBeforeStr + shortNameStr + onlyMineStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var models = []
@@ -540,11 +547,12 @@ module.exports = class LeiaAPI {
     * @param {string} createdAfter (optional) - only return models created after a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @param {string} createdBefore (optional) - only return models created before a certain date (ISO 8601 format : yyyy-MM-ddThh:mm:ss)
     * @param {string} shortName (optional) - filter by shortName
+    * @param {boolean} onlyMine (optional) - If true, only show application models 
     * @returns {object[]} a list of objects with the following format: [{contentRange: { offset: 0, limit: 10, total: 100 }, models: [Model]}]
     */
 
     getModels(offset = null, limit = null, sort = null, modelId = null, tags = null, modelType = null, name = null, 
-        description = null, inputTypes = null, createdAfter = null, createdBefore = null, shortName = null) {
+        description = null, inputTypes = null, createdAfter = null, createdBefore = null, shortName = null, onlyMine = null) {
         var offsetStr = ""
         var limitStr = ""
         var sortStr = ""
@@ -557,6 +565,7 @@ module.exports = class LeiaAPI {
         var createdAfterStr = ""
         var createdBeforeStr = ""
         var shortNameStr = ""
+        var onlyMineStr = ""
         var firstChar = "?"
 
         if (offset !== null) {
@@ -618,6 +627,11 @@ module.exports = class LeiaAPI {
             shortNameStr += firstChar + 'short_name=' + shortName
             firstChar = "&"
         }
+
+        if (onlyMine !== null) {
+            onlyMineStr += firstChar + 'only_mine=' + onlyMine.toString()
+            firstChar = "&"
+        }
         
         var that = this
         return new Promise(function (resolve, reject) {
@@ -626,7 +640,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/model' + offsetStr + limitStr + sortStr + modelIdStr + tagsStr + modelTypeStr + nameStr + descriptionStr + inputTypesStr + createdAfterStr + createdBeforeStr + shortNameStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/model' + offsetStr + limitStr + sortStr + modelIdStr + tagsStr + modelTypeStr + nameStr + descriptionStr + inputTypesStr + createdAfterStr + createdBeforeStr + shortNameStr + onlyMineStr, true, true, that.autoRefreshToken).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var models = []
