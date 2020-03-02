@@ -250,19 +250,19 @@ function mockModelAPI() {
         .reply(404, null);
 
     nock(serverURL)
-        .post('/admin/' + application.id + '/model?name=modelName&description=modelDescription&ttl=5&tags=tag1&tags=tag2&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2')
+        .post('/admin/' + application.id + '/model?name=modelName&description=modelDescription&ttl=5&tags=tag1&tags=tag2&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2&short_name=sname')
         .reply(200, model);
 
     nock(serverURL)
-        .post('/admin/' + application.id + '/model?name=modelName2&description=modelDescription&ttl=5&tags=tag1&tags=tag2&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2')
+        .post('/admin/' + application.id + '/model?name=modelName2&description=modelDescription&ttl=5&tags=tag1&tags=tag2&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2&short_name=sname')
         .reply(401, null);
 
     nock(serverURL)
-        .post('/admin/' + application.id + '/model?name=modelName3&description=modelDescription&ttl=5&tags=tag1&tags=tag2&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2')
+        .post('/admin/' + application.id + '/model?name=modelName3&description=modelDescription&ttl=5&tags=tag1&tags=tag2&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2&short_name=sname')
         .reply(409, null);
 
     nock(serverURL)
-        .post('/admin/' + application.id + '/model?name=modelName4&description=modelDescription&ttl=5&tags=tag1&tags=tag2&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2')
+        .post('/admin/' + application.id + '/model?name=modelName4&description=modelDescription&ttl=5&tags=tag1&tags=tag2&allow_all_applications=true&allowed_application_ids=id1&allowed_application_ids=id2&short_name=sname')
         .reply(400, null);
 
     nock(serverURL)
@@ -1561,7 +1561,7 @@ describe('LeIA Model API', () => {
         it('should return a model', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddModel(application.id, 'modelName', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2'], true, ['id1', 'id2']).then((result) => {
+                leiaAPI.adminAddModel(application.id, 'modelName', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2'], true, ['id1', 'id2'], 'sname').then((result) => {
                     result.should.be.a('object');
                     result.id.should.be.eql(model.id)
                     result.creationTime.should.be.eql(model.creation_time)
@@ -1584,7 +1584,7 @@ describe('LeIA Model API', () => {
         it('should return a 400 status when LeiaAPI returns a 400 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddModel(application.id, 'modelName4', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2'], true, ['id1', 'id2']).then((result) => {
+                leiaAPI.adminAddModel(application.id, 'modelName4', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2'], true, ['id1', 'id2'], 'sname').then((result) => {
                 }).catch((error) => {
                     error.status.should.be.eql(400)
                     done()
@@ -1595,7 +1595,7 @@ describe('LeIA Model API', () => {
         it('should return a 401 status when LeiaAPI returns a 401 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddModel(application.id, 'modelName2', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2'], true, ['id1', 'id2']).then((result) => {
+                leiaAPI.adminAddModel(application.id, 'modelName2', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2'], true, ['id1', 'id2'], 'sname').then((result) => {
                 }).catch((error) => {
                     error.status.should.be.eql(401)
                     done()
@@ -1606,7 +1606,7 @@ describe('LeIA Model API', () => {
         it('should return a 409 status when LeiaAPI returns a 409 status', (done) => {
             var leiaAPI = new LeiaAPI(serverURL)
             leiaAPI.login('mockApiKey').then((_) => {
-                leiaAPI.adminAddModel(application.id, 'modelName3', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2'], true, ['id1', 'id2']).then((result) => {
+                leiaAPI.adminAddModel(application.id, 'modelName3', Buffer.from([0xff, 0x11]), 'modelDescription', 5, ['tag1', 'tag2'], true, ['id1', 'id2'], 'sname').then((result) => {
                 }).catch((error) => {
                     error.status.should.be.eql(409)
                     done()
