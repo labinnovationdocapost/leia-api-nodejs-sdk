@@ -182,7 +182,7 @@ module.exports = class LeiaAPI {
     * (promise) Add a Model (admin)
     * @param {string} applicationId - an Application id
     * @param {string} name - a Model name
-    * @param {Buffer} fileBuffer - a model file zip buffer. The model inside the zip should have a valid name.
+    * @param {Buffer|string} file - a model file. Can be a buffer or a path. The model inside the zip should have a valid name.
     * @param {string} description (optional) - a Model description
     * @param {integer} ttl (optional) - a ttl value in seconds
     * @param {string[]} tags (optional) - a list of tags
@@ -192,7 +192,7 @@ module.exports = class LeiaAPI {
     * @returns {Model}
     */
 
-    adminAddModel(applicationId, name, fileBuffer, description = null, ttl = null, tags = null, allowAllApplications = null, allowedApplicationIds = null, shortName = null) {
+    adminAddModel(applicationId, name, file, description = null, ttl = null, tags = null, allowAllApplications = null, allowedApplicationIds = null, shortName = null) {
         var that = this
         var tagsStr = ""
         var allowedApplicationIdsStr = ""
@@ -216,7 +216,7 @@ module.exports = class LeiaAPI {
             + (ttl !== null ? '&ttl=' + ttl : '') 
             + tagsStr + (allowAllApplications !== null ? '&allow_all_applications=' + allowAllApplications : '') 
             + allowedApplicationIdsStr
-            + (shortName ? "&short_name=" + shortName : ''), fileBuffer, true, that.autoRefreshToken).then((body) => {
+            + (shortName ? "&short_name=" + shortName : ''), file, true, that.autoRefreshToken).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format))
             }).catch((error) => {
                 reject(error)
@@ -754,13 +754,13 @@ module.exports = class LeiaAPI {
     * (promise) Add a Document (admin)
     * @param {string} applicationId - an Application id
     * @param {string} fileName - a document file name
-    * @param {Buffer} fileBuffer - a document file buffer
+    * @param {Buffer|string} file - a document file. Can be a buffer or a path
     * @param {string[]} tags (optional) - a list of tags
     * @param {integer} ttl (optional) - a TTL in seconds
     * @returns {Document}
     */
 
-    adminAddDocument(applicationId, fileName, fileBuffer, tags = null, ttl = null) {
+    adminAddDocument(applicationId, fileName, file, tags = null, ttl = null) {
         var tagsStr = ""
         var ttlStr = ""
         var firstChar = "&"
@@ -780,7 +780,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/document?filename=' + fileName + tagsStr + ttlStr, fileBuffer, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/document?filename=' + fileName + tagsStr + ttlStr, file, true, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
@@ -791,13 +791,13 @@ module.exports = class LeiaAPI {
     /**
     * (promise) Add a Document
     * @param {string} fileName - a document file name
-    * @param {Buffer} fileBuffer - a document file buffer
+    * @param {Buffer|string} file - a document file. Can be a buffer or a path
     * @param {string[]} tags (optional) - a list of tags
     * @param {integer} ttl (optional) - a TTL in seconds
     * @returns {Document}
     */
 
-    addDocument(fileName, fileBuffer, tags = null, ttl = null) {
+    addDocument(fileName, file, tags = null, ttl = null) {
         var ttlStr = ""
         var tagsStr = ""
         var firstChar = "&"
@@ -817,7 +817,7 @@ module.exports = class LeiaAPI {
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/document?filename=' + fileName + tagsStr + ttlStr, fileBuffer, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.streamPost(that.serverURL + '/document?filename=' + fileName + tagsStr + ttlStr, file, true, that.autoRefreshToken).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)

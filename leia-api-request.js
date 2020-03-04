@@ -1,5 +1,6 @@
 var request = require('request');
 var streamifier = require('streamifier')
+var fs = require('fs')
 
 module.exports = class LeiaAPIRequest {
 
@@ -94,12 +95,21 @@ module.exports = class LeiaAPIRequest {
         })
     }
     
-    streamPost(url, dataStream, json, refreshToken) {
+    streamPost(url, bufferOrPath, json, refreshToken) {
         var args = [...arguments]
         var that = this
+        
+        var readStream = null
+
+        if (typeof bufferOrPath === 'string' || bufferOrPath instanceof String) {
+            readStream = fs.createReadStream(bufferOrPath);
+        } else {
+            readStream = streamifier.createReadStream(bufferOrPath)
+        }
+
         return new Promise(function (resolve, reject) {
             var headers = { 'content-type': 'application/octet-stream', 'token': that.token }
-            streamifier.createReadStream(dataStream).pipe(request.post({ url: url, json: json, headers: headers },
+            readStream.pipe(request.post({ url: url, json: json, headers: headers },
                 (err, response, body) => {
                     return that.handleLeiaIOResponse(err, response, body, that.streamPost, args, false, refreshToken).then((body) => {
                         resolve(body)
