@@ -11,9 +11,11 @@ module.exports = class Application {
      * @param {object} jobCounts
      * @param {boolean} dedicatedWorkers
      * @param {integer} dedicatedWorkersTtl
+     * @param {object[]} alwaysOnSchedules
+     * @param {string[]} alwaysOnWorkersModelIds
      * @param {string} apiKey 
      */
-   constructor(id, creationTime, applicationType, email, applicationName, firstname, lastname, defaultJobCallbackUrl, jobCounts, dedicatedWorkers, dedicatedWorkersTtl, apiKey) {
+   constructor(id, creationTime, applicationType, email, applicationName, firstname, lastname, defaultJobCallbackUrl, jobCounts, dedicatedWorkers, dedicatedWorkersTtl, alwaysOnSchedules, alwaysOnWorkersModelIds, apiKey) {
        this.id = id
        this.creationTime = creationTime
        this.applicationType = applicationType
@@ -25,6 +27,8 @@ module.exports = class Application {
        this.jobCounts = jobCounts
        this.dedicatedWorkers = dedicatedWorkers
        this.dedicatedWorkersTtl = dedicatedWorkersTtl
+       this.alwaysOnSchedules = alwaysOnSchedules
+       this.alwaysOnWorkersModelIds = alwaysOnWorkersModelIds
        this.apiKey = apiKey
    }
 }

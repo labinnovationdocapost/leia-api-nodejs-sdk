@@ -39,7 +39,7 @@ module.exports = class LeiaAPI {
         return new Promise(function (resolve, reject) {
             leiaAPIRequest.login().then((body) => {
                 that.leiaAPIRequest = leiaAPIRequest
-                resolve(new Application(body.application.id, body.application.creation_time, body.application.application_type, body.application.email, body.application.application_name, body.application.first_name, body.application.last_name, body.application.default_job_callback_url, body.application.job_counts, body.application.dedicated_workers, body.application.dedicated_workers_ttl, body.application.api_key))
+                resolve(new Application(body.application.id, body.application.creation_time, body.application.application_type, body.application.email, body.application.application_name, body.application.first_name, body.application.last_name, body.application.default_job_callback_url, body.application.job_counts, body.application.dedicated_workers, body.application.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.application.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -166,7 +166,7 @@ module.exports = class LeiaAPI {
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var applications = []
                 for (var i = 0; i < body.length; i++) {
-                    applications.push(new Application(body[i].id, body[i].creation_time, body[i].application_type, body[i].email, body[i].application_name, body[i].first_name, body[i].last_name, body[i].default_job_callback_url, body[i].job_counts, body[i].dedicated_workers, body[i].dedicated_workers_ttl, body[i].api_key))
+                    applications.push(new Application(body[i].id, body[i].creation_time, body[i].application_type, body[i].email, body[i].application_name, body[i].first_name, body[i].last_name, body[i].default_job_callback_url, body[i].job_counts, body[i].dedicated_workers, body[i].dedicated_workers_ttl, body[i].always_on_schedules, body[i].always_on_workers_model_ids, body[i].api_key))
                 }
                 resolve({ contentRange, applications })
             }).catch((error) => {
@@ -264,7 +264,7 @@ module.exports = class LeiaAPI {
             }
 
             that.leiaAPIRequest.post(that.serverURL + '/admin/application', application, true, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.api_key))
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -316,6 +316,91 @@ module.exports = class LeiaAPI {
     }
 
     /**
+     * Update an Application (admin)
+     * @param {string} defaultJobCallbackUrl (optional) - a default job callback url
+     * @param {boolean} dedicatedWorkers (optional) - determine whether or not an Application has dedicated workers
+     * @param {integer} dedicatedWorkersTtl (optional) - TTL for an Application
+     * @param {integer} alwaysOnNumber (optional) - number of always on workers
+     * @param {integer[]} alwaysOnStartDays (optional) - list of days from 1 to 7
+     * @param {integer} alwaysOnStartHour (optional) - an hour to start
+     * @param {integer} alwaysOnStopHour (optional) - an hour to stop
+     * @param {integer} alwaysOnStartMinute (optional) - minutes to start
+     * @param {integer} alwaysOnStopMinute (optional) - minutes to stop
+     * @param {string[]} alwaysOnWorkersModelIds (optional) - a list of model ids for always on workers
+     * @returns {Application} an Application object
+     */
+
+    adminUpdateApplication(applicationId, defaultJobCallbackUrl = null, dedicatedWorkers = null, dedicatedWorkersTtl = null, alwaysOnNumber = null, alwaysOnStartDays = null, alwaysOnStartHour = null, alwaysOnStopHour = null, alwaysOnStartMinute = null, alwaysOnStopMinute = null, alwaysOnWorkersModelIds = null) {
+        var query = ""
+        var firstChar = "?"
+        
+        if (defaultJobCallbackUrl !== null) {
+            query += firstChar + "default_job_callback_url=" + defaultJobCallbackUrl
+            firstChar = "&"
+        }
+
+        if (dedicatedWorkers !== null) {
+            query += firstChar + "dedicated_workers=" + dedicatedWorkers.toString()
+            firstChar = "&"
+        }
+
+        if (dedicatedWorkersTtl !== null) {
+            query += firstChar + "dedicated_workers_ttl=" + dedicatedWorkersTtl.toString()
+            firstChar = "&"
+        }
+        
+        if (alwaysOnNumber !== null) {
+            query += firstChar + "always_on_number=" + alwaysOnNumber.toString()
+            firstChar = "&"
+        }
+
+        for (var i = 0; alwaysOnStartDays && i < alwaysOnStartDays.length; i++) {
+            query += firstChar + 'always_on_start_days=' + alwaysOnStartDays[i].toString()
+            firstChar = "&"
+        }
+
+        if (alwaysOnStartHour !== null) {
+            query += firstChar + "always_on_start_hour=" + alwaysOnStartHour.toString()
+            firstChar = "&"
+        }
+
+        if (alwaysOnStopHour !== null) {
+            query += firstChar + "always_on_stop_hour=" + alwaysOnStopHour.toString()
+            firstChar = "&"
+        }
+
+        if (alwaysOnStartMinute !== null) {
+            query += firstChar + "always_on_start_minute=" + alwaysOnStartMinute.toString()
+            firstChar = "&"
+        }
+
+        if (alwaysOnStopMinute !== null) {
+            query += firstChar + "always_on_stop_minute=" + alwaysOnStopMinute.toString()
+            firstChar = "&"
+        }
+
+        for (var i = 0; alwaysOnWorkersModelIds && i < alwaysOnWorkersModelIds.length; i++) {
+            query += firstChar + 'always_on_workers_model_ids=' + alwaysOnWorkersModelIds[i].toString()
+            firstChar = "&"
+        }
+
+        var that = this
+        return new Promise(function (resolve, reject) {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.patch(that.serverURL + '/admin/application/' + applicationId + query, {}, true, that.autoRefreshToken).then((body) => {
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+
+    }
+
+    /**
      * (promise) Update a Model (admin)
      * @param {string} applicationId - an Application id
      * @param {string} modelId - a Model id
@@ -361,6 +446,7 @@ module.exports = class LeiaAPI {
 
         if (shortName !== null) {
             query += firstChar + "short_name=" + shortName
+            firstChar = "&"
         }
 
         var that = this
@@ -743,7 +829,30 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/admin/application/' + applicationId, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.api_key))
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+    /**
+     * (promoise) Delete a schedule
+     * @param {string} applicationId - an Application id
+     * @param {string} scheduleId - a schedule id
+     * @returns {Application}
+     */
+
+    adminDeleteSchedule(applicationId, scheduleId) {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.del(that.serverURL + '/admin/application/' + applicationId + '/always_on_schedules/' + scheduleId, true, that.autoRefreshToken).then((body) => {
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
