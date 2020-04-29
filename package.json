@@ -1,6 +1,6 @@
 {
   "name": "leia-api-sdk",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "LEIA API allows you to use a wide range of Deep Learning tools to inject intelligence in your projects.",
   "main": "index.js",
   "repository": {
@@ -8,7 +8,11 @@
     "url": "https://github.com/labinnovationdocapost/leia-api-nodejs-sdk.git"
   },
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "test": "mocha --timeout 10000"
+  },
+  "resolutions": {
+    "minimist": "^1.2.5"
   },
   "keywords": [
     "leiaws",
