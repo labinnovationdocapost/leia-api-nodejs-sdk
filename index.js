@@ -7,6 +7,7 @@ var Worker = require('./models/worker')
 var LeiaAPIRequest = require('./leia-api-request')
 var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils')
 
+
 /**
  * LeIA API communication class
  * @class
@@ -317,6 +318,10 @@ module.exports = class LeiaAPI {
 
     /**
      * Update an Application (admin)
+     * @param {string} email - an Application owner's email
+     * @param {string} applicationName - an Application name
+     * @param {string} firstname - an Application owner's firstname
+     * @param {string} lastname - an Application owner's lastname
      * @param {string} defaultJobCallbackUrl (optional) - a default job callback url
      * @param {boolean} dedicatedWorkers (optional) - determine whether or not an Application has dedicated workers
      * @param {integer} dedicatedWorkersTtl (optional) - TTL for an Application
@@ -330,9 +335,29 @@ module.exports = class LeiaAPI {
      * @returns {Application} an Application object
      */
 
-    adminUpdateApplication(applicationId, defaultJobCallbackUrl = null, dedicatedWorkers = null, dedicatedWorkersTtl = null, alwaysOnNumber = null, alwaysOnStartDays = null, alwaysOnStartHour = null, alwaysOnStopHour = null, alwaysOnStartMinute = null, alwaysOnStopMinute = null, alwaysOnWorkersModelIds = null) {
+    adminUpdateApplication(applicationId, email, applicationName, firstname, lastname, defaultJobCallbackUrl = null, dedicatedWorkers = null, dedicatedWorkersTtl = null, alwaysOnNumber = null, alwaysOnStartDays = null, alwaysOnStartHour = null, alwaysOnStopHour = null, alwaysOnStartMinute = null, alwaysOnStopMinute = null, alwaysOnWorkersModelIds = null) {
         var query = ""
         var firstChar = "?"
+
+        if (email !== null) {
+            query += firstChar + "email=" + email
+            firstChar = "&"
+        }
+
+        if (applicationName !== null) {
+            query += firstChar + "application_name=" + applicationName
+            firstChar = "&"
+        }
+
+        if (firstname !== null) {
+            query += firstChar + "first_name=" + firstname
+            firstChar = "&"
+        }
+
+        if (lastname !== null) {
+            query += firstChar + "last_name=" + lastname
+            firstChar = "&"
+        }
         
         if (defaultJobCallbackUrl !== null) {
             query += firstChar + "default_job_callback_url=" + defaultJobCallbackUrl
