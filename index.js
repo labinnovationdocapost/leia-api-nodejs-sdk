@@ -287,7 +287,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.post(that.serverURL + '/admin/application/' + applicationId + '/reset_api_key', {}, true, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.api_key))
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
