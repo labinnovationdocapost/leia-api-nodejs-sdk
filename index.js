@@ -40,7 +40,7 @@ module.exports = class LeiaAPI {
         return new Promise(function (resolve, reject) {
             leiaAPIRequest.login().then((body) => {
                 that.leiaAPIRequest = leiaAPIRequest
-                resolve(new Application(body.application.id, body.application.creation_time, body.application.application_type, body.application.email, body.application.application_name, body.application.first_name, body.application.last_name, body.application.default_job_callback_url, body.application.job_counts, body.application.dedicated_workers, body.application.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.application.api_key))
+                resolve(new Application(body.application.id, body.application.creation_time, body.application.application_type, body.application.email, body.application.application_name, body.application.first_name, body.application.last_name, body.application.default_job_callback_url, body.application.job_counts, body.application.dedicated_workers, body.application.dedicated_workers_ttl, body.dedicated_workers_max_models, body.always_on_schedules, body.always_on_workers_model_ids, body.application.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -167,7 +167,7 @@ module.exports = class LeiaAPI {
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var applications = []
                 for (var i = 0; i < body.length; i++) {
-                    applications.push(new Application(body[i].id, body[i].creation_time, body[i].application_type, body[i].email, body[i].application_name, body[i].first_name, body[i].last_name, body[i].default_job_callback_url, body[i].job_counts, body[i].dedicated_workers, body[i].dedicated_workers_ttl, body[i].always_on_schedules, body[i].always_on_workers_model_ids, body[i].api_key))
+                    applications.push(new Application(body[i].id, body[i].creation_time, body[i].application_type, body[i].email, body[i].application_name, body[i].first_name, body[i].last_name, body[i].default_job_callback_url, body[i].job_counts, body[i].dedicated_workers, body[i].dedicated_workers_ttl, body[i].dedicated_workers_max_models, body[i].always_on_schedules, body[i].always_on_workers_model_ids, body[i].api_key))
                 }
                 resolve({ contentRange, applications })
             }).catch((error) => {
@@ -235,10 +235,11 @@ module.exports = class LeiaAPI {
     * @param {string} defaultJobCallbackUrl (optional) - a default job callback url
     * @param {boolean} dedicatedWorkers (optional) - determine whether or not an Application has dedicated workers
     * @param {integer} dedicatedWorkersTtl (optional) - TTL for an Application
+    * @param {integer} dedicatedWorkersMaxModels (optional) - Max number of models per dedicated worker
     * @returns {Application}
     */
 
-    adminAddApplication(email, applicationName, applicationType, firstname, lastname, defaultJobCallbackUrl = null, dedicatedWorkers = null, dedicatedWorkersTtl = null) {
+    adminAddApplication(email, applicationName, applicationType, firstname, lastname, defaultJobCallbackUrl = null, dedicatedWorkers = null, dedicatedWorkersTtl = null, dedicatedWorkersMaxModels = null) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -264,8 +265,12 @@ module.exports = class LeiaAPI {
                 application['dedicated_workers_ttl'] = dedicatedWorkersTtl
             }
 
+            if (dedicatedWorkersMaxModels !== null) {
+                application['dedicated_workers_max_models'] = dedicatedWorkersMaxModels
+            }
+
             that.leiaAPIRequest.post(that.serverURL + '/admin/application', application, true, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.dedicated_workers_max_models, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -287,7 +292,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.post(that.serverURL + '/admin/application/' + applicationId + '/reset_api_key', {}, true, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.dedicated_workers_max_models, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -325,6 +330,7 @@ module.exports = class LeiaAPI {
      * @param {string} defaultJobCallbackUrl (optional) - a default job callback url
      * @param {boolean} dedicatedWorkers (optional) - determine whether or not an Application has dedicated workers
      * @param {integer} dedicatedWorkersTtl (optional) - TTL for an Application
+     * @param {integer} dedicatedWorkersMaxModels (optional) - Max number of models per dedicated worker
      * @param {integer} alwaysOnNumber (optional) - number of always on workers
      * @param {integer[]} alwaysOnStartDays (optional) - list of days from 1 to 7
      * @param {integer} alwaysOnStartHour (optional) - an hour to start
@@ -335,7 +341,7 @@ module.exports = class LeiaAPI {
      * @returns {Application} an Application object
      */
 
-    adminUpdateApplication(applicationId, email, applicationName, firstname, lastname, defaultJobCallbackUrl = null, dedicatedWorkers = null, dedicatedWorkersTtl = null, alwaysOnNumber = null, alwaysOnStartDays = null, alwaysOnStartHour = null, alwaysOnStopHour = null, alwaysOnStartMinute = null, alwaysOnStopMinute = null, alwaysOnWorkersModelIds = null) {
+    adminUpdateApplication(applicationId, email, applicationName, firstname, lastname, defaultJobCallbackUrl = null, dedicatedWorkers = null, dedicatedWorkersTtl = null, dedicatedWorkersMaxModels = null, alwaysOnNumber = null, alwaysOnStartDays = null, alwaysOnStartHour = null, alwaysOnStopHour = null, alwaysOnStartMinute = null, alwaysOnStopMinute = null, alwaysOnWorkersModelIds = null) {
         var query = ""
         var firstChar = "?"
 
@@ -371,6 +377,11 @@ module.exports = class LeiaAPI {
 
         if (dedicatedWorkersTtl !== null) {
             query += firstChar + "dedicated_workers_ttl=" + dedicatedWorkersTtl.toString()
+            firstChar = "&"
+        }
+
+        if (dedicatedWorkersMaxModels !== null) {
+            query += firstChar + "dedicated_workers_max_models=" + dedicatedWorkersMaxModels.toString()
             firstChar = "&"
         }
         
@@ -417,7 +428,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.patch(that.serverURL + '/admin/application/' + applicationId + query, {}, true, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.dedicated_workers_max_models, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -854,7 +865,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/admin/application/' + applicationId, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.dedicated_workers_max_models, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -877,7 +888,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.del(that.serverURL + '/admin/application/' + applicationId + '/always_on_schedules/' + scheduleId, true, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.dedicated_workers_max_models, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
