@@ -1,6 +1,6 @@
 {
   "name": "leia-api-sdk",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "LEIA API allows you to use a wide range of Deep Learning tools to inject intelligence in your projects.",
   "main": "index.js",
   "repository": {
