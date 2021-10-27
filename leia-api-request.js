@@ -12,7 +12,10 @@ module.exports = class LeiaAPIRequest {
         var that = this
         url = encodeURI(url)
         return new Promise(function (resolve, reject) {
-            var headers = { 'token': that.token }
+            var headers = {}
+            if (that.token !== null) {
+                headers['token'] = that.token
+            }
 
             request.post({ url: url, body: body, json: json, headers: headers },
                 (err, response, body) => {
@@ -146,7 +149,10 @@ module.exports = class LeiaAPIRequest {
         this.token = null
         var that = this
         return new Promise(function (resolve, reject) {
-            that.get(that.serverURL + '/login/' + apiKey, true, false, false).then((body) => {
+            const body = {
+                api_key: apiKey
+            }
+            that.post(that.serverURL + '/login', body,  true).then((body) => {
                 that.token = body.token
                 resolve(body)
             }).catch((error) => {
