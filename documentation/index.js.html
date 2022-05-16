@@ -41,7 +41,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
  * @class
  */
 
- class LeiaAPI {
+class LeiaAPI {
 
     /**
      * @param {string} serverURL  - a LeIA API server URL
@@ -63,12 +63,33 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
      */
 
     login(apiKey) {
-        const leiaAPIRequest = new LeiaAPIRequest(apiKey, this.serverURL)
+        const leiaAPIRequest = new LeiaAPIRequest(this.serverURL)
         var that = this
         return new Promise(function (resolve, reject) {
-            leiaAPIRequest.login().then((body) => {
+            leiaAPIRequest.login(apiKey).then((body) => {
                 that.leiaAPIRequest = leiaAPIRequest
-                resolve(new Application(body.application.id, body.application.creation_time, body.application.application_type, body.application.email, body.application.application_name, body.application.first_name, body.application.last_name, body.application.default_job_callback_url, body.application.job_counts, body.application.dedicated_workers, body.application.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.application.api_key))
+                if (that.autoRefreshToken) {
+                    that.whoAmiInterval = setInterval(() => {
+                        that.whoAmI()
+                    }, 600000)
+                }
+                resolve(new Application(body.application.id, body.application.creation_time, body.application.application_type, body.application.email, body.application.application_name, body.application.first_name, body.application.last_name, body.application.default_job_callback_url, body.application.job_counts, body.application.dedicated_workers, body.application.dedicated_workers_ttl, body.dedicated_workers_max_models, body.always_on_schedules, body.always_on_workers_model_ids, body.application.api_key))
+            }).catch((error) => {
+                reject(error)
+            })
+        })
+    }
+
+    whoAmI() {
+        var that = this
+        return new Promise(function (resolve, reject) {
+            if (!that.leiaAPIRequest) {
+                var error = new Error('You have to login before you can use any other method')
+                error.status = 401
+                return reject(error)
+            }
+            that.leiaAPIRequest.get(that.serverURL + '/whoami', true, true).then(() => {
+                resolve(null)
             }).catch((error) => {
                 reject(error)
             })
@@ -80,6 +101,9 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
      */
 
     logout() {
+        if (this.whoAmiInterval) {
+            clearInterval(this.whoAmiInterval)
+        }
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -190,12 +214,12 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/application' + offsetStr + limitStr + sortStr + applicationIdStr + emailStr + applicationNameStr + firstNameStr + lastNameStr + applicationTypeStr + createdAfterStr + createdBeforeStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/application' + offsetStr + limitStr + sortStr + applicationIdStr + emailStr + applicationNameStr + firstNameStr + lastNameStr + applicationTypeStr + createdAfterStr + createdBeforeStr, true, true).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var applications = []
                 for (var i = 0; i &lt; body.length; i++) {
-                    applications.push(new Application(body[i].id, body[i].creation_time, body[i].application_type, body[i].email, body[i].application_name, body[i].first_name, body[i].last_name, body[i].default_job_callback_url, body[i].job_counts, body[i].dedicated_workers, body[i].dedicated_workers_ttl, body[i].always_on_schedules, body[i].always_on_workers_model_ids, body[i].api_key))
+                    applications.push(new Application(body[i].id, body[i].creation_time, body[i].application_type, body[i].email, body[i].application_name, body[i].first_name, body[i].last_name, body[i].default_job_callback_url, body[i].job_counts, body[i].dedicated_workers, body[i].dedicated_workers_ttl, body[i].dedicated_workers_max_models, body[i].always_on_schedules, body[i].always_on_workers_model_ids, body[i].api_key))
                 }
                 resolve({ contentRange, applications })
             }).catch((error) => {
@@ -218,10 +242,13 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
     * @param {boolean} allowAllApplications (optional) - if true, all applications are allowed to access the model
     * @param {string[]} allowedApplicationIds (optional) - a list of application ids allowed to access the model
     * @param {string} shortName (optiona) - a short name
+    * @param {integer} cores (optional) - The number of CPU cores this model needs to run (If not given will use system defaults)
+    * @param {integer} memory (optional) - The memory in GB this model needs to run (If not given will use system defaults)
+    * @param {integer} alwaysOnWorkers (optional) - The number of always on workers to start for this model
     * @returns {Model}
     */
 
-    adminAddModel(applicationId, name, file, description = null, ttl = null, tags = null, allowAllApplications = null, allowedApplicationIds = null, shortName = null) {
+    adminAddModel(applicationId, name, file, description = null, ttl = null, tags = null, allowAllApplications = null, allowedApplicationIds = null, shortName = null, cores = null, memory = null, alwaysOnWorkers = null) {
         var that = this
         var tagsStr = ""
         var allowedApplicationIdsStr = ""
@@ -245,8 +272,11 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
             + (ttl !== null ? '&amp;ttl=' + ttl : '') 
             + tagsStr + (allowAllApplications !== null ? '&amp;allow_all_applications=' + allowAllApplications : '') 
             + allowedApplicationIdsStr
-            + (shortName ? "&amp;short_name=" + shortName : ''), file, true, that.autoRefreshToken).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format))
+            + (shortName ? "&amp;short_name=" + shortName : '')
+            + (cores !== null ? '&amp;cores=' + cores : '')
+            + (memory !== null ? '&amp;memory=' + memory : '')
+            + (alwaysOnWorkers !== null ? '&amp;always_on_workers=' + alwaysOnWorkers : ''), file, true).then((body) => {
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format, body.cores, body.memory, body.always_on_workers))
             }).catch((error) => {
                 reject(error)
             })
@@ -263,10 +293,11 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
     * @param {string} defaultJobCallbackUrl (optional) - a default job callback url
     * @param {boolean} dedicatedWorkers (optional) - determine whether or not an Application has dedicated workers
     * @param {integer} dedicatedWorkersTtl (optional) - TTL for an Application
+    * @param {integer} dedicatedWorkersMaxModels (optional) - Max number of models per dedicated worker
     * @returns {Application}
     */
 
-    adminAddApplication(email, applicationName, applicationType, firstname, lastname, defaultJobCallbackUrl = null, dedicatedWorkers = null, dedicatedWorkersTtl = null) {
+    adminAddApplication(email, applicationName, applicationType, firstname, lastname, defaultJobCallbackUrl = null, dedicatedWorkers = null, dedicatedWorkersTtl = null, dedicatedWorkersMaxModels = null) {
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -292,8 +323,12 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 application['dedicated_workers_ttl'] = dedicatedWorkersTtl
             }
 
-            that.leiaAPIRequest.post(that.serverURL + '/admin/application', application, true, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
+            if (dedicatedWorkersMaxModels !== null) {
+                application['dedicated_workers_max_models'] = dedicatedWorkersMaxModels
+            }
+
+            that.leiaAPIRequest.post(that.serverURL + '/admin/application', application, true).then((body) => {
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.dedicated_workers_max_models, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -314,8 +349,8 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/application/' + applicationId + '/reset_api_key', {}, true, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.api_key))
+            that.leiaAPIRequest.post(that.serverURL + '/admin/application/' + applicationId + '/reset_api_key', {}, true).then((body) => {
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.dedicated_workers_max_models, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -336,7 +371,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/model/' + modelId, true, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/model/' + modelId, true).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -353,6 +388,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
      * @param {string} defaultJobCallbackUrl (optional) - a default job callback url
      * @param {boolean} dedicatedWorkers (optional) - determine whether or not an Application has dedicated workers
      * @param {integer} dedicatedWorkersTtl (optional) - TTL for an Application
+     * @param {integer} dedicatedWorkersMaxModels (optional) - Max number of models per dedicated worker
      * @param {integer} alwaysOnNumber (optional) - number of always on workers
      * @param {integer[]} alwaysOnStartDays (optional) - list of days from 1 to 7
      * @param {integer} alwaysOnStartHour (optional) - an hour to start
@@ -363,7 +399,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
      * @returns {Application} an Application object
      */
 
-    adminUpdateApplication(applicationId, email, applicationName, firstname, lastname, defaultJobCallbackUrl = null, dedicatedWorkers = null, dedicatedWorkersTtl = null, alwaysOnNumber = null, alwaysOnStartDays = null, alwaysOnStartHour = null, alwaysOnStopHour = null, alwaysOnStartMinute = null, alwaysOnStopMinute = null, alwaysOnWorkersModelIds = null) {
+    adminUpdateApplication(applicationId, email, applicationName, firstname, lastname, defaultJobCallbackUrl = null, dedicatedWorkers = null, dedicatedWorkersTtl = null, dedicatedWorkersMaxModels = null, alwaysOnNumber = null, alwaysOnStartDays = null, alwaysOnStartHour = null, alwaysOnStopHour = null, alwaysOnStartMinute = null, alwaysOnStopMinute = null, alwaysOnWorkersModelIds = null) {
         var query = ""
         var firstChar = "?"
 
@@ -399,6 +435,11 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
 
         if (dedicatedWorkersTtl !== null) {
             query += firstChar + "dedicated_workers_ttl=" + dedicatedWorkersTtl.toString()
+            firstChar = "&amp;"
+        }
+
+        if (dedicatedWorkersMaxModels !== null) {
+            query += firstChar + "dedicated_workers_max_models=" + dedicatedWorkersMaxModels.toString()
             firstChar = "&amp;"
         }
         
@@ -444,8 +485,8 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.patch(that.serverURL + '/admin/application/' + applicationId + query, {}, true, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
+            that.leiaAPIRequest.patch(that.serverURL + '/admin/application/' + applicationId + query, {}, true).then((body) => {
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.dedicated_workers_max_models, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -463,10 +504,13 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
      * @param {boolean} allowAllApplications (optional) - if true, all applications are allowed to access the model
      * @param {string[]} allowedApplicationIds (optional) - a list of application ids allowed to access the model
      * @param {string} shortName (optional) - a short name
+     * @param {integer} cores (optional) - The number of CPU cores this model needs to run (If not given will use system defaults)
+     * @param {integer} memory (optional) - The memory in GB this model needs to run (If not given will use system defaults)
+     * @param {integer} alwaysOnWorkers (optional) - The number of always on workers to start for this model
      * @returns {Model}
      */
 
-    adminUpdateModel(applicationId, modelId, name = null, description = null, ttl = null, allowAllApplications = null, allowedApplicationIds = null, shortName = null) {
+    adminUpdateModel(applicationId, modelId, name = null, description = null, ttl = null, allowAllApplications = null, allowedApplicationIds = null, shortName = null, cores = null, memory = null, alwaysOnWorkers = null) {
         var query = ""
         var firstChar = "?"
         if (name !== null) {
@@ -502,6 +546,21 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
             firstChar = "&amp;"
         }
 
+        if (cores !== null) {
+            query += firstChar + "cores=" + cores
+            firstChar = "&amp;"
+        }
+
+        if (memory !== null) {
+            query += firstChar + "memory=" + memory
+            firstChar = "&amp;"
+        }
+
+        if (alwaysOnWorkers !== null) {
+            query += firstChar + "always_on_workers=" + alwaysOnWorkers
+            firstChar = "&amp;"
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -509,8 +568,8 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + query, {}, true, that.autoRefreshToken).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format))
+            that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + query, {}, true).then((body) => {
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format, body.cores, body.memory, body.always_on_workers))
             }).catch((error) => {
                 reject(error)
             })
@@ -530,7 +589,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/application/' + applicationId, true, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/application/' + applicationId, true).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -655,12 +714,12 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/admin/model' + offsetStr + limitStr + sortStr + applicationIdStr + modelIdStr + tagsStr + 
-               modelTypeStr + nameStr + descriptionStr + inputTypesStr + createdAfterStr + createdBeforeStr + shortNameStr + onlyMineStr, true, true, that.autoRefreshToken).then((result) => {
+               modelTypeStr + nameStr + descriptionStr + inputTypesStr + createdAfterStr + createdBeforeStr + shortNameStr + onlyMineStr, true, true).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var models = []
                 for (var i = 0; i &lt; body.length; i++) {
-                    models.push(new Model(body[i].id, body[i].creation_time, body[i].description, body[i].ttl, body[i].input_types, body[i].name, body[i].tags, body[i].model_type, body[i].allow_all_applications, body[i].allowed_application_ids, body[i].application_id, body[i].short_name, body[i].documentation, body[i].output_format))
+                    models.push(new Model(body[i].id, body[i].creation_time, body[i].description, body[i].ttl, body[i].input_types, body[i].name, body[i].tags, body[i].model_type, body[i].allow_all_applications, body[i].allowed_application_ids, body[i].application_id, body[i].short_name, body[i].documentation, body[i].output_format, body[i].cores, body[i].memory, body[i].always_on_workers))
                 }
                 resolve({ contentRange, models })
             }).catch((error) => {
@@ -781,12 +840,12 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/model' + offsetStr + limitStr + sortStr + modelIdStr + tagsStr + modelTypeStr + nameStr + descriptionStr + inputTypesStr + createdAfterStr + createdBeforeStr + shortNameStr + onlyMineStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/model' + offsetStr + limitStr + sortStr + modelIdStr + tagsStr + modelTypeStr + nameStr + descriptionStr + inputTypesStr + createdAfterStr + createdBeforeStr + shortNameStr + onlyMineStr, true, true).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var models = []
                 for (var i = 0; i &lt; body.length; i++) {
-                    models.push(new Model(body[i].id, body[i].creation_time, body[i].description, body[i].ttl, body[i].input_types, body[i].name, body[i].tags, body[i].model_type, body[i].allow_all_applications, body[i].allowed_application_ids, body[i].application_id, body[i].short_name, body[i].documentation, body[i].output_format))
+                    models.push(new Model(body[i].id, body[i].creation_time, body[i].description, body[i].ttl, body[i].input_types, body[i].name, body[i].tags, body[i].model_type, body[i].allow_all_applications, body[i].allowed_application_ids, body[i].application_id, body[i].short_name, body[i].documentation, body[i].output_format, body[i].cores, body[i].memory, body[i].always_on_workers))
                 }
                 resolve({ contentRange, models })
             }).catch((error) => {
@@ -813,8 +872,8 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/model/' + modelId, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format))
+            that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/model/' + modelId, true, false).then((body) => {
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format, body.cores, body.memory, body.always_on_workers))
             }).catch((error) => {
                 reject(error)
             })
@@ -836,7 +895,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.getFile(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/file_contents', false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.getFile(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/file_contents', false).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 reject(error)
@@ -858,8 +917,8 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/model/' + modelId, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format))
+            that.leiaAPIRequest.get(that.serverURL + '/model/' + modelId, true, false).then((body) => {
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format, body.cores, body.memory, body.always_on_workers))
             }).catch((error) => {
                 reject(error)
             })
@@ -881,8 +940,8 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/application/' + applicationId, true, false, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
+            that.leiaAPIRequest.get(that.serverURL + '/admin/application/' + applicationId, true, false).then((body) => {
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.dedicated_workers_max_models, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -904,8 +963,8 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/application/' + applicationId + '/always_on_schedules/' + scheduleId, true, that.autoRefreshToken).then((body) => {
-                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
+            that.leiaAPIRequest.del(that.serverURL + '/admin/application/' + applicationId + '/always_on_schedules/' + scheduleId, true).then((body) => {
+                resolve(new Application(body.id, body.creation_time, body.application_type, body.email, body.application_name, body.first_name, body.last_name, body.default_job_callback_url, body.job_counts, body.dedicated_workers, body.dedicated_workers_ttl, body.dedicated_workers_max_models, body.always_on_schedules, body.always_on_workers_model_ids, body.api_key))
             }).catch((error) => {
                 reject(error)
             })
@@ -942,7 +1001,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/document?filename=' + fileName + tagsStr + ttlStr, file, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.streamPost(that.serverURL + '/admin/' + applicationId + '/document?filename=' + fileName + tagsStr + ttlStr, file, true).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
@@ -979,7 +1038,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.streamPost(that.serverURL + '/document?filename=' + fileName + tagsStr + ttlStr, file, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.streamPost(that.serverURL + '/document?filename=' + fileName + tagsStr + ttlStr, file, true).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
@@ -1043,7 +1102,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentIdsString + '/transform/' + outputType + pageRangeStr + inputTagStr + outputTagStr + executeAfterIdStr + callbackUrlStr, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentIdsString + '/transform/' + outputType + pageRangeStr + inputTagStr + outputTagStr + executeAfterIdStr + callbackUrlStr, {}, true).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -1117,7 +1176,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentIdsString + '/transform/' + outputType + pageRangeStr + inputTagStr + outputTagStr + executeAfterIdStr + callbackUrlStr, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentIdsString + '/transform/' + outputType + pageRangeStr + inputTagStr + outputTagStr + executeAfterIdStr + callbackUrlStr, {}, true).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -1186,7 +1245,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + pageRangeStr + executeAfterIdStr + callbackUrlStr, modelParams ? modelParams : {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + pageRangeStr + executeAfterIdStr + callbackUrlStr, modelParams ? modelParams : {}, true).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -1254,7 +1313,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + pageRangeStr + executeAfterIdStr + callbackUrlStr, modelParams ? modelParams : {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/model/' + modelId + '/apply/' + documentIdsString + tagStr + pageRangeStr + executeAfterIdStr + callbackUrlStr, modelParams ? modelParams : {}, true).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -1288,7 +1347,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/document/' + documentId, false, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/document/' + documentId, false).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -1310,7 +1369,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/document/' + documentId, false, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/document/' + documentId, false).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -1334,7 +1393,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/tag/' + tag, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/tag/' + tag, {}, true).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format))
             }).catch((error) => {
                 reject(error)
@@ -1357,7 +1416,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/model/' + modelId + '/tag/' + tag, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/model/' + modelId + '/tag/' + tag, {}, true).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format))
             }).catch((error) => {
                 reject(error)
@@ -1381,7 +1440,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/tag/' + tag, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + '/tag/' + tag, true).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format))
             }).catch((error) => {
                 reject(error)
@@ -1404,7 +1463,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/model/' + modelId + '/tag/' + tag, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.del(that.serverURL + '/model/' + modelId + '/tag/' + tag, true).then((body) => {
                 resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format))
             }).catch((error) => {
                 reject(error)
@@ -1521,7 +1580,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/document' + offsetStr + limitStr + sortStr + applicationIdStr + tagResultStr + documentIdStr + tagsStr + filenameStr + extensionStr + mimeTypeStr + originalIdStr + createdAfterStr + createdBeforeStr, true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/document' + offsetStr + limitStr + sortStr + applicationIdStr + tagResultStr + documentIdStr + tagsStr + filenameStr + extensionStr + mimeTypeStr + originalIdStr + createdAfterStr + createdBeforeStr, true, true).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
@@ -1645,7 +1704,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
             }
 
             that.leiaAPIRequest.get(that.serverURL + '/document' + offsetStr + limitStr + sortStr + tagResultStr + documentIdStr + tagsStr +  
-             filenameStr + extensionStr + mimeTypeStr + originalIdStr + createdAfterStr + createdBeforeStr, true, true, that.autoRefreshToken).then((result) => {
+             filenameStr + extensionStr + mimeTypeStr + originalIdStr + createdAfterStr + createdBeforeStr, true, true).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var documents = []
@@ -1679,7 +1738,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/document/' + documentId, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/document/' + documentId, true, false).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
@@ -1701,7 +1760,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/document/' + documentId, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/document/' + documentId, true, false).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
@@ -1729,7 +1788,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.getFile(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/file_contents' + maxSizeStr, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.getFile(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/file_contents' + maxSizeStr, false).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 reject(error)
@@ -1756,7 +1815,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.getFile(that.serverURL + '/document/' + documentId + '/file_contents' + maxSizeStr, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.getFile(that.serverURL + '/document/' + documentId + '/file_contents' + maxSizeStr, false).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 reject(error)
@@ -1784,7 +1843,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/document/tag' + applicationIdStr, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/document/tag' + applicationIdStr, true, false).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 if (error.status == 404) {
@@ -1808,7 +1867,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/document/tag', true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/document/tag', true, false).then((body) => {
                 resolve(body)
             }).catch((error) => {
                 if (error.status == 404) {
@@ -1835,7 +1894,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/tag/' + tag, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/tag/' + tag, {}, true).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
@@ -1859,7 +1918,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/tag/' + tag, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + '/tag/' + tag, true).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
@@ -1882,7 +1941,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentId + '/tag/' + tag, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/document/' + documentId + '/tag/' + tag, {}, true).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
@@ -1906,7 +1965,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/document/' + documentId + '/tag/' + tag, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.del(that.serverURL + '/document/' + documentId + '/tag/' + tag, true).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
@@ -1945,7 +2004,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + filenameStr + rotationAngleStr, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/document/' + documentId + filenameStr + rotationAngleStr, {}, true).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
             }).catch((error) => {
                 reject(error)
@@ -1983,7 +2042,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.patch(that.serverURL + '/document/' + documentId + filenameStr + rotationAngleStr, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.patch(that.serverURL + '/document/' + documentId + filenameStr + rotationAngleStr, {}, true).then((body) => {
                 resolve(new Document(body.id, body.creation_time, body.application_id, body.filename, body.extension, body.original_id, body.mime_type, body.rotation_angle, body.tags, body.size, body.expiration_time))
                 resolve(document)
             }).catch((error) => {
@@ -2071,7 +2130,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/annotation' + offsetStr + limitStr + annotationIdStr + tagsStr + annotationTypeStr + nameStr + documentIdStr + createdAfterStr + createdBeforeStr , true, true, that.autoRefreshToken).then((result) => {
+            that.leiaAPIRequest.get(that.serverURL + '/annotation' + offsetStr + limitStr + annotationIdStr + tagsStr + annotationTypeStr + nameStr + documentIdStr + createdAfterStr + createdBeforeStr , true, true).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var annotations = []
@@ -2104,7 +2163,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/annotation/' + annotationId, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/annotation/' + annotationId, true, false).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -2126,7 +2185,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/annotation/' + annotationId, true, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/annotation/' + annotationId, true).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -2149,7 +2208,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/annotation/' + annotationId + '/tag/' + tag, {}, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/annotation/' + annotationId + '/tag/' + tag, {}, true).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -2173,7 +2232,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/annotation/' + annotationId + '/tag/' + tag, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.del(that.serverURL + '/annotation/' + annotationId + '/tag/' + tag, true).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -2206,7 +2265,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.post(that.serverURL + '/annotation/' + documentId + '?annotation_type=' + annotationType + (name ? ('&amp;name=' + name) : '') + tagsStr, prediction, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.post(that.serverURL + '/annotation/' + documentId + '?annotation_type=' + annotationType + (name ? ('&amp;name=' + name) : '') + tagsStr, prediction, true).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -2239,7 +2298,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.patch(that.serverURL + '/annotation/' + annotationId + nameStr, prediction, true, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.patch(that.serverURL + '/annotation/' + annotationId + nameStr, prediction, true).then((body) => {
                 resolve(new Annotation(body.id, body.creation_time, body.annotation_type, body.application_id, body.document_id, body.name, body.prediction,
                     body.tags))
             }).catch((error) => {
@@ -2367,7 +2426,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/admin/job' + offsetStr + limitStr + sortStr + jobIdStr + submitterIdStr + applicationIdStr 
-            + jobTypeStr + modelIdStr + documentIdStr + executeAfterIdStr + parentJobIdStr + statusStr + createdAfterStr + createdBeforeStr, true, true, that.autoRefreshToken).then((result) => {
+            + jobTypeStr + modelIdStr + documentIdStr + executeAfterIdStr + parentJobIdStr + statusStr + createdAfterStr + createdBeforeStr, true, true).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var jobs = []
@@ -2411,7 +2470,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/admin/' + submitterId + '/job/' + jobId, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/admin/' + submitterId + '/job/' + jobId, true, false).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -2445,7 +2504,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/admin/' + submitterId + '/job/' + jobId, true, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/admin/' + submitterId + '/job/' + jobId, true).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -2565,7 +2624,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/job' + offsetStr + limitStr + sortStr + jobIdStr + applicationIdStr + jobTypeStr + modelIdStr
-             + documentIdStr + executeAfterIdStr + parentJobIdStr + statusStr + createdAfterStr + createdBeforeStr, true, true, that.autoRefreshToken).then((result) => {
+             + documentIdStr + executeAfterIdStr + parentJobIdStr + statusStr + createdAfterStr + createdBeforeStr, true, true).then((result) => {
                 var body = result.body
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var jobs = []
@@ -2608,7 +2667,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/job/' + jobId, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/job/' + jobId, true, false).then((body) => {
                 var result = body.result
                 if (result !== null) {
                     if (body.result_type === 'document') {
@@ -2641,7 +2700,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.del(that.serverURL + '/job/' + jobId, true, that.autoRefreshToken).then(() => {
+            that.leiaAPIRequest.del(that.serverURL + '/job/' + jobId, true).then(() => {
                 resolve()
             }).catch((error) => {
                 reject(error)
@@ -2663,7 +2722,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/worker', true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/worker', true, false).then((body) => {
                 var workers = []
                 for (var i = 0; i &lt; body.length; i++) {
                     workers.push(new Worker(body[i].job_type, body[i].number, body[i].statuses))
@@ -2692,7 +2751,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
                 error.status = 401
                 return reject(error)
             }
-            that.leiaAPIRequest.get(that.serverURL + '/worker/' + jobType, true, false, that.autoRefreshToken).then((body) => {
+            that.leiaAPIRequest.get(that.serverURL + '/worker/' + jobType, true, false).then((body) => {
                 resolve(new Worker(body.job_type, body.number, body.statuses))
 
             }).catch((error) => {
@@ -2724,7 +2783,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.2</a> on Thu May 07 2020 15:27:19 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon May 16 2022 17:03:01 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

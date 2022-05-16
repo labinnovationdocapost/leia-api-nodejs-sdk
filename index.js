@@ -13,7 +13,7 @@ var { pythonizeParams, extractContentRangeInfo } = require('./utils/format-utils
  * @class
  */
 
-module.exports = class LeiaAPI {
+ module.exports = class LeiaAPI {
 
     /**
      * @param {string} serverURL  - a LeIA API server URL
@@ -214,10 +214,13 @@ module.exports = class LeiaAPI {
     * @param {boolean} allowAllApplications (optional) - if true, all applications are allowed to access the model
     * @param {string[]} allowedApplicationIds (optional) - a list of application ids allowed to access the model
     * @param {string} shortName (optiona) - a short name
+    * @param {integer} cores (optional) - The number of CPU cores this model needs to run (If not given will use system defaults)
+    * @param {integer} memory (optional) - The memory in GB this model needs to run (If not given will use system defaults)
+    * @param {integer} alwaysOnWorkers (optional) - The number of always on workers to start for this model
     * @returns {Model}
     */
 
-    adminAddModel(applicationId, name, file, description = null, ttl = null, tags = null, allowAllApplications = null, allowedApplicationIds = null, shortName = null) {
+    adminAddModel(applicationId, name, file, description = null, ttl = null, tags = null, allowAllApplications = null, allowedApplicationIds = null, shortName = null, cores = null, memory = null, alwaysOnWorkers = null) {
         var that = this
         var tagsStr = ""
         var allowedApplicationIdsStr = ""
@@ -241,8 +244,11 @@ module.exports = class LeiaAPI {
             + (ttl !== null ? '&ttl=' + ttl : '') 
             + tagsStr + (allowAllApplications !== null ? '&allow_all_applications=' + allowAllApplications : '') 
             + allowedApplicationIdsStr
-            + (shortName ? "&short_name=" + shortName : ''), file, true).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format))
+            + (shortName ? "&short_name=" + shortName : '')
+            + (cores !== null ? '&cores=' + cores : '')
+            + (memory !== null ? '&memory=' + memory : '')
+            + (alwaysOnWorkers !== null ? '&always_on_workers=' + alwaysOnWorkers : ''), file, true).then((body) => {
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format, body.cores, body.memory, body.always_on_workers))
             }).catch((error) => {
                 reject(error)
             })
@@ -470,10 +476,13 @@ module.exports = class LeiaAPI {
      * @param {boolean} allowAllApplications (optional) - if true, all applications are allowed to access the model
      * @param {string[]} allowedApplicationIds (optional) - a list of application ids allowed to access the model
      * @param {string} shortName (optional) - a short name
+     * @param {integer} cores (optional) - The number of CPU cores this model needs to run (If not given will use system defaults)
+     * @param {integer} memory (optional) - The memory in GB this model needs to run (If not given will use system defaults)
+     * @param {integer} alwaysOnWorkers (optional) - The number of always on workers to start for this model
      * @returns {Model}
      */
 
-    adminUpdateModel(applicationId, modelId, name = null, description = null, ttl = null, allowAllApplications = null, allowedApplicationIds = null, shortName = null) {
+    adminUpdateModel(applicationId, modelId, name = null, description = null, ttl = null, allowAllApplications = null, allowedApplicationIds = null, shortName = null, cores = null, memory = null, alwaysOnWorkers = null) {
         var query = ""
         var firstChar = "?"
         if (name !== null) {
@@ -509,6 +518,21 @@ module.exports = class LeiaAPI {
             firstChar = "&"
         }
 
+        if (cores !== null) {
+            query += firstChar + "cores=" + cores
+            firstChar = "&"
+        }
+
+        if (memory !== null) {
+            query += firstChar + "memory=" + memory
+            firstChar = "&"
+        }
+
+        if (alwaysOnWorkers !== null) {
+            query += firstChar + "always_on_workers=" + alwaysOnWorkers
+            firstChar = "&"
+        }
+
         var that = this
         return new Promise(function (resolve, reject) {
             if (!that.leiaAPIRequest) {
@@ -517,7 +541,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.patch(that.serverURL + '/admin/' + applicationId + '/model/' + modelId + query, {}, true).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format))
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format, body.cores, body.memory, body.always_on_workers))
             }).catch((error) => {
                 reject(error)
             })
@@ -667,7 +691,7 @@ module.exports = class LeiaAPI {
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var models = []
                 for (var i = 0; i < body.length; i++) {
-                    models.push(new Model(body[i].id, body[i].creation_time, body[i].description, body[i].ttl, body[i].input_types, body[i].name, body[i].tags, body[i].model_type, body[i].allow_all_applications, body[i].allowed_application_ids, body[i].application_id, body[i].short_name, body[i].documentation, body[i].output_format))
+                    models.push(new Model(body[i].id, body[i].creation_time, body[i].description, body[i].ttl, body[i].input_types, body[i].name, body[i].tags, body[i].model_type, body[i].allow_all_applications, body[i].allowed_application_ids, body[i].application_id, body[i].short_name, body[i].documentation, body[i].output_format, body[i].cores, body[i].memory, body[i].always_on_workers))
                 }
                 resolve({ contentRange, models })
             }).catch((error) => {
@@ -793,7 +817,7 @@ module.exports = class LeiaAPI {
                 var contentRange = extractContentRangeInfo(result.contentRange)
                 var models = []
                 for (var i = 0; i < body.length; i++) {
-                    models.push(new Model(body[i].id, body[i].creation_time, body[i].description, body[i].ttl, body[i].input_types, body[i].name, body[i].tags, body[i].model_type, body[i].allow_all_applications, body[i].allowed_application_ids, body[i].application_id, body[i].short_name, body[i].documentation, body[i].output_format))
+                    models.push(new Model(body[i].id, body[i].creation_time, body[i].description, body[i].ttl, body[i].input_types, body[i].name, body[i].tags, body[i].model_type, body[i].allow_all_applications, body[i].allowed_application_ids, body[i].application_id, body[i].short_name, body[i].documentation, body[i].output_format, body[i].cores, body[i].memory, body[i].always_on_workers))
                 }
                 resolve({ contentRange, models })
             }).catch((error) => {
@@ -821,7 +845,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/admin/' + applicationId + '/model/' + modelId, true, false).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format))
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format, body.cores, body.memory, body.always_on_workers))
             }).catch((error) => {
                 reject(error)
             })
@@ -866,7 +890,7 @@ module.exports = class LeiaAPI {
                 return reject(error)
             }
             that.leiaAPIRequest.get(that.serverURL + '/model/' + modelId, true, false).then((body) => {
-                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format))
+                resolve(new Model(body.id, body.creation_time, body.description, body.ttl, body.input_types, body.name, body.tags, body.model_type, body.allow_all_applications, body.allowed_application_ids, body.application_id, body.short_name, body.documentation, body.output_format, body.cores, body.memory, body.always_on_workers))
             }).catch((error) => {
                 reject(error)
             })

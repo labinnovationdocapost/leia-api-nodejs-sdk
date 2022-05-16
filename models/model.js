@@ -15,8 +15,11 @@ module.exports = class Model {
      * @param {string} shortName
      * @param {string} documentation
      * @param {object} outputFormat
+     * @param {integer} cores
+     * @param {integer} memory
+     * @param {integer} alwaysOnWorkers
      */
-    constructor(id, creationTime, description, ttl, inputTypes, name, tags, modelType, allowAllApplications, allowedApplicationIds, applicationId, shortName, documentation, outputFormat) {
+    constructor(id, creationTime, description, ttl, inputTypes, name, tags, modelType, allowAllApplications, allowedApplicationIds, applicationId, shortName, documentation, outputFormat, cores, memory, alwaysOnWorkers) {
         this.id = id
         this.creationTime = creationTime
         this.description = description
@@ -31,5 +34,8 @@ module.exports = class Model {
         this.shortName = shortName
         this.documentation = documentation
         this.outputFormat = outputFormat
+        this.cores = cores
+        this.memory = memory
+        this.alwaysOnWorkers = alwaysOnWorkers
     }
 }
